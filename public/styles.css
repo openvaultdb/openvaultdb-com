@@ -378,7 +378,9 @@ section { position: relative; padding: 90px 0; }
 }
 .spec-band p { color: var(--text-soft); max-width: 60ch; margin: 16px auto 0; font-size: 17.5px; }
 .spec-band strong { color: var(--brass); font-weight: 700; }
-.spec-band .btn { margin-top: 28px; }
+.spec-link { border-bottom: 2px solid var(--brass-bright); transition: border-color .2s var(--ease); }
+.spec-link:hover { border-color: var(--brass); }
+.spec-band .actions { margin-top: 28px; display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
 
 /* ---------- CTA ---------- */
 .cta { text-align: center; }
