@@ -255,6 +255,8 @@ section { position: relative; padding: 90px 0; }
 .vaulttree pre { margin: 0; white-space: pre; color: var(--text-soft); line-height: 1.9; overflow-x: auto; }
 .vaulttree pre b { color: var(--navy); font-weight: 700; }
 .vaulttree pre .ns { color: var(--brass); font-weight: 600; }
+.vaulttree pre a.ns { text-decoration: none; border-bottom: 1px solid var(--brass-bright); }
+.vaulttree pre a.ns:hover { color: var(--brass-deep); border-color: var(--brass); }
 
 /* ---------- Feature grid ---------- */
 .features { background: var(--band); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
