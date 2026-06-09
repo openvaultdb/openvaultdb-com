@@ -359,6 +359,27 @@ section { position: relative; padding: 90px 0; }
 .scope-col li:last-child { border-bottom: 0; }
 .scope-col.later li { color: var(--muted); }
 
+/* ---------- Defined in the open ---------- */
+.spec { padding-top: 0; }
+.spec-band {
+  text-align: center;
+  border: 1px solid var(--line);
+  border-top: 3px solid var(--brass);
+  border-radius: var(--r);
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  padding: 52px 32px;
+}
+.spec-band .eyebrow { justify-content: center; }
+.spec-band h2 {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(26px, 3.6vw, 38px); letter-spacing: -.02em; color: var(--navy);
+  margin: 16px 0 0;
+}
+.spec-band p { color: var(--text-soft); max-width: 60ch; margin: 16px auto 0; font-size: 17.5px; }
+.spec-band strong { color: var(--brass); font-weight: 700; }
+.spec-band .btn { margin-top: 28px; }
+
 /* ---------- CTA ---------- */
 .cta { text-align: center; }
 .cta .panel {
