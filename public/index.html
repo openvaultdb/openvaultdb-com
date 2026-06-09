@@ -1,0 +1,377 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OpenVaultDB — User-owned application databases</title>
+  <meta name="description" content="OpenVaultDB is an open protocol and platform for user-owned application databases. Applications don't own your data — you do, and you grant them access." />
+  <meta name="theme-color" content="#0c0e0d" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="OpenVaultDB — User-owned application databases" />
+  <meta property="og:description" content="An open protocol for user-owned databases. Apps store data in your vault, in namespaces they own — but the vault is yours." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://openvaultdb.com" />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="#top" aria-label="OpenVaultDB home">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <rect x="2.5" y="2.5" width="27" height="27" rx="6" stroke="#16293b" stroke-width="1.7"/>
+          <circle cx="16" cy="16" r="8.5" stroke="#16293b" stroke-width="1.7"/>
+          <circle cx="16" cy="16" r="3" fill="#a9741f"/>
+          <path d="M16 16l4.6 4.6M16 7.5v-2M16 24.5v2M7.5 16h-2M24.5 16h2" stroke="#a9741f" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+        <b>Open<span>Vault</span>DB</b>
+      </a>
+
+      <nav class="nav" id="nav">
+        <a href="#principle">Principle</a>
+        <a href="#features">Capabilities</a>
+        <a href="#architecture">Architecture</a>
+        <a href="#ecosystem">Ecosystem</a>
+        <a href="#scope">Roadmap</a>
+        <a class="ghost" href="https://github.com/openvaultdb" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="status-pill reveal d1"><span class="dot"></span> Open protocol · early proposal</span>
+        <h1 class="reveal d2">Applications don't own<br>your data. <em>You do.</em></h1>
+        <p class="lead reveal d3">
+          OpenVaultDB is an open protocol and platform for user-owned application
+          databases. Apps connect to <em>your</em> vault and store data in namespaces
+          they manage — but the vault, and everything in it, belongs to you.
+        </p>
+        <div class="actions reveal d4">
+          <a class="btn btn-primary" href="https://github.com/openvaultdb" rel="noopener">
+            Read the concept
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="#architecture">See the architecture</a>
+        </div>
+      </div>
+
+      <div class="vault reveal d3" aria-hidden="true">
+        <svg viewBox="0 0 500 500" fill="none">
+          <defs>
+            <radialGradient id="vg" cx="50%" cy="40%" r="62%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="100%" stop-color="#eef0f2"/>
+            </radialGradient>
+          </defs>
+          <circle cx="250" cy="250" r="240" fill="url(#vg)" stroke="#cdd4da" stroke-width="2"/>
+          <circle cx="250" cy="250" r="206" stroke="#dde1e5" stroke-width="1.5"/>
+          <!-- spinning outer dial -->
+          <g class="ring-spin">
+            <circle cx="250" cy="250" r="184" stroke="#c89a45" stroke-width="2.5" stroke-dasharray="3 14"/>
+            <circle cx="250" cy="66" r="5" fill="#a9741f"/>
+          </g>
+          <!-- bolts ring -->
+          <g class="ring-spin-rev">
+            <circle cx="250" cy="250" r="150" stroke="#16293b" stroke-width="1.5"/>
+            <g fill="#a9741f">
+              <circle cx="250" cy="100" r="4"/><circle cx="400" cy="250" r="4"/>
+              <circle cx="250" cy="400" r="4"/><circle cx="100" cy="250" r="4"/>
+              <circle cx="356" cy="144" r="3"/><circle cx="356" cy="356" r="3"/>
+              <circle cx="144" cy="356" r="3"/><circle cx="144" cy="144" r="3"/>
+            </g>
+          </g>
+          <!-- handle / keyhole -->
+          <circle cx="250" cy="250" r="92" fill="#ffffff" stroke="#16293b" stroke-width="2"/>
+          <g stroke="#a9741f" stroke-width="6" stroke-linecap="round">
+            <path d="M250 196v108M196 250h108"/>
+            <path d="M213 213l74 74M287 213l-74 74" stroke-width="4" opacity=".5"/>
+          </g>
+          <circle cx="250" cy="250" r="20" fill="#16293b"/>
+          <circle cx="250" cy="250" r="9" fill="#c89a45"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <div class="wrap"><div class="divider"></div></div>
+
+  <!-- ============ PRINCIPLE ============ -->
+  <section class="principle" id="principle">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">The core principle</span>
+        <blockquote>
+          Applications do not own user data. Users own their data and
+          <span>grant applications permission</span> to access it.
+        </blockquote>
+        <p>
+          You decide where the vault lives — your laptop, a home server, a VPS,
+          OpenVaultDB-hosted infrastructure, or your own cloud account. Each
+          application gets an isolated namespace it fully controls: it creates
+          its own schema, owns its migrations, and manages its own data lifecycle.
+          No global data model. No lock-in.
+        </p>
+      </div>
+
+      <div class="vaulttree" role="img" aria-label="Example of a user vault containing application namespaces">
+        <div class="top"><i></i> user vault</div>
+<pre><b>your-vault</b>
+├── <span class="ns">app.sneat.app</span>
+│     ├── schema  v3
+│     └── records
+├── <span class="ns">app.togethered.app</span>
+│     ├── schema  v1
+│     └── records
+└── <span class="ns">app.example.com</span>
+      ├── schema  v7
+      └── records</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CAPABILITIES ============ -->
+  <section class="features" id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">What the protocol gives you</span>
+        <h2>Ownership, portability, and a full audit trail — by design.</h2>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>User-owned data</h3>
+          <p>You own the OpenVaultDB instance. Applications receive credentials and scoped permissions — never the keys to your data.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M4 9h16M9 9v11" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          <h3>Application namespaces</h3>
+          <p>Each app gets an isolated area to create, alter, and delete its own schema and data. Apps own their migrations and versioning.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3z" stroke="currentColor" stroke-width="1.6"/><path d="M4 7v10c0 1.7 3.6 3 8 3s8-1.3 8-3V7M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          <h3>Bring your own storage</h3>
+          <p>Self-host, use a managed tier, or plug in your own Firestore, Postgres, SQLite or cloud DB through DALgo storage adapters.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.6" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="18" r="2.6" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="12" r="2.6" stroke="currentColor" stroke-width="1.6"/><path d="M6 8.6v6.8M8.4 7.2l7.4 3.6M8.4 16.8l7.4-3.6" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          <h3>Git-backed history</h3>
+          <p>The reference engine, inGitDB, versions every change — commit history, audit trail, and the ability to revert a record, table, or the whole vault.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="15" r="1.6" fill="currentColor"/></svg></div>
+          <h3>Layered encryption</h3>
+          <p>Encryption follows the deployment model. On third-party hosts, row-level encryption keeps contents unreadable to the provider by default.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="19" cy="18" r="2.4" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          <h3>Portable query API</h3>
+          <p>DTQL exposes only portable functionality across every backend — so queries that work on Git work on Postgres, SQLite, or Firestore too.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ARCHITECTURE ============ -->
+  <section class="arch" id="architecture">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">How it fits together</span>
+        <h2 style="font-family:var(--font-display);font-weight:360;font-size:clamp(30px,4.4vw,50px);letter-spacing:-.02em;line-height:1.05;margin:16px 0 18px;">One protocol, many backends.</h2>
+        <p style="color:var(--text-dim);margin:0 0 22px;">
+          OpenVaultDB defines the protocol and APIs. Queries flow through DTQL into
+          DALgo, the data abstraction layer, which maps them onto whichever storage
+          adapter you've chosen. The reference path writes Git-friendly INGR.io files
+          into a Git repository.
+        </p>
+        <div class="adapters">
+          <span>inGitDB</span><span>SQLite</span><span>PostgreSQL</span><span>Firestore</span>
+          <span class="future">DynamoDB · soon</span><span class="future">Cosmos DB · soon</span><span class="future">S3 · soon</span>
+        </div>
+      </div>
+
+      <div class="stack" aria-label="OpenVaultDB architecture stack, top to bottom">
+        <div class="layer"><span class="name">Application</span><span class="role">requests &amp; permissions</span></div>
+        <div class="connector"></div>
+        <div class="layer accent"><span class="name">OpenVaultDB</span><span class="role">protocol &amp; APIs</span></div>
+        <div class="connector"></div>
+        <div class="layer"><span class="name">DTQL</span><span class="role">portable query language</span></div>
+        <div class="connector"></div>
+        <div class="layer"><span class="name">DALgo</span><span class="role">data abstraction layer</span></div>
+        <div class="connector"></div>
+        <div class="layer"><span class="name">Storage adapter</span><span class="role">inGitDB · SQLite · Postgres · Firestore</span></div>
+        <div class="connector"></div>
+        <div class="layer"><span class="name">INGR.io → Git</span><span class="role">versioned, diff-friendly storage</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ECOSYSTEM ============ -->
+  <section class="ecosystem" id="ecosystem">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">The ecosystem</span>
+        <h2>A small family of focused, composable parts.</h2>
+      </div>
+
+      <div class="eco-list">
+        <div class="eco"><span class="tag">DTQL</span><div><h4><a href="https://dtql.org/" rel="noopener">Query language <span class="arr">↗</span></a></h4><p>The primary API. A portable query and mutation language built on DALgo capabilities — intentionally not full SQL.</p></div></div>
+        <div class="eco"><span class="tag">DALgo</span><div><h4><a href="https://dal-go.github.io/" rel="noopener">Data abstraction layer <span class="arr">↗</span></a></h4><p>Maps portable queries onto backend providers, so one query model spans many databases.</p></div></div>
+        <div class="eco"><span class="tag">inGitDB</span><div><h4><a href="https://ingitdb.com/" rel="noopener">Git-backed engine <span class="arr">↗</span></a></h4><p>The reference storage engine. Auditable history, easy rollback, and versioned data on top of Git.</p></div></div>
+        <div class="eco"><span class="tag">INGR.io</span><div><h4><a href="https://ingr.io/" rel="noopener">Storage format <span class="arr">↗</span></a></h4><p>A Git-friendly structured format designed for clean diffs, merges, and conflict resolution.</p></div></div>
+        <div class="eco"><span class="tag">DataTug</span><div><h4><a href="https://datatug.io" rel="noopener">Data explorer <span class="arr">↗</span></a></h4><p>A generic browser and CLI for inspecting OpenVaultDB data — see exactly what each app stores.</p></div></div>
+        <div class="eco"><span class="tag">Vault</span><div><h4>Your instance</h4><p>Self-hosted, OpenVaultDB-hosted, or your own cloud. The single place your data lives — under your control.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ROADMAP / SCOPE ============ -->
+  <section class="scope" id="scope">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">MVP scope</span>
+        <h2>Honest about what's in, what's next, and what's later.</h2>
+        <p>OpenVaultDB is an early proposal. Here's how the first milestone is scoped.</p>
+      </div>
+
+      <div class="scope-cols">
+        <div class="scope-col now">
+          <h4><i></i> In the MVP</h4>
+          <ul>
+            <li>Authentication &amp; token exchange</li>
+            <li>App namespaces</li>
+            <li>Schema management</li>
+            <li>DTQL &amp; CRUD operations</li>
+            <li>DALgo integration</li>
+            <li>inGitDB backend</li>
+            <li>Version history</li>
+            <li>Basic web UI</li>
+            <li>DataTug integration</li>
+            <li>Self-hosting</li>
+          </ul>
+        </div>
+        <div class="scope-col maybe">
+          <h4><i></i> Possibly included</h4>
+          <ul>
+            <li>SQLite backend</li>
+            <li>PostgreSQL backend</li>
+            <li>Firestore backend</li>
+          </ul>
+        </div>
+        <div class="scope-col later">
+          <h4><i></i> Deferred</h4>
+          <ul>
+            <li>Advanced GraphQL</li>
+            <li>Complex joins</li>
+            <li>Stored procedures</li>
+            <li>Cross-app querying</li>
+            <li>Full federation</li>
+            <li>Advanced sharing model</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="cta">
+    <div class="wrap">
+      <div class="panel">
+        <span class="eyebrow" style="justify-content:center;">Get involved</span>
+        <h2>Help define the protocol for user-owned data.</h2>
+        <p>OpenVaultDB is open and in the open. Read the architecture notes, weigh in on the open questions, or follow along as the specification takes shape.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="https://github.com/openvaultdb" rel="noopener">
+            View on GitHub
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="https://datatug.io" rel="noopener">Explore DataTug ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <div>
+        <span class="brand">
+          <svg viewBox="0 0 32 32" fill="none" aria-hidden="true" style="width:26px;height:26px;">
+            <rect x="2.5" y="2.5" width="27" height="27" rx="6" stroke="#c9a45c" stroke-width="1.5"/>
+            <circle cx="16" cy="16" r="8.5" stroke="#e7c684" stroke-width="1.5"/>
+            <circle cx="16" cy="16" r="3" fill="#c9a45c"/>
+          </svg>
+          <b>Open<span style="color:var(--brass)">Vault</span>DB</b>
+        </span>
+        <p>An open protocol for user-owned application databases. Your data, your vault, your rules.</p>
+      </div>
+
+      <div class="foot-links">
+        <div class="foot-col">
+          <h5>Protocol</h5>
+          <a href="#principle">Principle</a>
+          <a href="#features">Capabilities</a>
+          <a href="#architecture">Architecture</a>
+          <a href="#scope">Roadmap</a>
+        </div>
+        <div class="foot-col">
+          <h5>Ecosystem</h5>
+          <a href="https://dtql.org/" rel="noopener">DTQL ↗</a>
+          <a href="https://dal-go.github.io/" rel="noopener">DALgo ↗</a>
+          <a href="https://ingr.io/" rel="noopener">INGR.io ↗</a>
+          <a href="https://ingitdb.com/" rel="noopener">inGitDB ↗</a>
+          <a href="https://datatug.io" rel="noopener">DataTug ↗</a>
+        </div>
+        <div class="foot-col">
+          <h5>Project</h5>
+          <a href="https://github.com/openvaultdb" rel="noopener">GitHub ↗</a>
+          <a href="https://github.com/openvaultdb" rel="noopener">Open questions ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="legal">
+        <span>© 2026 OpenVaultDB · Apache-2.0</span>
+        <span>Early proposal — subject to change</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile nav toggle — the only JS this page needs.
+    var t = document.getElementById('navToggle');
+    var n = document.getElementById('nav');
+    t.addEventListener('click', function () {
+      var open = n.classList.toggle('open');
+      t.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    n.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') { n.classList.remove('open'); t.setAttribute('aria-expanded', 'false'); }
+    });
+  </script>
+</body>
+</html>
