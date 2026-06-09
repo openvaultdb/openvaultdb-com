@@ -19,32 +19,19 @@ Learn more at https://openvaultdb.com
 └── infrastructure/ Deployment and infrastructure configuration
 ```
 
-## Development
-
-```bash
-npm install
-npm run dev
-```
-
-## Build
-
-```bash
-npm run build
-```
-
 ## Deployment
 
-Changes pushed to the main branch are automatically deployed to the OpenVaultDB website.
+Changes pushed to the `main` branch are automatically deployed to the OpenVaultDB website.
 
 ## Related Projects
 
 - OpenVaultDB — Protocol and platform
-- DTQL — Query language
-- DALGO — Data abstraction layer
-- InGitDB — Git-backed storage engine
-- Ingrio — Git-friendly storage format
-- DataTug — Data explorer and administration tools
+- [DTQL](https://dtql.org) — Query language
+- [DALgo](https://dalgo.io) — Data abstraction layer
+- [inGitDB](https://ingitdb.com) — Git-backed storage engine
+- [INGR.io](https://ingr.io) — Git-friendly storage format
+- [DataTug](https://datatug.io) — Data explorer and administration tools
 
 ## License
 
-See LICENSE file for details.
+See [LICENSE](LICENSE) file for details.
