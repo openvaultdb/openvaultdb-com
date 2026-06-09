@@ -290,6 +290,41 @@ section { position: relative; padding: 90px 0; }
 .card h3 { font-family: var(--font-display); font-weight: 700; font-size: 20px; margin: 0 0 8px; letter-spacing: -.01em; color: var(--navy); }
 .card p { margin: 0; color: var(--text-soft); font-size: 15.5px; }
 
+/* ---------- Serverless mode ---------- */
+.serverless { background: var(--band); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.serverless .wrap { display: grid; grid-template-columns: 1fr .9fr; gap: 56px; align-items: center; }
+.sl-title {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: clamp(28px, 4vw, 44px); line-height: 1.08; letter-spacing: -.02em;
+  color: var(--navy); margin: 16px 0 0;
+}
+.sl-lead { color: var(--text-soft); margin: 18px 0 0; font-size: 18px; }
+.sl-points { list-style: none; margin: 22px 0 0; padding: 0; }
+.sl-points li { position: relative; padding: 8px 0 8px 28px; color: var(--text-soft); font-weight: 500; }
+.sl-points li::before {
+  content: ""; position: absolute; left: 0; top: 14px;
+  width: 12px; height: 12px; border: 2px solid var(--brass); border-radius: 3px;
+}
+.sl-note {
+  margin: 24px 0 0; padding: 14px 18px;
+  border-left: 3px solid var(--brass-bright);
+  background: var(--surface); border-radius: 0 8px 8px 0;
+  color: var(--muted); font-size: 15px;
+}
+.sl-flow { display: flex; flex-direction: column; align-items: stretch; }
+.sl-node {
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface);
+  box-shadow: var(--shadow); padding: 22px 24px; display: flex; flex-direction: column; gap: 5px;
+}
+.sl-node.accent { border-color: var(--brass-bright); background: linear-gradient(180deg, #fff, #fdf7ec); }
+.sl-k { font-family: var(--font-display); font-weight: 700; color: var(--navy); font-size: 18px; }
+.sl-node.accent .sl-k { color: var(--brass-deep); }
+.sl-v { font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); }
+.sl-arrow {
+  align-self: center; font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em;
+  color: var(--brass); padding: 14px 0;
+}
+
 /* ---------- Architecture stack ---------- */
 .arch .wrap { display: grid; grid-template-columns: .95fr 1.05fr; gap: 56px; align-items: center; }
 .stack { display: flex; flex-direction: column; gap: 10px; }
@@ -439,7 +474,7 @@ section { position: relative; padding: 90px 0; }
 @media (max-width: 940px) {
   .hero .wrap { grid-template-columns: 1fr; }
   .vault { order: -1; max-width: 300px; margin: 0 auto; }
-  .principle .wrap, .arch .wrap { grid-template-columns: 1fr; gap: 38px; }
+  .principle .wrap, .arch .wrap, .serverless .wrap { grid-template-columns: 1fr; gap: 38px; }
   .grid, .scope-cols { grid-template-columns: 1fr 1fr; }
   .eco-list { grid-template-columns: 1fr; }
 }

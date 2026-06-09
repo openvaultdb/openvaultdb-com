@@ -194,6 +194,44 @@
     </div>
   </section>
 
+  <!-- ============ SERVERLESS ============ -->
+  <section class="serverless">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">No server required</span>
+        <h2 class="sl-title">Your browser writes straight to your own Git repo.</h2>
+        <p class="sl-lead">
+          In serverless mode there's no backend to run. Sign in with GitHub —
+          openvaultdb.com handles the OAuth flow — and the app reads and writes
+          your data directly from the browser to a repository you own. inGitDB
+          and INGR.io keep every change a clean, mergeable commit.
+        </p>
+        <ul class="sl-points">
+          <li>No backend to run — OpenVaultDB handles GitHub sign-in</li>
+          <li>Private repos for private data, public repos for public data</li>
+          <li>Your data lives in a repo you control — clone it anywhere</li>
+        </ul>
+        <p class="sl-note">
+          Best for personal use and rarely-changing data. Need write throughput
+          or scale? Run inGitDB on a server, or use a cloud database or RDBMS
+          through DALgo — the right instrument for the job.
+        </p>
+      </div>
+
+      <div class="sl-flow" aria-label="Serverless data flow: browser to your GitHub repository">
+        <div class="sl-node">
+          <span class="sl-k">Your browser</span>
+          <span class="sl-v">app + DTQL</span>
+        </div>
+        <div class="sl-arrow">GitHub API ↓</div>
+        <div class="sl-node accent">
+          <span class="sl-k">Your GitHub repository</span>
+          <span class="sl-v">private or public · inGitDB / INGR.io</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ============ ARCHITECTURE ============ -->
   <section class="arch" id="architecture">
     <div class="wrap">
