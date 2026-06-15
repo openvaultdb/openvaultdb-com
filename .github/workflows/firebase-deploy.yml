@@ -1,8 +1,8 @@
 name: Deploy to Firebase Hosting
 
-# Static site — no build step. Publishes public/ to the live channel on push to
-# main. Auth is keyless via Workload Identity Federation (no service-account
-# key, per the org policy that disables SA keys).
+# Static site — no build step. Publishes public/ (hosting) and firestore.rules
+# to the live project on push to main. Auth is keyless via Workload Identity
+# Federation (no service-account key, per the org policy that disables SA keys).
 on:
   push:
     branches: [main]
@@ -28,5 +28,5 @@ jobs:
         with:
           node-version: 20
 
-      - name: Deploy to Firebase Hosting (live)
-        run: npx --yes firebase-tools@latest deploy --only hosting --project openvaultdb --non-interactive
+      - name: Deploy Firebase Hosting + Firestore rules (live)
+        run: npx --yes firebase-tools@latest deploy --only hosting,firestore:rules --project openvaultdb --non-interactive
