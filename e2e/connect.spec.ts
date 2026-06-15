@@ -35,7 +35,7 @@ test("manual path: route through OVDB Connect, enter server + vault", async ({ p
   await expect(page.getByText("todo-demo.openvaultdb.app").first()).toBeVisible();
 
   await page.locator("[data-manual-url]").fill(OVDB);
-  await page.locator("[data-manual-vault]").fill("local");
+  await page.locator("[data-manual-vault]").fill("personal");
   await page.locator("[data-manual-go]").click();
 
   await approveConsent(page);
@@ -69,11 +69,11 @@ test("registered path: sign in and pick a wallet vault", async ({ page }) => {
         {
           id: "v1",
           kind: "server",
-          name: "Local Vault",
+          name: "Personal",
           hostName: "Local OVDB",
           baseUrl: "http://localhost:8088",
           ownerToken: "seed-token",
-          vaultId: "local",
+          vaultId: "personal",
           backend: "ingit",
         },
       ]),

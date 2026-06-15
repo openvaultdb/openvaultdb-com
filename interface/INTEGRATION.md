@@ -24,8 +24,9 @@ cobra root command. The server is a subcommand, e.g. `ovdb-server serve --port 8
 
 ## Seed data (server creates on first run)
 
-- Vault: `{ id: "local", name: "Local Vault", backend: "ingit" }`
-- Namespace: `todo-demo.openvaultdb.app/openvaultdb/todos`
+- Vaults (3 defaults, records isolated per vault): `personal` (Personal),
+  `family` (Family), `work` (Work) — each `backend: "ingit"`.
+- Namespace (shared across vaults): `todo-demo.openvaultdb.app/openvaultdb/todos`
   - owner: `todo-demo.openvaultdb.app`
   - collections: `["tasks"]`
 - Namespace manifest roles:

@@ -88,34 +88,56 @@ async function connectHost() {
     return;
   }
   result.innerHTML = `
-    <p class="hint">Pick a vault on <strong>${escapeHtml(hostName)}</strong>.</p>
-    <div class="repo-list">
+    <p class="hint">Select the vaults to add from <strong>${escapeHtml(hostName)}</strong>.</p>
+    <div class="vault-checks">
       ${vaults
         .map(
           (v) => `
-        <button class="repo-item" type="button" data-pick-vault="${escapeHtml(v.id)}" data-vault-name="${escapeHtml(v.name)}" data-vault-backend="${escapeHtml(v.backend || "")}">
+        <label class="vault-check">
+          <input type="checkbox" checked data-vault-check value="${escapeHtml(v.id)}"
+            data-vault-name="${escapeHtml(v.name)}" data-vault-backend="${escapeHtml(v.backend || "")}" />
           <span class="repo-name">${escapeHtml(v.name)}</span>
           <span class="ov-tag">${escapeHtml(v.backend || "vault")}</span>
           <span class="ov-id">${escapeHtml(v.id)}</span>
-        </button>`,
+        </label>`,
         )
         .join("")}
-    </div>`;
-  result.querySelectorAll("[data-pick-vault]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const added = addVault({
+    </div>
+    <button class="btn-add" type="button" data-add-selected>Add vault</button>`;
+
+  // Multi-select: all checked by default; the button text reflects the count and
+  // disables when nothing is selected.
+  const checks = [...result.querySelectorAll("[data-vault-check]")];
+  const addBtn = result.querySelector("[data-add-selected]");
+  function refreshAddBtn() {
+    const n = checks.filter((c) => c.checked).length;
+    addBtn.disabled = n === 0;
+    addBtn.textContent = n > 1 ? `Add ${n} vaults` : "Add vault";
+  }
+  checks.forEach((c) => c.addEventListener("change", refreshAddBtn));
+  refreshAddBtn();
+
+  addBtn.addEventListener("click", () => {
+    const selected = checks.filter((c) => c.checked);
+    if (!selected.length) return;
+    let added = 0;
+    let dup = 0;
+    for (const c of selected) {
+      const ok = addVault({
         kind: "server",
-        name: btn.dataset.vaultName,
+        name: c.dataset.vaultName,
         hostName,
         baseUrl,
         ownerToken,
-        vaultId: btn.dataset.pickVault,
-        backend: btn.dataset.vaultBackend,
+        vaultId: c.value,
+        backend: c.dataset.vaultBackend,
       });
-      addv.hidden = true;
-      render();
-      if (!added) flash("That vault is already in your wallet.");
-    });
+      if (ok) added++;
+      else dup++;
+    }
+    addv.hidden = true;
+    render();
+    if (dup) flash(`Added ${added} vault${added === 1 ? "" : "s"}; ${dup} already in your wallet.`);
   });
 }
 
