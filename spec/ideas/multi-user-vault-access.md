@@ -1,14 +1,14 @@
 ---
 format: https://specscore.md/idea-specification
-status: Approved
+status: Specifying
 ---
 
 # Idea: Multi-User Vault Access
 
-**Status:** Approved
+**Status:** Specifying
 **Date:** 2026-06-15
 **Owner:** alexandertrakhimenok
-**Promotes To:** —
+**Promotes To:** multi-user-vault-access
 **Supersedes:** —
 **Related Ideas:** —
 
