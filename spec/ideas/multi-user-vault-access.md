@@ -1,6 +1,6 @@
 ---
 format: https://specscore.md/idea-specification
-status: Specifying
+status: Specified
 ---
 
 # Idea: Multi-User Vault Access
