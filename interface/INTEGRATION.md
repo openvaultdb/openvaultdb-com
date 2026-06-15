@@ -109,7 +109,9 @@ touches vault data; it only forwards the request to the chosen server's `/author
 
 ## Wallet (openvaultdb-com)
 
-- Stores vault/server pointers client-side (localStorage is fine for this milestone).
+- Stores the user's vault pointers in Firestore under `/users/{uid}/vaults`
+  (owner-only access; see `firestore.rules`). Requires sign-in; vault DATA is
+  never stored here, only pointers.
 - GitHub repo vault: list the signed-in user's private repos via the GitHub REST
   API using the GitHub OAuth access token obtained at Firebase GitHub sign-in.
   - The token is captured in `public/js/auth-ui.js`: GitHub sign-in requests the

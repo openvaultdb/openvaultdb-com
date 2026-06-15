@@ -1,0 +1,20 @@
+rules_version = '2';
+
+// The wallet's vault directory. Each user owns the documents under
+// /users/{uid}/vaults and may create, read, update, and delete only their own.
+// Nothing else is reachable by a client. Vault DATA never lives here — these
+// are only pointers (host URL, owner token, vault id).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{userId}/vaults/{vaultId} {
+      allow read, create, update, delete:
+        if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Everything else is closed to client access.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

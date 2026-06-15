@@ -1,4 +1,5 @@
 import { test, expect, type Page } from "@playwright/test";
+import { readFileSync } from "fs";
 
 // The flow under test:
 //   demo frontend → demo backend /connect → OVDB Connect (wallet) → vault
@@ -25,11 +26,7 @@ async function expectConnectedAndAddTask(page: Page, title: string) {
 }
 
 test("manual path: route through OVDB Connect, enter server + vault", async ({ page }) => {
-  // Sanity-check the frontend's Connect entry point.
-  await page.goto(FRONTEND);
-  await expect(page.getByRole("button", { name: "Connect your vault" })).toBeVisible();
-
-  // Drive the flow (the button just navigates to the backend's /connect).
+  // Drive the flow (the frontend's Connect button just navigates here).
   await page.goto(DEMO_CONNECT);
   await page.waitForURL(/localhost:8787\/connect/);
   await expect(page.getByText("todo-demo.openvaultdb.app").first()).toBeVisible();
@@ -48,8 +45,9 @@ test("manual path: route through OVDB Connect, enter server + vault", async ({ p
   await expect(page.getByText(title)).toBeVisible();
 });
 
-test("registered path: sign in and pick a wallet vault", async ({ page }) => {
+test("registered path: sign in, add a host vault, pick it", async ({ page }) => {
   const email = `e2e-${Date.now()}@example.com`;
+  const ownerToken = readFileSync("./.e2e-data/ovdb/owner-token", "utf8").trim();
 
   // 1. Sign up against the Auth emulator on the wallet origin.
   await page.goto(WALLET + "/");
@@ -61,24 +59,17 @@ test("registered path: sign in and pick a wallet vault", async ({ page }) => {
   await page.waitForURL(/localhost:8787\/my\/vaults/);
   await expect(page.locator(".user-chip")).toBeVisible();
 
-  // 2. Seed a registered server-vault pointer in the wallet.
-  await page.evaluate(() => {
-    localStorage.setItem(
-      "ovdb_vaults",
-      JSON.stringify([
-        {
-          id: "v1",
-          kind: "server",
-          name: "Personal",
-          hostName: "Local OVDB",
-          baseUrl: "http://localhost:8088",
-          ownerToken: "seed-token",
-          vaultId: "personal",
-          backend: "ingit",
-        },
-      ]),
-    );
-  });
+  // 2. Add a vault on the OpenVaultDB host — this writes to Firestore
+  //    (/users/{uid}/vaults). Keep only "Personal".
+  await page.locator("[data-add-vault]").click();
+  await page.locator("[data-host-url]").fill(OVDB);
+  await page.locator("[data-host-token]").fill(ownerToken);
+  await page.locator("[data-host-connect]").click();
+  await page.locator('[data-vault-check][value="family"]').uncheck();
+  await page.locator('[data-vault-check][value="work"]').uncheck();
+  await page.locator("[data-add-selected]").click();
+  // The vault list (read back from Firestore) shows the added vault row.
+  await expect(page.locator(".ov-row .ov-name", { hasText: "Personal" })).toBeVisible();
 
   // 3. Start the connect flow; OVDB Connect should offer the registered vault.
   await page.goto(DEMO_CONNECT);

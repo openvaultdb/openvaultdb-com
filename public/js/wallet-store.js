@@ -1,49 +1,46 @@
-// Wallet store: client-side vault pointers for the local-host demo milestone.
-// No backend — everything lives in localStorage. A vault carries its own host
-// details (base URL + owner token), so there is no separate "servers" store —
-// see Decision 0003 (Host / Vault / Namespace Model).
+// Wallet store: the user's vault directory, held in Firestore under
+// /users/{uid}/vaults — one document per vault pointer, owned by the signed-in
+// user (rules in firestore.rules). A vault carries its own host details (base
+// URL + owner token); there is no separate "servers" store. Vault DATA never
+// lives here — only pointers. See Decision 0003 (Host / Vault / Namespace Model).
 // The OVDB wire contract is interface/main.tsp.
+import { auth, db } from "./firebase-init.js";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  doc,
+} from "https://www.gstatic.com/firebasejs/12.14.0/firebase-firestore.js";
 
-const VAULTS_KEY = "ovdb_vaults"; // [{ id, kind, ... }]
 const GH_TOKEN_KEY = "gh_access_token"; // GitHub OAuth token (sessionStorage)
-
-// ---- generic helpers -----------------------------------------------------
-function readList(key) {
-  try {
-    const raw = localStorage.getItem(key);
-    const val = raw ? JSON.parse(raw) : [];
-    return Array.isArray(val) ? val : [];
-  } catch {
-    return [];
-  }
-}
-function writeList(key, list) {
-  localStorage.setItem(key, JSON.stringify(list));
-}
-function uid() {
-  return (
-    Date.now().toString(36) + Math.random().toString(36).slice(2, 8)
-  );
-}
 
 // Normalize a base URL: trim, drop trailing slashes.
 export function normalizeBaseUrl(input) {
   return String(input || "").trim().replace(/\/+$/, "");
 }
 
-// ---- vault pointers ------------------------------------------------------
+// ---- vault pointers (Firestore: /users/{uid}/vaults) ---------------------
 // A vault lives on a host. Two kinds:
-//   kind: "github" -> { id, kind, name, fullName, htmlUrl, private }
+//   kind: "github" -> { kind, name, fullName, htmlUrl, private }
 //        (host = a Git host; the repo is the vault)
-//   kind: "server" -> { id, kind, name, hostName, baseUrl, ownerToken, vaultId, backend }
+//   kind: "server" -> { kind, name, hostName, baseUrl, ownerToken, vaultId, backend }
 //        (host = an OpenVaultDB host; one host may back several vaults)
-export function getVaults() {
-  return readList(VAULTS_KEY);
+function vaultsCollection() {
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if (!uid) throw new OvdbError("Sign in to manage your vaults.");
+  return collection(db, "users", uid, "vaults");
 }
-export function addVault(vault) {
-  const vaults = getVaults();
+
+export async function getVaults() {
+  const snap = await getDocs(vaultsCollection());
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+export async function addVault(vault) {
   // De-dupe github repos by fullName; server vaults by host baseUrl + vaultId.
-  const isDup = vaults.some((v) =>
+  const existing = await getVaults();
+  const isDup = existing.some((v) =>
     v.kind === "github" && vault.kind === "github"
       ? v.fullName === vault.fullName
       : v.kind === "server" &&
@@ -52,15 +49,14 @@ export function addVault(vault) {
         v.vaultId === vault.vaultId,
   );
   if (isDup) return null;
-  const entry = { id: uid(), ...vault };
-  writeList(VAULTS_KEY, [...vaults, entry]);
-  return entry;
+  const ref = await addDoc(vaultsCollection(), vault);
+  return { id: ref.id, ...vault };
 }
-export function removeVault(id) {
-  writeList(
-    VAULTS_KEY,
-    getVaults().filter((v) => v.id !== id),
-  );
+
+export async function removeVault(id) {
+  const uid = auth.currentUser && auth.currentUser.uid;
+  if (!uid) throw new OvdbError("Sign in to manage your vaults.");
+  await deleteDoc(doc(db, "users", uid, "vaults", id));
 }
 
 // ---- GitHub OAuth token --------------------------------------------------

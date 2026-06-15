@@ -13,6 +13,8 @@ import {
   normalizeBaseUrl,
 } from "./wallet-store.js";
 import { requestGithubToken } from "./auth-ui.js";
+import { auth } from "./firebase-init.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 
 const $ = (sel) => document.querySelector(sel);
 const listEl = $("[data-vault-list]");
@@ -117,13 +119,14 @@ async function connectHost() {
   checks.forEach((c) => c.addEventListener("change", refreshAddBtn));
   refreshAddBtn();
 
-  addBtn.addEventListener("click", () => {
+  addBtn.addEventListener("click", async () => {
     const selected = checks.filter((c) => c.checked);
     if (!selected.length) return;
+    addBtn.disabled = true;
     let added = 0;
     let dup = 0;
     for (const c of selected) {
-      const ok = addVault({
+      const ok = await addVault({
         kind: "server",
         name: c.dataset.vaultName,
         hostName,
@@ -136,7 +139,7 @@ async function connectHost() {
       else dup++;
     }
     addv.hidden = true;
-    render();
+    await render();
     if (dup) flash(`Added ${added} vault${added === 1 ? "" : "s"}; ${dup} already in your wallet.`);
   });
 }
@@ -232,8 +235,14 @@ async function pickRepos(mode) {
 }
 
 // ---- list (flat; host shown as an attribute, namespaces read-only) -------
-function render() {
-  const vaults = getVaults();
+async function render() {
+  let vaults;
+  try {
+    vaults = await getVaults();
+  } catch {
+    listEl.innerHTML = '<div class="area-empty">Sign in to see your vaults.</div>';
+    return;
+  }
   if (!vaults.length) {
     listEl.innerHTML =
       '<div class="area-empty">No vaults yet. Use "Add vault" to connect an OpenVaultDB host or a GitHub repo.</div>';
@@ -289,11 +298,11 @@ async function loadNamespaces(vault) {
   }
 }
 
-listEl.addEventListener("click", (e) => {
+listEl.addEventListener("click", async (e) => {
   const rm = e.target.closest("[data-remove]");
   if (rm && confirm("Remove this vault from your wallet?")) {
-    removeVault(rm.dataset.remove);
-    render();
+    await removeVault(rm.dataset.remove);
+    await render();
   }
 });
 
@@ -301,4 +310,8 @@ function flash(msg) {
   alert(msg);
 }
 
-render();
+// The directory is per-user (Firestore): render once we know who is signed in.
+onAuthStateChanged(auth, (user) => {
+  if (user) render();
+  else listEl.innerHTML = '<div class="area-empty">Sign in to see your vaults.</div>';
+});

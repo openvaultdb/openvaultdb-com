@@ -41,7 +41,7 @@ export default defineConfig({
       timeout: 120_000,
     },
     {
-      command: "firebase emulators:start --only hosting,auth --project openvaultdb",
+      command: "firebase emulators:start --only hosting,auth,firestore --project openvaultdb",
       cwd: `${REPO}/openvaultdb-com`,
       url: "http://localhost:8787",
       reuseExistingServer: !process.env.CI,

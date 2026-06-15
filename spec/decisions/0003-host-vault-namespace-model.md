@@ -87,6 +87,10 @@ not the box it sits on. Rejected in favor of a vault-centric "My Vaults".
   (repository) vaults require reading the repo directly and follow later.
 - Specs and `/docs` copy adopt "host" for the user-facing top level; existing
   "vault server" / "server vault" phrasing is reconciled to "OpenVaultDB host".
+- The vault directory is held per-user in Firestore at `/users/{uid}/vaults`
+  (owner-only rules in `firestore.rules`), so it requires sign-in. Pointers only
+  — vault data never lives in Firestore. The signed-out manual Connect path is
+  unaffected.
 
 ## Observed Consequences
 

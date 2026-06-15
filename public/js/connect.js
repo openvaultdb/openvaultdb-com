@@ -6,6 +6,8 @@
 // that server's /authorize, where the user grants consent. OVDB never sees the
 // vault's data — it only forwards the request.
 import { getVaults, fetchServerInfo, normalizeBaseUrl, OvdbError } from "./wallet-store.js";
+import { auth } from "./firebase-init.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.14.0/firebase-auth.js";
 
 const $ = (sel) => document.querySelector(sel);
 
@@ -36,7 +38,11 @@ if (missing.length) {
     <dt>App</dt><dd><code>${escapeHtml(req.clientId)}</code></dd>
     <dt>Namespace</dt><dd><code>${escapeHtml(req.namespaceId)}</code></dd>
     <dt>Role</dt><dd><code>${escapeHtml(req.role)}</code></dd>`;
-  renderVaults();
+  // The registered-vault list is per-user (Firestore); load it once signed in.
+  // The manual path needs no account and is wired immediately.
+  onAuthStateChanged(auth, (user) => {
+    if (user) renderVaults();
+  });
   wireManual();
 }
 
@@ -66,9 +72,10 @@ async function proceed(baseUrl, vaultId, onError) {
 }
 
 // ---- primary path: registered vaults -------------------------------------
-function renderVaults() {
+async function renderVaults() {
   const target = $("[data-connect-vaults]");
-  const vaults = getVaults().filter((v) => v.kind === "server");
+  const all = await getVaults().catch(() => []);
+  const vaults = all.filter((v) => v.kind === "server");
   if (!vaults.length) {
     target.innerHTML =
       '<p class="hint">No vaults on an OpenVaultDB host in your wallet yet. <a href="/my/vaults">Add one</a>, or use the manual connection below.</p>';
