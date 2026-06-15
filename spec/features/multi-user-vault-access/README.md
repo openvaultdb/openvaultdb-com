@@ -1,11 +1,11 @@
 ---
 format: https://specscore.md/feature-specification
-status: Under Review
+status: Approved
 ---
 # Feature: Multi-User Vault Access
 
 > [SpecScore.**Studio**](https://specscore.studio): | [Explore](https://specscore.studio/app/github.com/openvaultdb/openvaultdb-com/spec/features/multi-user-vault-access?op=explore) | [Edit](https://specscore.studio/app/github.com/openvaultdb/openvaultdb-com/spec/features/multi-user-vault-access?op=edit) | [Ask question](https://specscore.studio/app/github.com/openvaultdb/openvaultdb-com/spec/features/multi-user-vault-access?op=ask) | [Request change](https://specscore.studio/app/github.com/openvaultdb/openvaultdb-com/spec/features/multi-user-vault-access?op=request-change) |
-**Status:** Under Review
+**Status:** Approved
 **Source Ideas:** multi-user-vault-access
 
 ## Summary

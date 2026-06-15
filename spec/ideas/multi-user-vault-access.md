@@ -5,7 +5,7 @@ status: Specifying
 
 # Idea: Multi-User Vault Access
 
-**Status:** Specifying
+**Status:** Specified
 **Date:** 2026-06-15
 **Owner:** alexandertrakhimenok
 **Promotes To:** multi-user-vault-access
