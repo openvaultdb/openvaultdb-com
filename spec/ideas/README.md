@@ -10,7 +10,7 @@ Pre-spec one-pagers. Each Idea is a lint-clean problem-direction-MVP one-pager t
 
 | Idea | Status | Date | Owner | Promotes To |
 |------|--------|------|-------|-------------|
-| [multi-user-vault-access](multi-user-vault-access.md) | Draft | 2026-06-15 | alexandertrakhimenok | — |
+| [multi-user-vault-access](multi-user-vault-access.md) | Approved | 2026-06-15 | alexandertrakhimenok | — |
 | [shared-namespaces](shared-namespaces.md) | Specifying | 2026-06-15 | alexandertrakhimenok | shared-namespaces |
 | [user-owned-auth](user-owned-auth.md) | Specifying | 2026-06-15 | alexandertrakhimenok | authentication-model |
 
