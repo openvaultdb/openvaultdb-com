@@ -54,8 +54,8 @@ user's vault data.
 #### REQ: vault-registration-manual
 
 The system MUST allow a user to add a GitHub-backed vault by entering an
-`[org/repo]` pointer (or a server vault URL) without signing in to GitHub; the
-stored pointer MAY be unverified, since OVDB never accesses the vault's data.
+`[org/repo]` pointer (or an OpenVaultDB host URL) without signing in to GitHub;
+the stored pointer MAY be unverified, since OVDB never accesses the vault's data.
 
 #### REQ: vault-registration-picker
 
@@ -69,8 +69,8 @@ enumerate repositories and then discarded, with only a pointer retained.
 
 The vault MUST be the authority that authenticates the user and issues the app's
 data token; OpenVaultDB MUST NOT mint or broker that token in any mode. For a
-server vault, OVDB Connect MAY route the app to the vault's authorize endpoint
-and then leave the data path.
+vault on an OpenVaultDB host, OVDB Connect MAY route the app to the host's
+authorize endpoint and then leave the data path.
 
 #### REQ: serverless-app-token
 
@@ -83,8 +83,8 @@ backendless app MUST use the personal-access-token path.
 #### REQ: cloud-needs-server
 
 A user-owned raw cloud backend (e.g. Firestore, DynamoDB) MUST be fronted by an
-OpenVaultDB vault server that exposes the authorize/token endpoint; the system
-MUST NOT require cloud credentials to be held in the browser.
+OpenVaultDB host that exposes the authorize/token endpoint; the system MUST NOT
+require cloud credentials to be held in the browser.
 
 ### App identity
 
@@ -149,7 +149,7 @@ rejected.
 
 ### AC: vault-mints-token (verifies REQ:vault-is-authority)
 
-**Given** a self-hosted vault server
+**Given** a self-hosted OpenVaultDB host
 **When** an app completes the Connect flow
 **Then** the access token is issued by the vault and OVDB Connect is absent from the subsequent data path.
 
@@ -169,7 +169,7 @@ rejected.
 
 **Given** a user-owned Firestore backend
 **When** the user attempts to connect an app
-**Then** the flow requires an OpenVaultDB vault server in front and never exposes cloud credentials to the browser.
+**Then** the flow requires an OpenVaultDB host in front and never exposes cloud credentials to the browser.
 
 ### AC: namespace-derived-from-domain (verifies REQ:domain-identity)
 

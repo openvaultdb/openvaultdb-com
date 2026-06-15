@@ -45,12 +45,14 @@ app's data token, how an app proves its identity, and — given GitHub-backed
 | 1 | Wallet login | User → openvaultdb.com | Any (email, Google, GitHub, passkey…) | Never |
 | 2 | Owner login | App owner → openvaultdb.com | Any (optional; not a registry) | Never |
 | 3 | Vault registration | Adding a vault to the wallet | Wallet login for the entry; GitHub optional, only to list repos | Never |
-| 4 | App data access | User → the vault authority | Vault server · app's own GitHub OAuth/App · user PAT | This **is** the app's token |
+| 4 | App data access | User → the vault authority | OpenVaultDB host · app's own GitHub OAuth/App · user PAT | This **is** the app's token |
 
-Surface 3 has two paths: **manual** — type `[org/repo]` (or a server URL), no
-GitHub auth, pointer stored unverified; and **picker** — an optional "Sign in
-with GitHub" that lists the user's orgs/repos, then discards the token and keeps
-only a pointer.
+Surface 3 has two paths: **manual** — type `[org/repo]` (or an OpenVaultDB host
+URL), no GitHub auth, pointer stored unverified; and **picker** — an optional
+"Sign in with GitHub" that lists the user's orgs/repos, then discards the token
+and keeps only a pointer. The wallet exposes this through a single **My Vaults**
+tab; see Decision 0003 (Host / Vault / Namespace Model) for the terminology and
+information architecture.
 
 ## Rationale
 
@@ -101,8 +103,8 @@ the first conflicts with "optional," the second is unusable.
   - Apps should prefer a **GitHub App** over a classic OAuth App for **per-repo**
     scoping (`repository_id` / selected-repo install) — true least privilege.
 - **User-owned cloud:** raw cloud DBs have no namespace/consent concept, so this
-  mode requires a vault server in front (reducing to the self-hosted case).
-- Each server vault must implement (or be fronted by) an OAuth-style
+  mode requires an OpenVaultDB host in front (reducing to the self-hosted case).
+- Each OpenVaultDB host must implement (or be fronted by) an OAuth-style
   authorize/token endpoint.
 - App owners must control a domain and host a manifest — a small barrier, but it
   removes any central registration step.

@@ -10,18 +10,20 @@ status: Draft
 
 ## Summary
 
-The first end-to-end milestone: a user registers vaults (a private GitHub repo
-and a private OVDB server on localhost), browses the vaults a server hosts, and
-connects a demo to-do app to a vault on the local server via the connect flow.
-The frontend (wallet) lives in openvaultdb-com, the server in openvaultdb-go, the
-demo app in openvaultdb-todo-demo. The frontend↔server wire contract is the
-TypeSpec at `interface/main.tsp`.
+The first end-to-end milestone: from **My Vaults**, a user adds vaults backed by
+two host kinds (a private GitHub repository, and a local OpenVaultDB host on
+localhost), browses the vaults a host holds, and connects a demo to-do app to a
+vault on the local host via the connect flow. The frontend (wallet) lives in
+openvaultdb-com, the OpenVaultDB server in openvaultdb-go, the demo app in
+openvaultdb-todo-demo. The frontend↔server wire contract is the TypeSpec at
+`interface/main.tsp`. Terminology follows Decision 0003 (Host / Vault /
+Namespace): "host" is the user-facing term; "server" stays at the wire layer.
 
 ## Problem
 
 OpenVaultDB has specs but no working path a user can touch. This milestone proves
-the core loop — register a vault, see what a server holds, and let an app
-read/write data in a vault through the connect flow.
+the core loop — add a vault, see what a host holds, and let an app read/write
+data in a vault through the connect flow.
 
 ## Behavior
 
@@ -29,31 +31,33 @@ read/write data in a vault through the connect flow.
 
 #### REQ: register-github-repo-vault
 
-The wallet MUST let a user register a private GitHub repository as a vault by
-choosing it from a list loaded via the GitHub API (repos the signed-in user can
-access), storing it as a pointer in the user's wallet.
+The wallet MUST let a user add a private GitHub repository as a vault (the
+repository's host is a Git host) by choosing it from a list loaded via the GitHub
+API (repos the signed-in user can access), storing it as a pointer in the user's
+wallet.
 
 #### REQ: register-ovdb-server
 
-The wallet MUST provide a `/my/servers` page where a user registers a private
-OVDB server by base URL (localhost for now); the wallet MUST validate the server
-by fetching `GET /.well-known/openvaultdb` (per `interface/main.tsp`) before
-saving it.
+From the **My Vaults** add-vault flow (`/my/vaults`), the wallet MUST let a user
+add a private OpenVaultDB host by base URL (localhost for now); the wallet MUST
+validate the host by fetching `GET /.well-known/openvaultdb` (per
+`interface/main.tsp`) before saving it. There is no separate `/my/servers` tab
+(Decision 0003).
 
 ### Vault discovery
 
 #### REQ: list-server-vaults
 
-For a registered OVDB server, the wallet MUST list the vaults the server hosts by
-calling `GET /vaults` with the owner token, and MUST let the user drill into a
+For a registered OpenVaultDB host, the wallet MUST list the vaults the host holds
+by calling `GET /vaults` with the owner token, and MUST let the user drill into a
 vault's namespaces (`GET /vaults/{vaultId}/namespaces`).
 
 ### App connect
 
 #### REQ: connect-demo-app
 
-The demo to-do app MUST obtain access to a namespace on a vault hosted by the
-local OVDB server via the connect flow (`GET /authorize` → consent →
+The demo to-do app MUST obtain access to a namespace on a vault on the local
+OpenVaultDB host via the connect flow (`GET /authorize` → consent →
 `POST /token` → scoped token), then read and write its to-do records through the
 data endpoints, limited to its granted scope.
 
@@ -73,19 +77,19 @@ endpoints); the contract is the single source of truth for the wire format.
 
 ### AC: register-and-validate-server (verifies REQ:register-ovdb-server)
 
-**Given** a local OVDB server running at `http://localhost:8088`
-**When** the user enters that URL on `/my/servers`
-**Then** the wallet fetches `/.well-known/openvaultdb`, shows the server identity, and saves the server on success (and rejects an unreachable/invalid URL).
+**Given** a local OpenVaultDB host running at `http://localhost:8088`
+**When** the user enters that URL in the add-vault flow on `/my/vaults`
+**Then** the wallet fetches `/.well-known/openvaultdb`, shows the host identity, and saves the host on success (and rejects an unreachable/invalid URL).
 
 ### AC: list-vaults-and-namespaces (verifies REQ:list-server-vaults)
 
-**Given** a registered local OVDB server hosting at least one vault
-**When** the user opens that server in the wallet
+**Given** a registered local OpenVaultDB host holding at least one vault
+**When** the user opens that host in the wallet
 **Then** the wallet shows the vaults from `GET /vaults` and the namespaces of a selected vault.
 
 ### AC: demo-app-connects-and-writes (verifies REQ:connect-demo-app)
 
-**Given** the demo to-do app and a vault on the local server
+**Given** the demo to-do app and a vault on the local OpenVaultDB host
 **When** the user completes the connect flow and grants the app a namespace
 **Then** the app receives a scoped token and can create, list, update, and delete to-do records within that namespace.
 
