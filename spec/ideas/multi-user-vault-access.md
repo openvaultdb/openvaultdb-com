@@ -1,11 +1,11 @@
 ---
 format: https://specscore.md/idea-specification
-status: Draft
+status: Approved
 ---
 
 # Idea: Multi-User Vault Access
 
-**Status:** Draft
+**Status:** Approved
 **Date:** 2026-06-15
 **Owner:** alexandertrakhimenok
 **Promotes To:** —
