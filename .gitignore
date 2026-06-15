@@ -145,3 +145,8 @@ vite.config.ts.timestamp-*
 # brainstorming visual companion artifacts
 .superpowers/
 specscore.local.yaml
+
+# TypeSpec interface build
+interface/node_modules/
+interface/generated/
+interface/package-lock.json

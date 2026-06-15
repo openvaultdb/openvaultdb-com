@@ -1,0 +1,16 @@
+{
+  "name": "openvaultdb-interface",
+  "version": "0.0.1",
+  "private": true,
+  "description": "TypeSpec contract for the OpenVaultDB local server HTTP API (frontend <-> backend).",
+  "type": "module",
+  "scripts": {
+    "build": "tsp compile .",
+    "watch": "tsp compile . --watch"
+  },
+  "dependencies": {
+    "@typespec/compiler": "latest",
+    "@typespec/http": "latest",
+    "@typespec/openapi3": "latest"
+  }
+}
