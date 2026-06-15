@@ -1,0 +1,7 @@
+# SpecScore Repo Config Schema: https://specscore.md/repo-config
+
+project:
+    title: openvaultdb-com
+    host: github.com
+    org: openvaultdb
+    repo: openvaultdb-com
