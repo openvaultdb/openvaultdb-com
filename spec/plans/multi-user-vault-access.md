@@ -1,10 +1,10 @@
 ---
 format: https://specscore.md/plan-specification
-status: Under Review
+status: Approved
 ---
 # Plan: Multi User Vault Access
 
-**Status:** Under Review
+**Status:** Approved
 **Source Feature:** multi-user-vault-access
 **Date:** 2026-06-15
 **Owner:** alexandertrakhimenok
