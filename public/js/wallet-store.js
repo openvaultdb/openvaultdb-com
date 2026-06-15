@@ -1,8 +1,9 @@
-// Wallet store: client-side pointers for the local-server demo milestone.
-// No backend — everything lives in localStorage (servers + vault pointers).
+// Wallet store: client-side vault pointers for the local-host demo milestone.
+// No backend — everything lives in localStorage. A vault carries its own host
+// details (base URL + owner token), so there is no separate "servers" store —
+// see Decision 0003 (Host / Vault / Namespace Model).
 // The OVDB wire contract is interface/main.tsp.
 
-const SERVERS_KEY = "ovdb_servers"; // [{ id, name, baseUrl, ownerToken }]
 const VAULTS_KEY = "ovdb_vaults"; // [{ id, kind, ... }]
 const GH_TOKEN_KEY = "gh_access_token"; // GitHub OAuth token (sessionStorage)
 
@@ -30,51 +31,24 @@ export function normalizeBaseUrl(input) {
   return String(input || "").trim().replace(/\/+$/, "");
 }
 
-// ---- servers -------------------------------------------------------------
-export function getServers() {
-  return readList(SERVERS_KEY);
-}
-export function getServer(id) {
-  return getServers().find((s) => s.id === id) || null;
-}
-export function addServer({ name, baseUrl, ownerToken }) {
-  const servers = getServers();
-  const normUrl = normalizeBaseUrl(baseUrl);
-  const existing = servers.find((s) => s.baseUrl === normUrl);
-  const entry = {
-    id: existing ? existing.id : uid(),
-    name,
-    baseUrl: normUrl,
-    ownerToken,
-  };
-  const next = existing
-    ? servers.map((s) => (s.id === existing.id ? entry : s))
-    : [...servers, entry];
-  writeList(SERVERS_KEY, next);
-  return entry;
-}
-export function removeServer(id) {
-  writeList(
-    SERVERS_KEY,
-    getServers().filter((s) => s.id !== id),
-  );
-}
-
 // ---- vault pointers ------------------------------------------------------
-// kind: "github" -> { id, kind, name, fullName, htmlUrl, private }
-// kind: "server" -> { id, kind, name, serverId, serverName, baseUrl, vaultId, backend }
+// A vault lives on a host. Two kinds:
+//   kind: "github" -> { id, kind, name, fullName, htmlUrl, private }
+//        (host = a Git host; the repo is the vault)
+//   kind: "server" -> { id, kind, name, hostName, baseUrl, ownerToken, vaultId, backend }
+//        (host = an OpenVaultDB host; one host may back several vaults)
 export function getVaults() {
   return readList(VAULTS_KEY);
 }
 export function addVault(vault) {
   const vaults = getVaults();
-  // De-dupe github repos by fullName; server vaults by serverId+vaultId.
+  // De-dupe github repos by fullName; server vaults by host baseUrl + vaultId.
   const isDup = vaults.some((v) =>
     v.kind === "github" && vault.kind === "github"
       ? v.fullName === vault.fullName
       : v.kind === "server" &&
         vault.kind === "server" &&
-        v.serverId === vault.serverId &&
+        v.baseUrl === vault.baseUrl &&
         v.vaultId === vault.vaultId,
   );
   if (isDup) return null;

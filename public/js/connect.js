@@ -71,21 +71,36 @@ function renderVaults() {
   const vaults = getVaults().filter((v) => v.kind === "server");
   if (!vaults.length) {
     target.innerHTML =
-      '<p class="hint">No server vaults in your wallet yet. <a href="/my/vaults">Register one</a>, or use the manual connection below.</p>';
+      '<p class="hint">No vaults on an OpenVaultDB host in your wallet yet. <a href="/my/vaults">Add one</a>, or use the manual connection below.</p>';
     return;
   }
-  target.innerHTML = `
-    <div class="repo-list">
-      ${vaults
-        .map(
-          (v) => `
-        <button class="repo-item" type="button" data-pick-vault="${v.id}">
-          <span class="repo-name">${escapeHtml(v.name)}</span>
-          <span class="ov-sub">${escapeHtml(v.serverName)} · ${escapeHtml(v.baseUrl)} · vault ${escapeHtml(v.vaultId)}</span>
-        </button>`,
-        )
-        .join("")}
-    </div>
+  // Flat list grouped by host (Decision 0003): one section per host, its vaults
+  // listed under it.
+  const groups = new Map();
+  for (const v of vaults) {
+    const host = v.hostName || v.baseUrl;
+    if (!groups.has(host)) groups.set(host, []);
+    groups.get(host).push(v);
+  }
+  target.innerHTML = `${[...groups.entries()]
+    .map(
+      ([host, hostVaults]) => `
+      <div class="connect-host">
+        <p class="ov-host-label">${escapeHtml(host)}</p>
+        <div class="repo-list">
+          ${hostVaults
+            .map(
+              (v) => `
+            <button class="repo-item" type="button" data-pick-vault="${v.id}">
+              <span class="repo-name">${escapeHtml(v.name)}</span>
+              <span class="ov-sub">${escapeHtml(host)} · ${escapeHtml(v.name)}</span>
+            </button>`,
+            )
+            .join("")}
+        </div>
+      </div>`,
+    )
+    .join("")}
     <p class="ov-error" data-pick-error hidden></p>`;
   target.querySelectorAll("[data-pick-vault]").forEach((btn) => {
     btn.addEventListener("click", () => {

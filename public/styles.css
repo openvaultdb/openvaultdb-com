@@ -755,3 +755,9 @@ a.ov-sub:hover { color: var(--brass-deep); }
 .ov-error { color: #b3261e; font-size: 14px; margin: 4px 0; }
 
 .gh-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 4px 0 14px; }
+
+/* Host / Vault / Namespace UI (Decision 0003) */
+.ov-host-label { font-size: 13px; font-weight: 600; color: var(--brass); letter-spacing: .02em; margin: 14px 0 6px; }
+.connect-host { margin-bottom: 6px; }
+.ov-ns { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.ov-muted { color: var(--muted); font-size: 13px; }

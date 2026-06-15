@@ -1,23 +1,24 @@
-// /my/vaults page logic: render stored vault pointers and add new ones via two
-// paths — (a) a private GitHub repo (listed via the GitHub REST API using the
-// OAuth token captured at sign-in), (b) a vault on a registered OVDB server.
-// All pointers in localStorage.
+// /my/vaults page logic. A vault lives on a host (Decision 0003). Two ways to
+// add one: (a) an OpenVaultDB host — enter its URL + owner token, then pick one
+// of the vaults it holds; (b) a GitHub repo — pick from the GitHub API. Vaults
+// are stored as pointers in localStorage; each carries its host details.
 import {
   getVaults,
   addVault,
   removeVault,
-  getServers,
-  getServer,
   getGithubToken,
+  fetchServerInfo,
   fetchVaults,
+  fetchNamespaces,
+  normalizeBaseUrl,
 } from "./wallet-store.js";
 import { requestGithubToken } from "./auth-ui.js";
 
 const $ = (sel) => document.querySelector(sel);
 const listEl = $("[data-vault-list]");
 const addv = $("[data-addv]");
+const hostPanel = $('[data-addv-panel="host"]');
 const ghPanel = $('[data-addv-panel="github"]');
-const serverPanel = $('[data-addv-panel="server"]');
 
 function escapeHtml(s) {
   return String(s).replace(/[&<>"']/g, (c) =>
@@ -29,9 +30,7 @@ function escapeHtml(s) {
 $("[data-add-vault]").addEventListener("click", () => {
   const show = addv.hidden;
   addv.hidden = !show;
-  if (show) {
-    selectTab("github");
-  }
+  if (show) selectTab("host");
 });
 $("[data-addv-close]").addEventListener("click", () => {
   addv.hidden = true;
@@ -44,16 +43,83 @@ function selectTab(which) {
   addv.querySelectorAll("[data-addv-tab]").forEach((b) =>
     b.classList.toggle("active", b.dataset.addvTab === which),
   );
+  hostPanel.hidden = which !== "host";
   ghPanel.hidden = which !== "github";
-  serverPanel.hidden = which !== "server";
-  if (which === "github") loadGithubRepos();
-  else loadServerVaults();
+  if (which === "host") renderHostPanel();
+  else loadGithubRepos();
 }
 
-// ---- path (a): GitHub repos (incremental scopes) -------------------------
-// Login stays minimal. We only request `public_repo` when the user browses
-// public repos, and escalate to `repo` only when they choose to pick a private
-// one — never at sign-in.
+// ---- path (a): a vault on an OpenVaultDB host -----------------------------
+function renderHostPanel() {
+  hostPanel.innerHTML = `
+    <p class="hint">Connect an OpenVaultDB host, then pick a vault it holds. The owner token authorizes the wallet to list vaults — it stays on this device.</p>
+    <label class="field"><span>Host name (optional)</span>
+      <input class="ovin" type="text" placeholder="My local host" data-host-name /></label>
+    <label class="field"><span>Base URL</span>
+      <input class="ovin" type="url" placeholder="http://localhost:8088" data-host-url /></label>
+    <label class="field"><span>Owner token</span>
+      <input class="ovin" type="password" placeholder="paste the host's owner token" data-host-token /></label>
+    <button class="btn-add" type="button" data-host-connect>Connect host</button>
+    <div data-host-result></div>`;
+  hostPanel.querySelector("[data-host-connect]").addEventListener("click", connectHost);
+}
+
+async function connectHost() {
+  const result = hostPanel.querySelector("[data-host-result]");
+  const hostNameInput = hostPanel.querySelector("[data-host-name]").value.trim();
+  const baseUrl = normalizeBaseUrl(hostPanel.querySelector("[data-host-url]").value);
+  const ownerToken = hostPanel.querySelector("[data-host-token]").value.trim();
+  if (!baseUrl || !ownerToken) {
+    result.innerHTML = '<p class="ov-error">Enter both a base URL and an owner token.</p>';
+    return;
+  }
+  result.innerHTML = '<p class="ov-loading">Verifying host…</p>';
+  let info, vaults;
+  try {
+    info = await fetchServerInfo(baseUrl);
+    vaults = await fetchVaults({ baseUrl, ownerToken });
+  } catch (err) {
+    result.innerHTML = `<p class="ov-error">${escapeHtml(err.message || "Could not reach that host.")}</p>`;
+    return;
+  }
+  const hostName = hostNameInput || info.name || baseUrl;
+  if (!Array.isArray(vaults) || !vaults.length) {
+    result.innerHTML = '<p class="ov-loading">This host holds no vaults.</p>';
+    return;
+  }
+  result.innerHTML = `
+    <p class="hint">Pick a vault on <strong>${escapeHtml(hostName)}</strong>.</p>
+    <div class="repo-list">
+      ${vaults
+        .map(
+          (v) => `
+        <button class="repo-item" type="button" data-pick-vault="${escapeHtml(v.id)}" data-vault-name="${escapeHtml(v.name)}" data-vault-backend="${escapeHtml(v.backend || "")}">
+          <span class="repo-name">${escapeHtml(v.name)}</span>
+          <span class="ov-tag">${escapeHtml(v.backend || "vault")}</span>
+          <span class="ov-id">${escapeHtml(v.id)}</span>
+        </button>`,
+        )
+        .join("")}
+    </div>`;
+  result.querySelectorAll("[data-pick-vault]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const added = addVault({
+        kind: "server",
+        name: btn.dataset.vaultName,
+        hostName,
+        baseUrl,
+        ownerToken,
+        vaultId: btn.dataset.pickVault,
+        backend: btn.dataset.vaultBackend,
+      });
+      addv.hidden = true;
+      render();
+      if (!added) flash("That vault is already in your wallet.");
+    });
+  });
+}
+
+// ---- path (b): GitHub repos (incremental scopes) -------------------------
 function loadGithubRepos() {
   ghPanel.innerHTML = `
     <p class="hint">Register a GitHub repository as a vault. We only ask GitHub for the access you choose.</p>
@@ -71,7 +137,6 @@ async function pickRepos(mode) {
   const needScope = mode === "private" ? "repo" : "public_repo";
   const haveScope = sessionStorage.getItem("gh_token_scope") || "";
   let token = getGithubToken();
-  // (Re)authorize only when we lack a token, or need `repo` but only hold `public_repo`.
   if (!token || (needScope === "repo" && !haveScope.split(" ").includes("repo"))) {
     result.innerHTML = '<p class="ov-loading">Waiting for GitHub authorization…</p>';
     try {
@@ -112,7 +177,7 @@ async function pickRepos(mode) {
     return;
   }
   result.innerHTML = `
-    <p class="hint">Pick a repository to register as a vault pointer.</p>
+    <p class="hint">Pick a repository to register as a vault.</p>
     <div class="repo-list">
       ${repos
         .map(
@@ -144,81 +209,12 @@ async function pickRepos(mode) {
   });
 }
 
-// ---- path (b): vault from a registered server ----------------------------
-async function loadServerVaults() {
-  const servers = getServers();
-  if (!servers.length) {
-    serverPanel.innerHTML =
-      '<p class="hint">No servers registered. <a href="/my/servers">Register an OVDB server</a> first.</p>';
-    return;
-  }
-  serverPanel.innerHTML = `
-    <label class="field">
-      <span>Server</span>
-      <select class="ovin" data-server-select>
-        ${servers
-          .map((s) => `<option value="${s.id}">${escapeHtml(s.name)} — ${escapeHtml(s.baseUrl)}</option>`)
-          .join("")}
-      </select>
-    </label>
-    <div data-server-vaults><p class="ov-loading">Loading vaults…</p></div>`;
-  const select = serverPanel.querySelector("[data-server-select]");
-  select.addEventListener("change", () => listVaultsForServer(select.value));
-  listVaultsForServer(select.value);
-}
-
-async function listVaultsForServer(serverId) {
-  const target = serverPanel.querySelector("[data-server-vaults]");
-  target.innerHTML = '<p class="ov-loading">Loading vaults…</p>';
-  const server = getServer(serverId);
-  let vaults;
-  try {
-    vaults = await fetchVaults(server);
-  } catch (err) {
-    target.innerHTML = `<p class="ov-error">${escapeHtml(err.message || "Failed to load vaults.")}</p>`;
-    return;
-  }
-  if (!Array.isArray(vaults) || !vaults.length) {
-    target.innerHTML = '<p class="ov-loading">This server hosts no vaults.</p>';
-    return;
-  }
-  target.innerHTML = `
-    <div class="repo-list">
-      ${vaults
-        .map(
-          (v) => `
-        <button class="repo-item" type="button" data-pick-vault="${escapeHtml(v.id)}" data-vault-name="${escapeHtml(v.name)}" data-vault-backend="${escapeHtml(v.backend)}">
-          <span class="repo-name">${escapeHtml(v.name)}</span>
-          <span class="ov-tag">${escapeHtml(v.backend)}</span>
-          <span class="ov-id">${escapeHtml(v.id)}</span>
-        </button>`,
-        )
-        .join("")}
-    </div>`;
-  target.querySelectorAll("[data-pick-vault]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const added = addVault({
-        kind: "server",
-        name: btn.dataset.vaultName,
-        serverId: server.id,
-        serverName: server.name,
-        baseUrl: server.baseUrl,
-        vaultId: btn.dataset.pickVault,
-        backend: btn.dataset.vaultBackend,
-      });
-      addv.hidden = true;
-      render();
-      if (!added) flash("That vault is already registered.");
-    });
-  });
-}
-
-// ---- list ----------------------------------------------------------------
+// ---- list (flat; host shown as an attribute, namespaces read-only) -------
 function render() {
   const vaults = getVaults();
   if (!vaults.length) {
     listEl.innerHTML =
-      '<div class="area-empty">No vaults yet. Use "Add vault" to register a GitHub repo or a vault from a server.</div>';
+      '<div class="area-empty">No vaults yet. Use "Add vault" to connect an OpenVaultDB host or a GitHub repo.</div>';
     return;
   }
   listEl.innerHTML = `<div class="ov-vaults">${vaults
@@ -238,19 +234,42 @@ function render() {
       <div class="ov-row">
         <div class="ov-row-main">
           <div class="ov-row-info">
-            <span class="ov-name">${escapeHtml(v.name)} <span class="ov-tag">${escapeHtml(v.backend)}</span></span>
-            <span class="ov-sub">${escapeHtml(v.serverName)} · ${escapeHtml(v.baseUrl)} · vault ${escapeHtml(v.vaultId)}</span>
+            <span class="ov-name">${escapeHtml(v.name)} <span class="ov-tag">${escapeHtml(v.backend || "vault")}</span></span>
+            <span class="ov-sub">${escapeHtml(v.hostName || v.baseUrl)} · ${escapeHtml(v.baseUrl)}</span>
+            <span class="ov-ns" data-ns-for="${v.id}"><span class="ov-loading">Loading namespaces…</span></span>
           </div>
           <button class="btn-remove" type="button" data-remove="${v.id}">Remove</button>
         </div>
       </div>`,
     )
     .join("")}</div>`;
+
+  // Namespaces are created by apps — show them read-only, best-effort.
+  vaults
+    .filter((v) => v.kind === "server")
+    .forEach((v) => loadNamespaces(v));
+}
+
+async function loadNamespaces(vault) {
+  const slot = listEl.querySelector(`[data-ns-for="${vault.id}"]`);
+  if (!slot) return;
+  try {
+    const list = await fetchNamespaces({ baseUrl: vault.baseUrl, ownerToken: vault.ownerToken }, vault.vaultId);
+    if (!Array.isArray(list) || !list.length) {
+      slot.innerHTML = '<span class="ov-muted">No namespaces yet — they appear when an app connects.</span>';
+      return;
+    }
+    slot.innerHTML = list
+      .map((ns) => `<span class="ov-tag">${escapeHtml(ns.id || ns.name || "namespace")}</span>`)
+      .join(" ");
+  } catch {
+    slot.innerHTML = '<span class="ov-muted">Namespaces unavailable (host offline?).</span>';
+  }
 }
 
 listEl.addEventListener("click", (e) => {
   const rm = e.target.closest("[data-remove]");
-  if (rm && confirm("Remove this vault pointer?")) {
+  if (rm && confirm("Remove this vault from your wallet?")) {
     removeVault(rm.dataset.remove);
     render();
   }
