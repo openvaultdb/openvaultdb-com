@@ -91,13 +91,15 @@ MUST NOT require cloud credentials to be held in the browser.
 #### REQ: domain-identity
 
 An application's `client_id` MUST be the authoritative domain it controls, and
-the namespace it may access MUST derive from that domain, so an app cannot claim
-a namespace it cannot prove it owns.
+the namespaces it may access MUST be domain-bounded under that domain
+(`<domain>/openvaultdb/<name>` — see Feature: Shared Namespaces), so an app
+cannot claim a namespace it cannot prove it owns. Manifests are YAML
+(`openvaultdb.yaml`); JSON MAY be accepted as an alias.
 
 #### REQ: identity-proof
 
 The system MUST verify app identity by requiring the OAuth redirect URI to live
-on an origin authorized by the app's `/.well-known/openvaultdb.json` manifest on
+on an origin authorized by the app's `/.well-known/openvaultdb.yaml` manifest on
 the authoritative domain.
 
 #### REQ: delegated-origins
@@ -173,7 +175,7 @@ rejected.
 
 **Given** an app with authoritative domain `sneat.app`
 **When** it requests a namespace
-**Then** it may only obtain the `sneat.app` namespace and is denied any other namespace.
+**Then** it may only obtain namespaces under `sneat.app/openvaultdb/` and is denied any other namespace.
 
 ### AC: redirect-uri-must-match (verifies REQ:identity-proof)
 

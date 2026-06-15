@@ -63,7 +63,7 @@ to one self-hosted vault and read/write its own namespace.
 | Tier | Assumption | How to validate |
 |------|------------|-----------------|
 | Must-be-true | Every vault deployment can expose an OAuth-style authorize/token endpoint (or be fronted by one) | Prototype the endpoint on the reference Go server and the GitHub broker |
-| Should-be-true | App owners will host a `/.well-known/openvaultdb.json` manifest on a domain they control | Validate with the existing sneat.app / datatug.app apps |
+| Should-be-true | App owners will host a `/.well-known/openvaultdb.yaml` manifest on a domain they control | Validate with the existing sneat.app / datatug.app apps |
 | Might-be-true | Users accept picking a vault from a directory as the consent step | Usability check on the Connect widget |
 
 ## SpecScore Integration

@@ -11,6 +11,7 @@ Feature specifications for this project.
 | Feature | Status | Description |
 |---------|--------|-------------|
 | [authentication-model](authentication-model/README.md) | Draft | How users connect apps to vaults they own, and how apps prove their identity. |
+| [shared-namespaces](shared-namespaces/README.md) | Draft | TODO: Add description. |
 
 ## Open Questions
 

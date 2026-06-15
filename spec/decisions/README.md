@@ -11,6 +11,7 @@ Architecture Decision Records for this project.
 | # | Decision | Status | Date | Tags | Affected |
 |---|----------|--------|------|------|----------|
 | [0001](0001-auth-architecture.md) | Auth Architecture | Proposed | 2026-06-15 | authentication, architecture | — |
+| [0002](0002-shared-namespaces.md) | Shared Namespaces | Proposed | 2026-06-15 | — | — |
 
 ## Open Questions
 

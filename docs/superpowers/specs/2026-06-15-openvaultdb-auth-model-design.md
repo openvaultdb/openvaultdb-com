@@ -13,6 +13,13 @@ identity. Covers the user side and the app-owner side of authentication.
 > app's data path — GitHub-backed apps self-broker with their own GitHub OAuth/App
 > or a user PAT. OpenVaultDB's own GitHub OAuth is account-side only. See the
 > four-surface model in the Decision.
+>
+> Namespace identifiers shown below as bare domains are superseded: namespaces
+> are now **domain-bounded and resolvable** — `<owner-domain>/openvaultdb/<name>`
+> with a YAML `manifest.yaml` — per the
+> [Shared Namespaces design](2026-06-15-shared-namespaces-design.md) and
+> [Decision 0002](../../../spec/decisions/0002-shared-namespaces.md). Manifests
+> are YAML (`openvaultdb.yaml`), not JSON.
 
 ---
 

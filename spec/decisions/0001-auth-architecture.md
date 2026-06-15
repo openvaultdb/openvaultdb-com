@@ -31,8 +31,9 @@ app's data token, how an app proves its identity, and — given GitHub-backed
    on the account/management side (see surfaces below) and is never exposed to
    an app.
 3. **App identity is its domain.** `client_id` is the app's authoritative
-   domain, proven by the OAuth redirect URI plus a `/.well-known/openvaultdb.json`
-   manifest. The namespace derives from the verified domain.
+   domain, proven by the OAuth redirect URI plus a `/.well-known/openvaultdb.yaml`
+   manifest (YAML; JSON alias). Namespaces are domain-bounded under the verified
+   domain (`<domain>/openvaultdb/<name>` — see Decision 0002).
 4. **A manifest may delegate additional origins** via `allowed_origins`, letting
    sibling apps (e.g. sharing one Firebase Auth project) act under the
    authoritative domain's namespace.

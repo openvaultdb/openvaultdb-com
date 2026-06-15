@@ -171,7 +171,7 @@
         <article class="card">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3z" stroke="currentColor" stroke-width="1.6"/><path d="M4 7v10c0 1.7 3.6 3 8 3s8-1.3 8-3V7" stroke="currentColor" stroke-width="1.6"/></svg></div>
           <h3>The domain is the app's identity</h3>
-          <p>An app's <code>client_id</code> is a domain it controls, proven by its redirect URI and a <code>/.well-known/openvaultdb.json</code> manifest. The namespace derives from the verified domain — no central registry.</p>
+          <p>An app's <code>client_id</code> is a domain it controls, proven by its redirect URI and a <code>/.well-known/openvaultdb.yaml</code> manifest. Namespaces are domain-bounded under it (<code>&lt;domain&gt;/openvaultdb/&lt;name&gt;</code>) — no central registry.</p>
         </article>
 
         <article class="card">
@@ -325,26 +325,21 @@
     <div class="wrap">
       <span class="eyebrow">App identity</span>
       <h2>An app is its domain — and the manifest proves it.</h2>
-      <p class="intro">No registration anywhere. The app publishes a manifest on the domain it controls; the namespace it may claim derives from that same domain.</p>
+      <p class="intro">No registration anywhere. The app publishes a manifest on the domain it controls; the namespaces it may claim are domain-bounded under that same domain (<code>&lt;domain&gt;/openvaultdb/&lt;name&gt;</code>).</p>
 
       <div class="two-col">
         <div>
-          <div class="codeblock" aria-label="Example openvaultdb.json manifest">
-<pre><span class="c">// https://sneat.app/.well-known/openvaultdb.json</span>
-{
-  <span class="k">"client_id"</span>: <span class="s">"sneat.app"</span>,
-  <span class="k">"name"</span>: <span class="s">"Sneat"</span>,
-  <span class="k">"logo"</span>: <span class="s">"https://sneat.app/logo.svg"</span>,
-  <span class="k">"namespace"</span>: <span class="s">"sneat.app"</span>,
-  <span class="k">"requested_scopes"</span>: [
-    <span class="s">"namespace:sneat.app:read"</span>,
-    <span class="s">"namespace:sneat.app:write"</span>
-  ],
-  <span class="k">"allowed_origins"</span>: [
-    <span class="s">"https://sneat.app"</span>,
-    <span class="s">"https://datatug.app"</span>
-  ]
-}</pre>
+          <div class="codeblock" aria-label="Example openvaultdb.yaml identity manifest">
+<pre><span class="c"># https://sneat.app/.well-known/openvaultdb.yaml</span>
+<span class="k">client_id:</span> <span class="s">sneat.app</span>
+<span class="k">name:</span> <span class="s">Sneat</span>
+<span class="k">logo:</span> <span class="s">https://sneat.app/logo.svg</span>
+<span class="k">namespaces:</span>            <span class="c"># each resolves to its own manifest.yaml</span>
+  - <span class="s">sneat.app/openvaultdb/calendar</span>
+  - <span class="s">sneat.app/openvaultdb/settings</span>
+<span class="k">allowed_origins:</span>
+  - <span class="s">https://sneat.app</span>
+  - <span class="s">https://datatug.app</span></pre>
           </div>
         </div>
 
