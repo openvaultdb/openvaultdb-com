@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>My Apps — OpenVaultDB</title>
-  <meta name="description" content="The apps you build with OpenVaultDB." />
+  <title>My Servers — OpenVaultDB</title>
+  <meta name="description" content="Register and browse your OpenVaultDB servers." />
   <meta name="theme-color" content="#0c0e0d" />
   <meta name="robots" content="noindex" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -45,9 +45,9 @@
     <section class="account-anon" data-auth-anon hidden>
       <div class="wrap">
         <div class="panel">
-          <span class="eyebrow" style="justify-content:center;">My Apps</span>
-          <h2>Sign in to manage your apps</h2>
-          <p>Build apps on OpenVaultDB. Apps are identified by a domain you control — see the authentication model for how it works.</p>
+          <span class="eyebrow" style="justify-content:center;">My Servers</span>
+          <h2>Sign in to manage your servers</h2>
+          <p>Register a private OpenVaultDB server and browse the vaults it hosts. OpenVaultDB never holds your data — only pointers.</p>
           <button class="btn-signin" type="button" data-auth-open>Sign in</button>
         </div>
       </div>
@@ -58,21 +58,42 @@
       <section class="account-head">
         <div class="wrap">
           <span class="eyebrow">Your account</span>
-          <h1>My Apps</h1>
+          <h1>My Servers</h1>
         </div>
       </section>
       <section class="wrap account-areas">
         <nav class="my-tabs">
           <a class="my-tab" href="/my/vaults">Vaults</a>
-          <a class="my-tab" href="/my/servers">Servers</a>
-          <a class="my-tab active" href="/my/apps">Apps</a>
+          <a class="my-tab active" href="/my/servers">Servers</a>
+          <a class="my-tab" href="/my/apps">Apps</a>
         </nav>
         <div class="area">
           <div class="area-head">
-            <span class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 9h18M8 4v16" stroke="currentColor" stroke-width="1.6"/></svg></span>
-            <h2>Apps you build</h2>
+            <span class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="3.5" width="18" height="7" rx="2" stroke="currentColor" stroke-width="1.6"/><rect x="3" y="13.5" width="18" height="7" rx="2" stroke="currentColor" stroke-width="1.6"/><circle cx="7" cy="7" r="1.1" fill="currentColor"/><circle cx="7" cy="17" r="1.1" fill="currentColor"/></svg></span>
+            <h2>OpenVaultDB servers</h2>
+            <button class="btn-add" type="button" data-add-server>+ Register a server</button>
           </div>
-          <div class="area-empty">No apps yet. App registration is coming soon — see the <a href="/docs/auth-model" style="color:var(--brass);border-bottom:1px solid var(--brass-bright);">authentication model</a>.</div>
+
+          <!-- Register form (hidden until "Register a server") -->
+          <form class="reg-form" data-reg-form hidden novalidate>
+            <label class="field">
+              <span>Server base URL</span>
+              <input class="ovin" name="baseUrl" type="url" inputmode="url" placeholder="http://localhost:8088" autocomplete="off" required />
+            </label>
+            <label class="field">
+              <span>Owner token</span>
+              <input class="ovin" name="ownerToken" type="password" placeholder="OWNER_TOKEN printed by the server" autocomplete="off" required />
+            </label>
+            <p class="hint">The server prints <code>OWNER_TOKEN=…</code> on startup. We validate the URL via <code>/.well-known/openvaultdb</code> before saving.</p>
+            <div class="reg-actions">
+              <button class="btn-primary-sm" type="submit" data-reg-submit>Validate &amp; save</button>
+              <button class="btn-ghost-sm" type="button" data-reg-cancel>Cancel</button>
+            </div>
+            <p class="reg-msg" data-reg-msg hidden></p>
+          </form>
+
+          <!-- Server list -->
+          <div data-server-list></div>
         </div>
       </section>
     </div>
@@ -123,5 +144,6 @@
     });
   </script>
   <script type="module" src="/js/auth-ui.js"></script>
+  <script type="module" src="/js/my-servers.js"></script>
 </body>
 </html>

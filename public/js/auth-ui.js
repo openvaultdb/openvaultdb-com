@@ -113,9 +113,26 @@ function onSignedIn() {
 }
 
 async function providerSignIn(which) {
-  const provider = which === "github" ? new GithubAuthProvider() : new GoogleAuthProvider();
+  let provider;
+  if (which === "github") {
+    provider = new GithubAuthProvider();
+    // Request `repo` so the wallet can list the user's repos (incl. private)
+    // to register one as a vault pointer.
+    provider.addScope("repo");
+  } else {
+    provider = new GoogleAuthProvider();
+  }
   try {
-    await signInWithPopup(auth, provider);
+    const result = await signInWithPopup(auth, provider);
+    if (which === "github") {
+      // The OAuth access token is only available on the credential right after
+      // sign-in (Firebase never persists it). Stash it in sessionStorage so the
+      // vaults page can call the GitHub REST API.
+      const cred = GithubAuthProvider.credentialFromResult(result);
+      if (cred && cred.accessToken) {
+        try { sessionStorage.setItem("gh_access_token", cred.accessToken); } catch {}
+      }
+    }
     onSignedIn();
   } catch (err) {
     showError(friendlyError(err));

@@ -98,5 +98,14 @@ OVDB server.** The frontend never calls the OVDB server directly.
 - Stores vault/server pointers client-side (localStorage is fine for this milestone).
 - GitHub repo vault: list the signed-in user's private repos via the GitHub REST
   API using the GitHub OAuth access token obtained at Firebase GitHub sign-in.
+  - The token is captured in `public/js/auth-ui.js`: GitHub sign-in requests the
+    `repo` scope (`provider.addScope("repo")`) and reads the OAuth access token
+    via `GithubAuthProvider.credentialFromResult(result)` immediately after
+    `signInWithPopup`. Firebase never persists this token, so the wallet stores
+    it in `sessionStorage` under `gh_access_token` for the current tab/session.
+  - `/my/vaults` calls `GET https://api.github.com/user/repos?visibility=all&per_page=100`
+    with `Authorization: token <gh_access_token>`. If the token is absent
+    (e.g. signed in with Google/email, or a new tab), the page shows a
+    re-authenticate prompt instead of a repo list.
 - Server registration: validate via `GET /.well-known/openvaultdb`, then store
   `{ baseUrl, ownerToken }`; list vaults via `GET /vaults`.
