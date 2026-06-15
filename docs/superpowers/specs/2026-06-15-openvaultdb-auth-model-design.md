@@ -5,6 +5,15 @@
 **Scope:** How users connect apps to their vaults, and how apps prove their
 identity. Covers the user side and the app-owner side of authentication.
 
+> **Note (refined after review):** the authoritative version of this model now
+> lives as SpecScore artifacts under [`spec/`](../../../spec/) — the
+> [Decision](../../../spec/decisions/0001-auth-architecture.md) and
+> [Feature](../../../spec/features/authentication-model/README.md). The key
+> refinement: there is **no "serverless exception."** OpenVaultDB is never in any
+> app's data path — GitHub-backed apps self-broker with their own GitHub OAuth/App
+> or a user PAT. OpenVaultDB's own GitHub OAuth is account-side only. See the
+> four-surface model in the Decision.
+
 ---
 
 ## Core principle
@@ -46,7 +55,7 @@ dependency.
 | **User** | Owns the vault and the data. Grants apps scoped access. |
 | **App** | Wants a namespace in the user's vault. Identified by its domain. |
 | **Vault** | The user's chosen storage endpoint. **The authority** that authenticates the user and issues scoped tokens. |
-| **OVDB Connect** | Optional broker/router at openvaultdb.com. Holds a directory of the user's vaults; routes apps to the right vault. Not in the trust or data path (except serverless GitHub, see below). |
+| **OVDB Connect** | Optional broker/router at openvaultdb.com. Holds a directory of the user's vaults; routes apps to the right vault. Never in the data path — for GitHub vaults the app self-brokers (see below). |
 
 ---
 
@@ -58,11 +67,11 @@ The rule "the vault is the authority" resolves differently per mode:
 |------|-----------|-------|
 | **Self-hosted server** | The vault server | Exposes an OAuth-style authorize/token endpoint, issues its own scoped tokens. Textbook. |
 | **OVDB-hosted server** | The vault server (hosted by OVDB) | Same as self-hosted; OVDB runs it as a service but it is still a vault, not the broker. |
-| **Serverless (browser → GitHub)** | **GitHub** | No vault server exists. GitHub is the real IdP; the app needs a GitHub token scoped to one repo. OVDB **necessarily** brokers this OAuth (it holds the OAuth client secret). This is the one acknowledged exception where OVDB sits in the auth path. |
+| **Serverless (browser → GitHub)** | **GitHub** | No vault server exists. GitHub is the real IdP; the app needs a GitHub token scoped to one repo. The app obtains it via **its own** GitHub OAuth/App, or the user supplies a fine-grained PAT. **OVDB does not broker it.** (GitHub still requires a client secret even with PKCE, and its token endpoint has no CORS — so a backendless app uses the PAT path.) |
 | **User-owned cloud (Firestore/Dynamo/…)** | A vault server in front of the cloud DB | Raw cloud DBs have no namespace/consent concept. This mode **requires** a thin OpenVaultDB server in front (which reduces it to the self-hosted case). Browser-direct-to-cloud is explicitly **not** a first-class mode — it would force a second, weaker auth path and risk exposing cloud credentials to the browser. |
 
-**Design intent:** one auth model, not one per backend. Serverless GitHub is the
-single honest exception.
+**Design intent:** one auth model, not one per backend. OpenVaultDB is never in
+any app's data path — GitHub-backed apps self-broker.
 
 ---
 
@@ -138,9 +147,10 @@ Happy path, model B with a vault that is its own authority:
      OVDB Connect is no longer involved.
 ```
 
-For **serverless GitHub**, step 3–5 are brokered by OVDB against GitHub's OAuth
-(the acknowledged exception), and the resulting token is a repo-scoped GitHub
-token the browser uses directly against the GitHub API.
+For **serverless GitHub**, there is no vault server, so steps 3–5 are replaced by
+the app's **own** GitHub OAuth/App exchange (or a user-supplied fine-grained PAT).
+OVDB is not involved. The resulting repo-scoped GitHub token is used directly
+against the GitHub API.
 
 ---
 
@@ -155,9 +165,10 @@ app OpenVaultDB-compatible, an owner:
 3. Implements the OAuth redirect callback on an authorized origin.
 4. (Optional) lists sibling origins in `allowed_origins`.
 
-No secrets are issued by OVDB for the general (server/self-hosted) case; the
-vault is the authority. The serverless GitHub mode is the exception where an
-OAuth client secret exists and is held by openvaultdb.com's broker.
+OVDB issues no secrets to apps in any mode; the vault is the authority. For
+serverless GitHub, the OAuth client secret (when used) belongs to the **app's
+own** GitHub OAuth/App and is held by the app's own minimal exchange endpoint —
+not by openvaultdb.com.
 
 ---
 

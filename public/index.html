@@ -202,13 +202,14 @@
         <span class="eyebrow">No server required</span>
         <h2 class="sl-title">Your browser writes straight to your own Git repo.</h2>
         <p class="sl-lead">
-          In serverless mode there's no backend to run. Sign in with GitHub —
-          openvaultdb.com handles the OAuth flow — and the app reads and writes
-          your data directly from the browser to a repository you own. inGitDB
-          and INGR.io keep every change a clean, mergeable commit.
+          In serverless mode the app reads and writes your data directly from the
+          browser to a Git repository you own — authenticated with the app's own
+          GitHub sign-in, or a fine-grained token you provide. OpenVaultDB stays
+          out of the data path entirely. inGitDB and INGR.io keep every change a
+          clean, mergeable commit.
         </p>
         <ul class="sl-points">
-          <li>No backend to run — OpenVaultDB handles GitHub sign-in</li>
+          <li>OpenVaultDB is never in the data path — your browser talks straight to GitHub</li>
           <li>Private repos for private data, public repos for public data</li>
           <li>Your data lives in a repo you control — clone it anywhere</li>
         </ul>

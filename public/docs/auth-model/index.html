@@ -181,6 +181,31 @@
     </div>
   </section>
 
+  <!-- ============ AUTH SURFACES ============ -->
+  <section class="doc-section">
+    <div class="wrap">
+      <span class="eyebrow">Four authentication surfaces</span>
+      <h2>OpenVaultDB's auth and an app's data auth never cross.</h2>
+      <p class="intro">Authentication happens in four distinct places. The first three are OpenVaultDB's own, account-side, and are <em>never</em> exposed to an application. The fourth is the app's data token — and OpenVaultDB never sees or holds it.</p>
+
+      <table class="modes">
+        <thead>
+          <tr><th>#</th><th>Surface</th><th>Providers</th><th>Exposed to app?</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="auth">1</td><td class="mode">Wallet login</td><td>Any — email, Google, GitHub, passkey…</td><td class="note">Never</td></tr>
+          <tr><td class="auth">2</td><td class="mode">Owner login</td><td>Any (optional — not a registry)</td><td class="note">Never</td></tr>
+          <tr><td class="auth">3</td><td class="mode">Vault registration</td><td>Wallet login for the entry; GitHub optional, only to list repos</td><td class="note">Never</td></tr>
+          <tr class="exc"><td class="auth">4</td><td class="mode">App data access</td><td>Vault server · app's own GitHub OAuth/App · user PAT</td><td class="note">This <strong>is</strong> the app's token</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout" style="margin-top:24px;max-width:820px">
+        <strong>Adding a GitHub vault needs no GitHub sign-in.</strong> Surface 3 is just a <code class="codeline" style="font-family:var(--font-mono);font-size:.92em;color:var(--brass-deep);">[org/repo]</code> text input — you type the repo. An optional <em>"Sign in with GitHub to choose vault repo"</em> picker can list your orgs and repos for convenience; it uses the token only to enumerate, then discards it and keeps a pointer. OpenVaultDB never validates the pointer, because it never touches the data.
+      </div>
+    </div>
+  </section>
+
   <!-- ============ CONNECT FLOW ============ -->
   <section class="doc-section">
     <div class="wrap">
@@ -226,8 +251,8 @@
         </div>
       </div>
 
-      <div class="callout" style="margin-top:30px;max-width:760px">
-        <strong>Serverless exception.</strong> When the vault is a GitHub repo, there is no vault server — GitHub is the authority. Here OpenVaultDB necessarily brokers the GitHub OAuth exchange (it holds the OAuth client secret), and the app receives a repo-scoped GitHub token it uses directly against the GitHub API. This is the one acknowledged case where OpenVaultDB sits in the auth path.
+      <div class="callout" style="margin-top:30px;max-width:820px">
+        <strong>GitHub-backed vaults — still no OpenVaultDB in the path.</strong> When the vault is a GitHub repo, GitHub is the authority. The app obtains its repo-scoped token through <em>its own</em> GitHub OAuth/App, or the user supplies a fine-grained PAT. OpenVaultDB never brokers it. (See the GitHub specifics below for why a backendless app uses a PAT.)
       </div>
     </div>
   </section>
@@ -254,10 +279,10 @@
             <td class="auth">The vault server</td>
             <td class="note">Same as self-hosted; OpenVaultDB runs it as a service, but it is still a vault — not the broker.</td>
           </tr>
-          <tr class="exc">
-            <td class="mode">Serverless (browser → GitHub) <span class="pill-exc">exception</span></td>
+          <tr>
+            <td class="mode">Serverless (browser → GitHub)</td>
             <td class="auth">GitHub</td>
-            <td class="note">No vault server exists. OpenVaultDB brokers the GitHub OAuth exchange; the app gets a repo-scoped GitHub token used directly.</td>
+            <td class="note">No vault server exists. The app gets a repo-scoped token via <em>its own</em> GitHub OAuth/App, or the user supplies a fine-grained PAT. OpenVaultDB is not involved.</td>
           </tr>
           <tr>
             <td class="mode">User-owned cloud</td>
@@ -266,6 +291,30 @@
           </tr>
         </tbody>
       </table>
+    </div>
+  </section>
+
+  <!-- ============ SERVERLESS / GITHUB SPECIFICS ============ -->
+  <section class="doc-section">
+    <div class="wrap">
+      <span class="eyebrow">GitHub specifics</span>
+      <h2>Three ways to land a repo-scoped token in the browser.</h2>
+      <p class="intro">For a GitHub-backed vault, the app needs a token scoped to one repo. There are three interchangeable ways to get one — none of them route through OpenVaultDB.</p>
+
+      <table class="modes">
+        <thead>
+          <tr><th>Who brokers</th><th>Needs a backend?</th><th>Best for</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="mode">App's own GitHub App</td><td class="auth">Yes — a minimal exchange endpoint</td><td class="note">Apps that already have GitHub OAuth. Prefer a GitHub App for per-repo scoping; use PKCE.</td></tr>
+          <tr><td class="mode">App's own OAuth App</td><td class="auth">Yes — a minimal exchange endpoint</td><td class="note">Same, but classic OAuth Apps grant the broad <code class="codeline" style="font-family:var(--font-mono);font-size:.9em;color:var(--brass-deep);">repo</code> scope — less least-privilege.</td></tr>
+          <tr class="exc"><td class="mode">User fine-grained PAT</td><td class="auth">No</td><td class="note">Fully backendless apps and personal use. The user pastes a token scoped to the repo; the browser uses it directly.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout" style="margin-top:24px;max-width:840px">
+        <strong>Why a backendless app must use a PAT.</strong> Verified against GitHub's docs (2025–2026): GitHub <em>supports PKCE</em> (since Jul 2025) and recommends it, but still <strong>requires a client secret for every client</strong> — it doesn't distinguish public from confidential clients, so PKCE alone can't replace a backend. And the token endpoint <code class="codeline" style="font-family:var(--font-mono);font-size:.9em;color:var(--brass-deep);">github.com/login/oauth/access_token</code> sends <strong>no CORS headers</strong>, so a browser can't redeem a code directly. A self-brokering app therefore needs a tiny secret-holding endpoint; a truly backendless app uses a personal access token, which works because GitHub's REST <em>data</em> API <em>is</em> CORS-enabled for authenticated requests.
+      </div>
     </div>
   </section>
 
