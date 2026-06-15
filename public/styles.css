@@ -499,3 +499,148 @@ section { position: relative; padding: 90px 0; }
   .grid, .scope-cols { grid-template-columns: 1fr; }
   section { padding: 62px 0; }
 }
+
+/* ============================================================
+   Auth — header slot, sign-in button, user chip, modal
+   ============================================================ */
+.auth-slot { display: inline-flex; align-items: center; gap: 10px; }
+
+.btn-signin {
+  font-family: var(--font-body); font-weight: 600; font-size: 15px;
+  color: #fff; background: var(--navy); border: 1px solid var(--navy);
+  padding: 8px 16px; border-radius: 8px; cursor: pointer;
+  transition: background .2s var(--ease), transform .2s var(--ease);
+}
+.btn-signin:hover { background: var(--navy-2); transform: translateY(-1px); }
+
+.user-chip { display: inline-flex; align-items: center; gap: 9px; color: var(--navy); }
+.user-avatar {
+  width: 28px; height: 28px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--brass); color: #fff; font-family: var(--font-mono); font-size: 13px; font-weight: 600;
+}
+.user-name { font-weight: 600; font-size: 14.5px; max-width: 16ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.btn-signout {
+  font-family: var(--font-body); font-weight: 600; font-size: 14px;
+  color: var(--text-soft); background: transparent; border: 1px solid var(--line-2);
+  padding: 6px 12px; border-radius: 8px; cursor: pointer;
+}
+.btn-signout:hover { border-color: var(--navy); color: var(--navy); }
+
+.auth-overlay {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(22,41,59,.5); backdrop-filter: blur(4px);
+  display: grid; place-items: center; padding: 20px;
+}
+.auth-overlay[hidden] { display: none; }
+.auth-dialog {
+  position: relative; width: 100%; max-width: 380px;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: 16px; box-shadow: var(--shadow-lg); padding: 30px 28px 24px;
+}
+.auth-close {
+  position: absolute; top: 12px; right: 14px;
+  background: none; border: none; font-size: 24px; line-height: 1; color: var(--muted); cursor: pointer;
+}
+.auth-close:hover { color: var(--navy); }
+.auth-title { font-family: var(--font-display); font-weight: 700; font-size: 21px; color: var(--navy); margin: 0; }
+.auth-sub { color: var(--text-soft); font-size: 14.5px; margin: 6px 0 20px; }
+.auth-provider {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+  font-family: var(--font-body); font-weight: 600; font-size: 15px; color: var(--navy);
+  background: var(--surface); border: 1px solid var(--line-2); border-radius: 9px;
+  padding: 11px 14px; margin-bottom: 10px; cursor: pointer;
+  transition: border-color .2s var(--ease), background .2s var(--ease);
+}
+.auth-provider:hover { border-color: var(--navy); background: var(--surface-2); }
+.auth-divider { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 12.5px; margin: 14px 0; }
+.auth-divider::before, .auth-divider::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.auth-form { display: flex; flex-direction: column; gap: 10px; }
+.auth-input {
+  font-family: var(--font-body); font-size: 15px; color: var(--text);
+  border: 1px solid var(--line-2); border-radius: 9px; padding: 11px 13px; background: var(--surface);
+}
+.auth-input:focus { outline: none; border-color: var(--navy); }
+.auth-submit {
+  font-family: var(--font-body); font-weight: 600; font-size: 15px; color: #fff;
+  background: var(--brass); border: 1px solid var(--brass); border-radius: 9px; padding: 11px 14px; cursor: pointer;
+  transition: background .2s var(--ease);
+}
+.auth-submit:hover { background: var(--brass-deep); }
+.auth-error { color: #b3261e; font-size: 13.5px; margin: 12px 0 0; }
+.auth-error[hidden] { display: none; }
+.auth-toggle { font-size: 13.5px; color: var(--text-soft); margin: 14px 0 0; text-align: center; }
+.auth-toggle a { color: var(--brass); border-bottom: 1px solid var(--brass-bright); }
+.auth-toggle a:hover { color: var(--brass-deep); }
+
+/* ============================================================
+   Account page — My Vaults / My Apps areas
+   ============================================================ */
+.account-head { padding: clamp(40px, 7vh, 72px) 0 8px; }
+.account-head h1 {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(30px, 4.6vw, 48px); letter-spacing: -.025em; color: var(--navy); margin: 8px 0 0;
+}
+.account-head .lead { color: var(--text-soft); font-size: 18px; margin: 14px 0 0; }
+.account-anon { padding: 60px 0 90px; }
+.account-anon .panel {
+  border: 1px solid var(--line); border-top: 3px solid var(--brass); border-radius: var(--r);
+  background: var(--surface); box-shadow: var(--shadow); padding: 48px 32px; text-align: center; max-width: 520px; margin: 0 auto;
+}
+.account-anon h2 { font-family: var(--font-display); font-weight: 700; font-size: 26px; color: var(--navy); margin: 14px 0 0; }
+.account-anon p { color: var(--text-soft); margin: 12px auto 24px; max-width: 40ch; }
+.account-areas { padding: 30px 0 90px; }
+.my-tabs { display: inline-flex; gap: 4px; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+.my-tab {
+  font-family: var(--font-body); font-weight: 600; font-size: 15.5px; color: var(--text-soft);
+  padding: 10px 18px; border-bottom: 2px solid transparent; margin-bottom: -1px;
+}
+.my-tab:hover { color: var(--navy); }
+.my-tab.active { color: var(--navy); border-bottom-color: var(--brass); }
+.area {
+  border: 1px solid var(--line); border-radius: var(--r); background: var(--surface);
+  box-shadow: var(--shadow); padding: 28px 26px; min-height: 240px; display: flex; flex-direction: column;
+}
+.area-head { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+.area-head .ico {
+  width: 40px; height: 40px; border-radius: 10px; display: grid; place-items: center;
+  border: 1px solid var(--line); background: var(--surface-2); color: var(--navy);
+}
+.area-head .ico svg { width: 20px; height: 20px; }
+.area-head h2 { font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--navy); margin: 0; }
+.area-empty {
+  flex: 1; display: grid; place-items: center; text-align: center;
+  border: 1px dashed var(--line-2); border-radius: 10px; color: var(--muted); font-size: 14.5px; padding: 24px;
+}
+/* ============================================================
+   Homepage "Get started" cards
+   ============================================================ */
+.getstarted { background: var(--band); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.start-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.start-card {
+  position: relative; display: flex; flex-direction: column;
+  border: 1px solid var(--line); border-radius: var(--r); background: var(--surface);
+  box-shadow: var(--shadow); padding: 30px 30px 28px; overflow: hidden;
+  transition: transform .25s var(--ease), box-shadow .25s var(--ease), border-color .25s var(--ease);
+}
+.start-card::after {
+  content: ""; position: absolute; left: 0; top: 0; height: 3px; width: 100%;
+  background: var(--brass); transform: scaleX(0); transform-origin: left; transition: transform .35s var(--ease);
+}
+.start-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--line-2); }
+.start-card:hover::after { transform: scaleX(1); }
+.start-card .ico {
+  width: 46px; height: 46px; border-radius: 11px; display: grid; place-items: center;
+  border: 1px solid var(--line); background: var(--surface-2); color: var(--navy); margin-bottom: 18px;
+}
+.start-card .ico svg { width: 23px; height: 23px; }
+.start-card .label {
+  font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
+}
+.start-card h3 { font-family: var(--font-display); font-weight: 700; font-size: 22px; color: var(--navy); margin: 0 0 8px; letter-spacing: -.01em; }
+.start-card p { margin: 0 0 20px; color: var(--text-soft); font-size: 15.5px; flex: 1; }
+.start-card .cta { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; color: var(--brass); }
+.start-card .cta svg { width: 16px; height: 16px; }
+.start-card:hover .cta { color: var(--brass-deep); }
+
+@media (max-width: 760px) { .account-areas { grid-template-columns: 1fr; } .start-cards { grid-template-columns: 1fr; } }

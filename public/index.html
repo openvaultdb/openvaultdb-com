@@ -46,6 +46,8 @@
         <a class="ghost" href="https://github.com/openvaultdb" target="_blank" rel="noopener">GitHub ↗</a>
       </nav>
 
+      <div class="auth-slot" data-auth-slot></div>
+
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       </button>
@@ -112,6 +114,34 @@
   </section>
 
   <div class="wrap"><div class="divider"></div></div>
+
+  <!-- ============ GET STARTED ============ -->
+  <section class="getstarted" id="get-started">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Get started</span>
+        <h2>Two ways in — for people, and for the apps they use.</h2>
+      </div>
+
+      <div class="start-cards">
+        <a class="start-card" href="/my/vaults" data-auth-cta>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="2.5" width="19" height="19" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg></span>
+          <div class="label">For you</div>
+          <h3>Vaults wallet</h3>
+          <p>Keep a directory of the vaults you own and grant apps access to them. Your data stays yours — OpenVaultDB only ever holds pointers.</p>
+          <span class="cta">Open your wallet <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+
+        <a class="start-card" href="/my/apps" data-auth-cta>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 9h18M8 4v16" stroke="currentColor" stroke-width="1.6"/></svg></span>
+          <div class="label">For developers</div>
+          <h3>Register your app</h3>
+          <p>Build apps that store data in users' vaults. Apps are identified by a domain you control — no central registry required.</p>
+          <span class="cta">Set up your app <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+      </div>
+    </div>
+  </section>
 
   <!-- ============ PRINCIPLE ============ -->
   <section class="principle" id="principle">
@@ -446,5 +476,6 @@
       if (e.target.tagName === 'A') { n.classList.remove('open'); t.setAttribute('aria-expanded', 'false'); }
     });
   </script>
+  <script type="module" src="/js/auth-ui.js"></script>
 </body>
 </html>

@@ -124,6 +124,8 @@
         <a class="ghost" href="https://github.com/openvaultdb" target="_blank" rel="noopener">GitHub ↗</a>
       </nav>
 
+      <div class="auth-slot" data-auth-slot></div>
+
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
       </button>
@@ -467,5 +469,6 @@
       if (e.target.tagName === 'A') { n.classList.remove('open'); t.setAttribute('aria-expanded', 'false'); }
     });
   </script>
+  <script type="module" src="/js/auth-ui.js"></script>
 </body>
 </html>

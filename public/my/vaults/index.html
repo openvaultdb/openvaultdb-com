@@ -3,44 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Docs — OpenVaultDB</title>
-  <meta name="description" content="OpenVaultDB documentation — protocol design notes, generated from open SpecScore specifications." />
+  <title>My Vaults — OpenVaultDB</title>
+  <meta name="description" content="The vaults you own, in your OpenVaultDB wallet." />
   <meta name="theme-color" content="#0c0e0d" />
+  <meta name="robots" content="noindex" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-
-  <meta property="og:title" content="OpenVaultDB — Docs" />
-  <meta property="og:description" content="Protocol design notes, generated from open specifications." />
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://openvaultdb.com/docs" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="/styles.css" />
-  <style>
-    .doc-head { padding: clamp(44px, 8vh, 90px) 0 12px; }
-    .doc-head h1 {
-      font-family: var(--font-display); font-weight: 800;
-      font-size: clamp(34px, 5.4vw, 60px); line-height: 1.04; letter-spacing: -.025em;
-      color: var(--navy); margin: 18px 0 0;
-    }
-    .doc-head .lead { font-size: 19px; color: var(--text-soft); max-width: 58ch; margin: 22px 0 0; }
-    .doc-list { padding: 40px 0 90px; }
-    .doc-card {
-      display: grid; grid-template-columns: auto 1fr auto; gap: 22px; align-items: center;
-      border: 1px solid var(--line); border-radius: var(--r); background: var(--surface);
-      box-shadow: var(--shadow); padding: 26px 28px; margin-bottom: 16px;
-      transition: transform .2s var(--ease), box-shadow .2s var(--ease), border-color .2s var(--ease);
-    }
-    .doc-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--line-2); }
-    .doc-card .num { font-family: var(--font-mono); font-size: 13px; color: var(--brass); border: 1px solid var(--brass-bright); border-radius: 8px; padding: 9px 12px; }
-    .doc-card h3 { font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--navy); margin: 0 0 5px; }
-    .doc-card p { margin: 0; color: var(--text-soft); font-size: 15.5px; max-width: 60ch; }
-    .doc-card .arr { color: var(--brass); font-size: 22px; }
-    .doc-card .status { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 8px; display: inline-block; }
-    @media (max-width: 620px){ .doc-card { grid-template-columns: 1fr; gap: 12px; } .doc-card .arr { display:none; } }
-  </style>
 </head>
 <body>
 
@@ -59,7 +32,6 @@
         <a href="/#principle">Principle</a>
         <a href="/#architecture">Architecture</a>
         <a href="/docs/">Docs</a>
-        <a class="ghost" href="https://github.com/openvaultdb" target="_blank" rel="noopener">GitHub ↗</a>
       </nav>
       <div class="auth-slot" data-auth-slot></div>
       <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
@@ -69,32 +41,40 @@
   </header>
 
   <main>
-  <section class="doc-head">
-    <div class="wrap">
-      <span class="eyebrow">Documentation</span>
-      <h1>Design notes, in the open.</h1>
-      <p class="lead">
-        Each page here is generated from an open
-        <a href="https://specscore.md/" target="_blank" rel="noopener" class="spec-link">SpecScore</a>
-        specification in the repository — the source of truth a developer, a
-        tool, or an AI agent can read and build a conformant implementation from.
-      </p>
-    </div>
-  </section>
-
-  <section class="doc-list">
-    <div class="wrap">
-      <a class="doc-card" href="/docs/auth-model">
-        <span class="num">01</span>
-        <div>
-          <h3>Authentication Model</h3>
-          <p>How users connect apps to vaults they own, and how apps prove their identity. The vault is the authority; OpenVaultDB only routes.</p>
-          <span class="status">Draft</span>
+    <!-- Signed-out prompt -->
+    <section class="account-anon" data-auth-anon hidden>
+      <div class="wrap">
+        <div class="panel">
+          <span class="eyebrow" style="justify-content:center;">My Vaults</span>
+          <h2>Sign in to see your vaults</h2>
+          <p>Your wallet keeps a directory of the vaults you own. OpenVaultDB never holds your data — only pointers.</p>
+          <button class="btn-signin" type="button" data-auth-open>Sign in</button>
         </div>
-        <span class="arr">→</span>
-      </a>
+      </div>
+    </section>
+
+    <!-- Signed-in content -->
+    <div data-auth-required hidden>
+      <section class="account-head">
+        <div class="wrap">
+          <span class="eyebrow">Your account</span>
+          <h1>My Vaults</h1>
+        </div>
+      </section>
+      <section class="wrap account-areas">
+        <nav class="my-tabs">
+          <a class="my-tab active" href="/my/vaults">Vaults</a>
+          <a class="my-tab" href="/my/apps">Apps</a>
+        </nav>
+        <div class="area">
+          <div class="area-head">
+            <span class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="2.5" width="19" height="19" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg></span>
+            <h2>Vaults you own</h2>
+          </div>
+          <div class="area-empty">No vaults yet. Vault management is coming soon.</div>
+        </div>
+      </section>
     </div>
-  </section>
   </main>
 
   <footer class="site-footer">
@@ -115,12 +95,6 @@
           <h5>Docs</h5>
           <a href="/docs/">Overview</a>
           <a href="/docs/auth-model">Authentication model</a>
-        </div>
-        <div class="foot-col">
-          <h5>Protocol</h5>
-          <a href="/#principle">Principle</a>
-          <a href="/#features">Capabilities</a>
-          <a href="/#architecture">Architecture</a>
         </div>
         <div class="foot-col">
           <h5>Project</h5>

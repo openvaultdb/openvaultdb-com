@@ -1,75 +1,84 @@
-# Deploying openvaultdb.com to CloudFlare
+# Deploying openvaultdb.com to Firebase Hosting
 
-This site is a static landing page (`public/index.html` + `public/styles.css` +
-`public/favicon.svg`). It deploys as a **CloudFlare Worker with static assets**
-— the current model, *not* the deprecated standalone CloudFlare Pages product.
+This site is a static, build-less collection of pages under `public/`
+(`index.html`, the `docs/` pages, the `account/` page, `styles.css`, `js/`,
+`favicon.svg`). It deploys to **Firebase Hosting** (project `openvaultdb`).
 
-There is no Worker script and no build step: the Worker is assets-only.
+There is no build step — `public/` is served as-is.
 
 ## Files
 
 ```
 openvaultdb-com/
-├── public/            ← everything served to the browser
+├── public/                     ← everything served to the browser
 │   ├── index.html
 │   ├── styles.css
-│   └── favicon.svg
-└── wrangler.jsonc     ← Worker + assets config
+│   ├── favicon.svg
+│   ├── js/                     ← Firebase init + auth UI (ES modules, CDN SDK)
+│   ├── docs/ …
+│   └── account/index.html      ← signed-in user page (My Vaults / My Apps)
+├── firebase.json               ← Hosting config (public dir, clean URLs)
+├── .firebaserc                 ← default project: openvaultdb
+└── .github/workflows/firebase-deploy.yml
 ```
 
 ## One-time setup
 
-1. Install Wrangler (CLI) and authenticate:
+1. Install the Firebase CLI and sign in:
    ```sh
-   npm install -g wrangler        # or use `npx wrangler ...` per-command
-   wrangler login                 # opens browser, authorizes your CF account
+   npm install -g firebase-tools
+   firebase login
    ```
 
-2. (Optional) Confirm the account/config:
+2. Wire up CI deploys (creates the service-account secret automatically):
    ```sh
-   wrangler whoami
+   firebase init hosting:github
    ```
+   When prompted, target this repo and the existing `public/` directory; decline
+   any build step. This adds the repo secret used by the workflow. If you skip
+   the wizard, create the secret manually:
+   - In the Firebase console: **Project settings → Service accounts → Generate
+     new private key**.
+   - In GitHub: **Settings → Secrets and variables → Actions → New secret**,
+     name **`FIREBASE_SERVICE_ACCOUNT_OPENVAULTDB`**, value = the JSON key.
 
 ## Preview locally
 
 ```sh
-wrangler dev
+firebase emulators:start --only hosting
+# or:
+firebase serve --only hosting
 ```
-Serves the `public/` directory at `http://localhost:8787` exactly as CloudFlare will.
+Serves `public/` at `http://localhost:5000`.
 
 ## Deploy
 
-From the `openvaultdb-com/` directory:
+Automatic: every push to `main` runs
+`.github/workflows/firebase-deploy.yml`, which deploys `public/` to the **live**
+channel via `FirebaseExtended/action-hosting-deploy`.
 
+Manual:
 ```sh
-wrangler deploy
+firebase deploy --only hosting
 ```
-
-This uploads `public/` and publishes the Worker. The first deploy prints a
-`*.workers.dev` URL you can use to verify before attaching the domain.
 
 ## Attach the custom domain (openvaultdb.com)
 
-Custom domains require the domain to be on CloudFlare (its nameservers pointed
-at CloudFlare). Two ways:
+DNS currently points at Cloudflare and must be moved to Firebase Hosting:
 
-**Dashboard (simplest):**
-1. CloudFlare Dashboard → **Workers & Pages** → `openvaultdb-com` → **Settings** → **Domains & Routes**.
-2. **Add** → **Custom Domain** → enter `openvaultdb.com` (and `www.openvaultdb.com` if wanted).
-3. CloudFlare provisions the DNS record + TLS automatically. SSL is ready within a minute or two.
+1. Firebase console → **Hosting** → **Add custom domain** → `openvaultdb.com`
+   (and `www.openvaultdb.com` if wanted).
+2. Firebase shows the DNS records to set (a `TXT` for verification, then `A`
+   records — or the provided records). Apply them at your DNS provider.
+3. Firebase provisions the TLS certificate automatically once DNS propagates.
 
-**Or declare it in `wrangler.jsonc`** and let `wrangler deploy` manage it — add:
-```jsonc
-"routes": [
-  { "pattern": "openvaultdb.com", "custom_domain": true }
-]
-```
-then run `wrangler deploy` again.
+## Auth notes
 
-## Notes
-
-- `not_found_handling: "404-page"` serves the page for unknown paths; with a
-  single page this rarely matters, but it avoids leaking a default error page.
-- No secrets, no environment variables, no KV/D1 bindings are needed.
-- To roll back, redeploy a previous commit, or use **Deployments** in the
-  dashboard to revert to an earlier version.
+- Sign-in uses Firebase Authentication (GitHub, Google, email/password). Enable
+  each provider in the Firebase console: **Authentication → Sign-in method**.
+- `openvaultdb.firebaseapp.com`, `openvaultdb.web.app`, and `localhost` are
+  authorized redirect domains by default. Add `openvaultdb.com` under
+  **Authentication → Settings → Authorized domains** once the custom domain is
+  live.
+- The web `apiKey` in `public/js/firebase-init.js` is not a secret; it is safe to
+  commit (Firebase access is governed by Auth + security rules, not the key).
