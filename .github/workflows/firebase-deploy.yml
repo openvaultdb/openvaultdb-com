@@ -1,21 +1,32 @@
 name: Deploy to Firebase Hosting
 
-# Static site — no build step. Publishes public/ to the live channel on push to main.
+# Static site — no build step. Publishes public/ to the live channel on push to
+# main. Auth is keyless via Workload Identity Federation (no service-account
+# key, per the org policy that disables SA keys).
 on:
   push:
     branches: [main]
 
 permissions:
   contents: read
+  id-token: write # required for Workload Identity Federation
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: FirebaseExtended/action-hosting-deploy@v0
+
+      - id: auth
+        uses: google-github-actions/auth@v2
         with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_OPENVAULTDB }}
-          channelId: live
-          projectId: openvaultdb
+          project_id: openvaultdb
+          workload_identity_provider: projects/323159488879/locations/global/workloadIdentityPools/github/providers/github-provider
+          service_account: github-deploy@openvaultdb.iam.gserviceaccount.com
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Deploy to Firebase Hosting (live)
+        run: npx --yes firebase-tools@latest deploy --only hosting --project openvaultdb --non-interactive

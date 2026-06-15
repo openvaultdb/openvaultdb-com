@@ -30,17 +30,29 @@ openvaultdb-com/
    firebase login
    ```
 
-2. Wire up CI deploys (creates the service-account secret automatically):
+2. CI auth is **keyless**, via Workload Identity Federation (the org policy
+   `iam.disableServiceAccountKeyCreation` forbids long-lived SA keys). The
+   workflow uses `google-github-actions/auth@v2` against a WIF provider. The
+   one-time GCP setup (already applied) was:
    ```sh
-   firebase init hosting:github
+   # service account + Firebase Hosting Admin
+   gcloud iam service-accounts create github-deploy --project=openvaultdb
+   gcloud projects add-iam-policy-binding openvaultdb \
+     --member="serviceAccount:github-deploy@openvaultdb.iam.gserviceaccount.com" \
+     --role="roles/firebasehosting.admin" --condition=None
+   # WIF pool + GitHub OIDC provider (restricted to the openvaultdb org)
+   gcloud iam workload-identity-pools create github --project=openvaultdb --location=global
+   gcloud iam workload-identity-pools providers create-oidc github-provider \
+     --project=openvaultdb --location=global --workload-identity-pool=github \
+     --issuer-uri="https://token.actions.githubusercontent.com" \
+     --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository,attribute.repository_owner=assertion.repository_owner" \
+     --attribute-condition="assertion.repository_owner=='openvaultdb'"
+   # let this repo impersonate the SA
+   gcloud iam service-accounts add-iam-policy-binding github-deploy@openvaultdb.iam.gserviceaccount.com \
+     --project=openvaultdb --role=roles/iam.workloadIdentityUser \
+     --member="principalSet://iam.googleapis.com/projects/323159488879/locations/global/workloadIdentityPools/github/attribute.repository/openvaultdb/openvaultdb-com"
    ```
-   When prompted, target this repo and the existing `public/` directory; decline
-   any build step. This adds the repo secret used by the workflow. If you skip
-   the wizard, create the secret manually:
-   - In the Firebase console: **Project settings → Service accounts → Generate
-     new private key**.
-   - In GitHub: **Settings → Secrets and variables → Actions → New secret**,
-     name **`FIREBASE_SERVICE_ACCOUNT_OPENVAULTDB`**, value = the JSON key.
+   No GitHub secrets are required.
 
 ## Preview locally
 
