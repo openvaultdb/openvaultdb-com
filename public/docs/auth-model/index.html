@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Authentication Model — OpenVaultDB</title>
+  <meta name="description" content="How users connect apps to vaults they own, and how apps prove their identity. An optional connection directory routes apps to the user's vault, which is the authority that issues scoped tokens." />
+  <meta name="theme-color" content="#0c0e0d" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+  <meta property="og:title" content="OpenVaultDB — Authentication Model" />
+  <meta property="og:description" content="The vault is the authority; OpenVaultDB only routes. Apps are identified by a domain they control." />
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://openvaultdb.com/docs/auth-model" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    /* ---- Docs-page-scoped styles (built on the same tokens) ---- */
+    .doc-head { padding: clamp(40px, 7vh, 80px) 0 10px; }
+    .crumb { font-family: var(--font-mono); font-size: 12.5px; letter-spacing: .04em; color: var(--muted); margin-bottom: 22px; }
+    .crumb a { color: var(--brass); border-bottom: 1px solid var(--brass-bright); }
+    .crumb a:hover { color: var(--brass-deep); }
+    .crumb span { color: var(--line-2); margin: 0 8px; }
+    .doc-head h1 {
+      font-family: var(--font-display); font-weight: 800;
+      font-size: clamp(32px, 5vw, 54px); line-height: 1.05; letter-spacing: -.025em;
+      color: var(--navy); margin: 16px 0 0; max-width: 18ch;
+    }
+    .doc-head .lead { font-size: 19px; color: var(--text-soft); max-width: 60ch; margin: 22px 0 0; }
+    .doc-section { padding: 56px 0; border-top: 1px solid var(--line); }
+    .doc-section:first-of-type { border-top: 0; }
+    .doc-section > .wrap > h2 {
+      font-family: var(--font-display); font-weight: 700;
+      font-size: clamp(24px, 3.4vw, 36px); letter-spacing: -.02em; color: var(--navy); margin: 14px 0 0;
+    }
+    .doc-section > .wrap > p.intro { color: var(--text-soft); font-size: 18px; max-width: 64ch; margin: 16px 0 34px; }
+
+    /* numbered flow */
+    .flow { display: flex; flex-direction: column; gap: 0; max-width: 760px; }
+    .flow-step { position: relative; display: grid; grid-template-columns: auto 1fr; gap: 20px; padding: 0 0 26px 0; }
+    .flow-step:last-child { padding-bottom: 0; }
+    .flow-num {
+      width: 38px; height: 38px; border-radius: 50%; flex: none;
+      display: grid; place-items: center; font-family: var(--font-mono); font-weight: 600; font-size: 15px;
+      background: var(--navy); color: #fff; z-index: 1;
+    }
+    .flow-step::before {
+      content: ""; position: absolute; left: 18px; top: 38px; bottom: -2px; width: 2px; background: var(--line-2);
+    }
+    .flow-step:last-child::before { display: none; }
+    .flow-step.exc .flow-num { background: var(--brass); }
+    .flow-body h3 { font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--navy); margin: 6px 0 4px; }
+    .flow-body p { margin: 0; color: var(--text-soft); font-size: 15.5px; }
+    .flow-body code, .codeline code { font-family: var(--font-mono); font-size: .92em; color: var(--brass-deep); background: var(--surface-2); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; }
+
+    /* authority-map table */
+    .modes { width: 100%; border-collapse: collapse; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; box-shadow: var(--shadow); }
+    .modes th, .modes td { text-align: left; padding: 15px 18px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 15px; }
+    .modes thead th { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); background: var(--surface-2); }
+    .modes tbody tr:last-child td { border-bottom: 0; }
+    .modes td.mode { font-family: var(--font-display); font-weight: 700; color: var(--navy); white-space: nowrap; }
+    .modes td.auth { font-family: var(--font-mono); font-size: 13px; color: var(--brass-deep); }
+    .modes td .note { color: var(--text-soft); }
+    .modes tr.exc td.auth { color: var(--signal); }
+    .pill-exc { display: inline-block; font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--brass-deep); border: 1px solid var(--brass-bright); border-radius: 999px; padding: 2px 8px; margin-left: 6px; vertical-align: middle; }
+
+    /* dark code block (manifest) */
+    .codeblock {
+      background: var(--navy); border-radius: var(--r); padding: 22px 24px; overflow-x: auto;
+      box-shadow: var(--shadow-lg); border: 1px solid var(--navy-2);
+    }
+    .codeblock pre { margin: 0; font-family: var(--font-mono); font-size: 13.5px; line-height: 1.75; color: #d7dee6; white-space: pre; }
+    .codeblock .k { color: #c89a45; }
+    .codeblock .s { color: #9ec7bd; }
+    .codeblock .c { color: #6c7a88; }
+
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: start; }
+    @media (max-width: 880px) { .two-col { grid-template-columns: 1fr; gap: 26px; } }
+
+    .callout {
+      border-left: 3px solid var(--brass-bright); background: var(--surface);
+      border-radius: 0 8px 8px 0; padding: 16px 20px; color: var(--text-soft); font-size: 15.5px; box-shadow: var(--shadow);
+    }
+    .callout strong { color: var(--brass-deep); }
+
+    /* delegated-origin mini diagram */
+    .deleg { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; font-family: var(--font-mono); font-size: 13px; }
+    .deleg .box { border: 1px solid var(--line-2); border-radius: 9px; padding: 12px 16px; background: var(--surface); box-shadow: var(--shadow); }
+    .deleg .box.auth { border-color: var(--brass-bright); background: linear-gradient(180deg,#fff,#fdf7ec); }
+    .deleg .box b { font-family: var(--font-display); color: var(--navy); display: block; font-size: 14px; }
+    .deleg .box.auth b { color: var(--brass-deep); }
+    .deleg .box small { color: var(--muted); }
+    .deleg .vouch { color: var(--brass); white-space: nowrap; }
+
+    .qlist { list-style: none; margin: 0; padding: 0; max-width: 70ch; }
+    .qlist li { position: relative; padding: 10px 0 10px 26px; border-bottom: 1px solid var(--line); color: var(--text-soft); font-size: 15.5px; }
+    .qlist li:last-child { border-bottom: 0; }
+    .qlist li::before { content: "?"; position: absolute; left: 0; top: 10px; font-family: var(--font-mono); color: var(--brass); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="/" aria-label="OpenVaultDB home">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <rect x="2.5" y="2.5" width="27" height="27" rx="6" stroke="#16293b" stroke-width="1.7"/>
+          <circle cx="16" cy="16" r="8.5" stroke="#16293b" stroke-width="1.7"/>
+          <circle cx="16" cy="16" r="3" fill="#a9741f"/>
+          <path d="M16 16l4.6 4.6M16 7.5v-2M16 24.5v2M7.5 16h-2M24.5 16h2" stroke="#a9741f" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+        <b>Open<span>Vault</span>DB</b>
+      </a>
+
+      <nav class="nav" id="nav">
+        <a href="/#principle">Principle</a>
+        <a href="/#architecture">Architecture</a>
+        <a href="/docs/">Docs</a>
+        <a class="ghost" href="https://github.com/openvaultdb" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+  <!-- ============ DOC HEAD ============ -->
+  <section class="doc-head">
+    <div class="wrap">
+      <div class="crumb"><a href="/docs/">Docs</a><span>/</span>Authentication Model</div>
+      <span class="status-pill"><span class="dot"></span> Draft · early proposal</span>
+      <h1>Authentication Model</h1>
+      <p class="lead">
+        How a user connects an application to a vault they own, and how an
+        application proves who it is. The guiding rule: <em>the vault is the
+        authority — OpenVaultDB only routes, and never becomes a party you're
+        forced to trust.</em>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ PRINCIPLE / DECISIONS ============ -->
+  <section class="doc-section">
+    <div class="wrap">
+      <span class="eyebrow">Core decisions</span>
+      <h2>Four rules hold the whole model together.</h2>
+      <p class="intro">Each one exists to keep openvaultdb.com a convenience, never a dependency.</p>
+
+      <div class="grid">
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 9h8M8 13h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></div>
+          <h3>The account is optional</h3>
+          <p>An OpenVaultDB account is a <em>connection directory</em> — a "vault wallet" that remembers your providers. It stores pointers and brokers consent. It never holds your data, and apps work without it.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>The vault is the authority</h3>
+          <p>The vault authenticates you and issues the app's scoped token. OpenVaultDB Connect only routes the app to the vault's authorize endpoint, then leaves the data path entirely.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3z" stroke="currentColor" stroke-width="1.6"/><path d="M4 7v10c0 1.7 3.6 3 8 3s8-1.3 8-3V7" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          <h3>The domain is the app's identity</h3>
+          <p>An app's <code>client_id</code> is a domain it controls, proven by its redirect URI and a <code>/.well-known/openvaultdb.json</code> manifest. The namespace derives from the verified domain — no central registry.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.6" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="18" r="2.6" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="12" r="2.6" stroke="currentColor" stroke-width="1.6"/><path d="M6 8.6v6.8M8.4 7.2l7.4 3.6M8.4 16.8l7.4-3.6" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          <h3>A manifest can delegate origins</h3>
+          <p>The authoritative domain may list sibling origins in <code>allowed_origins</code> — so several mini-apps sharing one auth project (e.g. one Firebase Authentication) can act under one namespace.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CONNECT FLOW ============ -->
+  <section class="doc-section">
+    <div class="wrap">
+      <span class="eyebrow">The Connect flow</span>
+      <h2>How an app gets access — and how OpenVaultDB steps out.</h2>
+      <p class="intro">The happy path with a vault that is its own authority (a self-hosted or OpenVaultDB-hosted server).</p>
+
+      <div class="flow">
+        <div class="flow-step">
+          <div class="flow-num">1</div>
+          <div class="flow-body">
+            <h3>The app opens OpenVaultDB Connect</h3>
+            <p>A popup or redirect: <em>"App <code>sneat.app</code> wants a namespace in your vault."</em></p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">2</div>
+          <div class="flow-body">
+            <h3>You choose a vault</h3>
+            <p>Pick one from your directory — or paste a vault URL directly, which works with no account at all.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">3</div>
+          <div class="flow-body">
+            <h3>Connect routes you to that vault</h3>
+            <p>OpenVaultDB redirects the app to <em>the vault's own authorize endpoint</em>. Its job is now essentially done.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">4</div>
+          <div class="flow-body">
+            <h3>The vault authenticates you and issues a token</h3>
+            <p>The vault shows a consent screen (app name, logo, and scopes resolved from the manifest) and mints a token scoped to the app's namespace.</p>
+          </div>
+        </div>
+        <div class="flow-step">
+          <div class="flow-num">5</div>
+          <div class="flow-body">
+            <h3>The app talks directly to the vault</h3>
+            <p>From here the app uses that token straight against the vault. <strong>OpenVaultDB Connect is no longer involved.</strong></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top:30px;max-width:760px">
+        <strong>Serverless exception.</strong> When the vault is a GitHub repo, there is no vault server — GitHub is the authority. Here OpenVaultDB necessarily brokers the GitHub OAuth exchange (it holds the OAuth client secret), and the app receives a repo-scoped GitHub token it uses directly against the GitHub API. This is the one acknowledged case where OpenVaultDB sits in the auth path.
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ AUTHORITY MAP ============ -->
+  <section class="doc-section">
+    <div class="wrap">
+      <span class="eyebrow">Where authority lives</span>
+      <h2>One auth model, four deployment modes.</h2>
+      <p class="intro">"The vault is the authority" resolves differently per backend — with exactly two explicit carve-outs.</p>
+
+      <table class="modes">
+        <thead>
+          <tr><th>Deployment mode</th><th>Authority</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="mode">Self-hosted server</td>
+            <td class="auth">The vault server</td>
+            <td class="note">Exposes an OAuth-style authorize/token endpoint and issues its own scoped tokens. Textbook.</td>
+          </tr>
+          <tr>
+            <td class="mode">OpenVaultDB-hosted</td>
+            <td class="auth">The vault server</td>
+            <td class="note">Same as self-hosted; OpenVaultDB runs it as a service, but it is still a vault — not the broker.</td>
+          </tr>
+          <tr class="exc">
+            <td class="mode">Serverless (browser → GitHub) <span class="pill-exc">exception</span></td>
+            <td class="auth">GitHub</td>
+            <td class="note">No vault server exists. OpenVaultDB brokers the GitHub OAuth exchange; the app gets a repo-scoped GitHub token used directly.</td>
+          </tr>
+          <tr>
+            <td class="mode">User-owned cloud</td>
+            <td class="auth">A vault server in front</td>
+            <td class="note">Raw cloud DBs (Firestore, DynamoDB…) have no namespace or consent concept, so this mode requires a thin vault server. Browser-direct-to-cloud is deliberately not a first-class mode — it would expose cloud credentials to the browser.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============ APP IDENTITY / MANIFEST ============ -->
+  <section class="doc-section">
+    <div class="wrap">
+      <span class="eyebrow">App identity</span>
+      <h2>An app is its domain — and the manifest proves it.</h2>
+      <p class="intro">No registration anywhere. The app publishes a manifest on the domain it controls; the namespace it may claim derives from that same domain.</p>
+
+      <div class="two-col">
+        <div>
+          <div class="codeblock" aria-label="Example openvaultdb.json manifest">
+<pre><span class="c">// https://sneat.app/.well-known/openvaultdb.json</span>
+{
+  <span class="k">"client_id"</span>: <span class="s">"sneat.app"</span>,
+  <span class="k">"name"</span>: <span class="s">"Sneat"</span>,
+  <span class="k">"logo"</span>: <span class="s">"https://sneat.app/logo.svg"</span>,
+  <span class="k">"namespace"</span>: <span class="s">"sneat.app"</span>,
+  <span class="k">"requested_scopes"</span>: [
+    <span class="s">"namespace:sneat.app:read"</span>,
+    <span class="s">"namespace:sneat.app:write"</span>
+  ],
+  <span class="k">"allowed_origins"</span>: [
+    <span class="s">"https://sneat.app"</span>,
+    <span class="s">"https://datatug.app"</span>
+  ]
+}</pre>
+          </div>
+        </div>
+
+        <div>
+          <h3 style="font-family:var(--font-display);font-weight:700;color:var(--navy);margin:0 0 10px;font-size:19px;">Delegated origins</h3>
+          <p style="color:var(--text-soft);margin:0 0 22px;font-size:15.5px;max-width:46ch;">
+            <code class="codeline" style="font-family:var(--font-mono);font-size:.92em;color:var(--brass-deep);">sneat.app</code> owns the namespace, but vouches for
+            <code class="codeline" style="font-family:var(--font-mono);font-size:.92em;color:var(--brass-deep);">datatug.app</code> — a sibling app sharing the same Firebase
+            Authentication. So <code class="codeline" style="font-family:var(--font-mono);font-size:.92em;color:var(--brass-deep);">datatug.app</code> may connect on its behalf.
+          </p>
+
+          <div class="deleg">
+            <div class="box auth"><b>sneat.app</b><small>authoritative · owns namespace</small></div>
+            <div class="vouch">─ vouches&nbsp;via&nbsp;allowed_origins ▶</div>
+            <div class="box"><b>datatug.app</b><small>delegated origin</small></div>
+          </div>
+
+          <div class="callout" style="margin-top:24px">
+            <strong>Why it's safe.</strong> Only whoever controls <code class="codeline" style="font-family:var(--font-mono);font-size:.92em;color:var(--brass-deep);">sneat.app</code> can edit its manifest. So a domain can pull other origins into <em>its own</em> namespace — but nothing can claim a namespace it isn't named by. A request from an unlisted origin is rejected.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DEFERRED / OPEN ============ -->
+  <section class="doc-section">
+    <div class="wrap">
+      <div class="two-col">
+        <div>
+          <span class="eyebrow">Out of scope (for now)</span>
+          <h2 style="font-size:clamp(22px,3vw,30px)">Deliberately deferred</h2>
+          <ul class="qlist" style="margin-top:20px">
+            <li>A verified <strong>app directory</strong> at openvaultdb.com — a convenience layer over domain identity, never required to connect.</li>
+            <li>Browser-direct-to-cloud as a first-class mode.</li>
+            <li>Table- and row-level permission scopes (namespace-level for now).</li>
+          </ul>
+        </div>
+        <div>
+          <span class="eyebrow">Still open</span>
+          <h2 style="font-size:clamp(22px,3vw,30px)">Questions we're working through</h2>
+          <ul class="qlist" style="margin-top:20px">
+            <li>Serverless token handling in the browser — session vs. localStorage.</li>
+            <li>The exact scope string vocabulary.</li>
+            <li>Manifest caching, and how fast a delegated origin can be revoked.</li>
+            <li>Token format and lifetime — per-vault, or a minimum conformance profile.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="cta">
+    <div class="wrap">
+      <div class="panel">
+        <span class="eyebrow">Defined in the open</span>
+        <h2>This page is generated from an open specification.</h2>
+        <p>The authentication model lives as a SpecScore Idea, Decision, and Feature in the repository — the source of truth any developer or AI agent can read and build against.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="https://github.com/openvaultdb/openvaultdb-com/tree/main/spec" target="_blank" rel="noopener">
+            Read the spec
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="/docs/">All docs</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <div>
+        <span class="brand">
+          <svg viewBox="0 0 32 32" fill="none" aria-hidden="true" style="width:26px;height:26px;">
+            <rect x="2.5" y="2.5" width="27" height="27" rx="6" stroke="#c9a45c" stroke-width="1.5"/>
+            <circle cx="16" cy="16" r="8.5" stroke="#e7c684" stroke-width="1.5"/>
+            <circle cx="16" cy="16" r="3" fill="#c9a45c"/>
+          </svg>
+          <b>Open<span style="color:var(--brass)">Vault</span>DB</b>
+        </span>
+        <p>An open protocol for user-owned application databases. Your data, your vault, your rules.</p>
+      </div>
+
+      <div class="foot-links">
+        <div class="foot-col">
+          <h5>Docs</h5>
+          <a href="/docs/">Overview</a>
+          <a href="/docs/auth-model">Authentication model</a>
+        </div>
+        <div class="foot-col">
+          <h5>Protocol</h5>
+          <a href="/#principle">Principle</a>
+          <a href="/#features">Capabilities</a>
+          <a href="/#architecture">Architecture</a>
+        </div>
+        <div class="foot-col">
+          <h5>Project</h5>
+          <a href="https://github.com/openvaultdb" target="_blank" rel="noopener">GitHub ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="legal">
+        <span>© 2026 OpenVaultDB · Apache-2.0</span>
+        <span>Early proposal — subject to change</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    var t = document.getElementById('navToggle');
+    var n = document.getElementById('nav');
+    t.addEventListener('click', function () {
+      var open = n.classList.toggle('open');
+      t.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    n.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') { n.classList.remove('open'); t.setAttribute('aria-expanded', 'false'); }
+    });
+  </script>
+</body>
+</html>
