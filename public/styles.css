@@ -753,3 +753,5 @@ a.ov-sub:hover { color: var(--brass-deep); }
 
 .ov-loading { color: var(--muted); font-size: 14px; margin: 4px 0; }
 .ov-error { color: #b3261e; font-size: 14px; margin: 4px 0; }
+
+.gh-actions { display: flex; gap: 10px; flex-wrap: wrap; margin: 4px 0 14px; }

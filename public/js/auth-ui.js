@@ -113,30 +113,35 @@ function onSignedIn() {
 }
 
 async function providerSignIn(which) {
-  let provider;
-  if (which === "github") {
-    provider = new GithubAuthProvider();
-    // Request `repo` so the wallet can list the user's repos (incl. private)
-    // to register one as a vault pointer.
-    provider.addScope("repo");
-  } else {
-    provider = new GoogleAuthProvider();
-  }
+  // General login requests MINIMAL scopes (identity only). Repo access is
+  // requested later, on demand, via requestGithubToken().
+  const provider =
+    which === "github" ? new GithubAuthProvider() : new GoogleAuthProvider();
   try {
-    const result = await signInWithPopup(auth, provider);
-    if (which === "github") {
-      // The OAuth access token is only available on the credential right after
-      // sign-in (Firebase never persists it). Stash it in sessionStorage so the
-      // vaults page can call the GitHub REST API.
-      const cred = GithubAuthProvider.credentialFromResult(result);
-      if (cred && cred.accessToken) {
-        try { sessionStorage.setItem("gh_access_token", cred.accessToken); } catch {}
-      }
-    }
+    await signInWithPopup(auth, provider);
     onSignedIn();
   } catch (err) {
     showError(friendlyError(err));
   }
+}
+
+// Step-up GitHub authorization: request a GitHub OAuth token with specific
+// scopes on demand — e.g. ["public_repo"] to browse public repos, ["repo"] for
+// private ones. The token is only exposed on the credential right after the
+// popup (Firebase never persists it), so we stash it in sessionStorage.
+export async function requestGithubToken(scopes) {
+  const provider = new GithubAuthProvider();
+  (scopes || []).forEach((s) => provider.addScope(s));
+  const result = await signInWithPopup(auth, provider);
+  const cred = GithubAuthProvider.credentialFromResult(result);
+  const token = cred && cred.accessToken;
+  if (token) {
+    try {
+      sessionStorage.setItem("gh_access_token", token);
+      sessionStorage.setItem("gh_token_scope", (scopes || []).join(" "));
+    } catch {}
+  }
+  return token;
 }
 
 async function emailSubmit(e) {

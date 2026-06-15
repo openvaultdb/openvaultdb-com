@@ -11,6 +11,7 @@ import {
   getGithubToken,
   fetchVaults,
 } from "./wallet-store.js";
+import { requestGithubToken } from "./auth-ui.js";
 
 const $ = (sel) => document.querySelector(sel);
 const listEl = $("[data-vault-list]");
@@ -49,46 +50,68 @@ function selectTab(which) {
   else loadServerVaults();
 }
 
-// ---- path (a): GitHub repos ----------------------------------------------
-async function loadGithubRepos() {
-  const token = getGithubToken();
-  if (!token) {
-    ghPanel.innerHTML = `
-      <p class="ov-error">No GitHub access token in this session. Sign out and sign back in with GitHub to grant repo access.</p>
-      <button class="btn-ghost-sm" type="button" data-gh-reauth>Re-authenticate with GitHub</button>`;
-    ghPanel.querySelector("[data-gh-reauth]").addEventListener("click", () => {
-      // Force a fresh sign-in: drop the Firebase session marker by signing out
-      // via the auth chip is cleaner, but here we just open the sign-in modal.
-      document.querySelector("[data-auth-open], .btn-signin")?.click();
-    });
-    return;
+// ---- path (a): GitHub repos (incremental scopes) -------------------------
+// Login stays minimal. We only request `public_repo` when the user browses
+// public repos, and escalate to `repo` only when they choose to pick a private
+// one — never at sign-in.
+function loadGithubRepos() {
+  ghPanel.innerHTML = `
+    <p class="hint">Register a GitHub repository as a vault. We only ask GitHub for the access you choose.</p>
+    <div class="gh-actions">
+      <button class="btn-ghost-sm" type="button" data-gh="public">Browse my public repos</button>
+      <button class="btn-ghost-sm" type="button" data-gh="private">Select my private repo</button>
+    </div>
+    <div data-gh-result></div>`;
+  ghPanel.querySelector('[data-gh="public"]').addEventListener("click", () => pickRepos("public"));
+  ghPanel.querySelector('[data-gh="private"]').addEventListener("click", () => pickRepos("private"));
+}
+
+async function pickRepos(mode) {
+  const result = ghPanel.querySelector("[data-gh-result]");
+  const needScope = mode === "private" ? "repo" : "public_repo";
+  const haveScope = sessionStorage.getItem("gh_token_scope") || "";
+  let token = getGithubToken();
+  // (Re)authorize only when we lack a token, or need `repo` but only hold `public_repo`.
+  if (!token || (needScope === "repo" && !haveScope.split(" ").includes("repo"))) {
+    result.innerHTML = '<p class="ov-loading">Waiting for GitHub authorization…</p>';
+    try {
+      token = await requestGithubToken([needScope]);
+    } catch (err) {
+      result.innerHTML = `<p class="ov-error">${escapeHtml(err?.message || "GitHub authorization was cancelled.")}</p>`;
+      return;
+    }
+    if (!token) {
+      result.innerHTML = '<p class="ov-error">No GitHub token returned.</p>';
+      return;
+    }
   }
-  ghPanel.innerHTML = '<p class="ov-loading">Loading your repositories…</p>';
+
+  const visibility = mode === "private" ? "all" : "public";
+  result.innerHTML = '<p class="ov-loading">Loading repositories…</p>';
   let repos;
   try {
     const res = await fetch(
-      "https://api.github.com/user/repos?visibility=all&per_page=100&sort=updated",
+      `https://api.github.com/user/repos?visibility=${visibility}&affiliation=owner&per_page=100&sort=updated`,
       { headers: { Authorization: `token ${token}`, Accept: "application/vnd.github+json" } },
     );
     if (res.status === 401) {
-      ghPanel.innerHTML =
-        '<p class="ov-error">GitHub rejected the token (expired). Sign out and sign back in with GitHub.</p>';
+      result.innerHTML = '<p class="ov-error">GitHub rejected the token. Try again to re-authorize.</p>';
       return;
     }
     if (!res.ok) {
-      ghPanel.innerHTML = `<p class="ov-error">GitHub returned ${res.status}.</p>`;
+      result.innerHTML = `<p class="ov-error">GitHub returned ${res.status}.</p>`;
       return;
     }
     repos = await res.json();
   } catch {
-    ghPanel.innerHTML = '<p class="ov-error">Could not reach the GitHub API.</p>';
+    result.innerHTML = '<p class="ov-error">Could not reach the GitHub API.</p>';
     return;
   }
   if (!Array.isArray(repos) || !repos.length) {
-    ghPanel.innerHTML = '<p class="ov-loading">No repositories found.</p>';
+    result.innerHTML = '<p class="ov-loading">No repositories found.</p>';
     return;
   }
-  ghPanel.innerHTML = `
+  result.innerHTML = `
     <p class="hint">Pick a repository to register as a vault pointer.</p>
     <div class="repo-list">
       ${repos
@@ -105,7 +128,7 @@ async function loadGithubRepos() {
         )
         .join("")}
     </div>`;
-  ghPanel.querySelectorAll("[data-pick-repo]").forEach((btn) => {
+  result.querySelectorAll("[data-pick-repo]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const added = addVault({
         kind: "github",
