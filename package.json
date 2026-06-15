@@ -1,0 +1,28 @@
+{
+  "name": "openvaultdb-com",
+  "version": "1.0.0",
+  "description": "Source code for the [OpenVaultDB.com](https://openvaultdb.com/) website and documentation portal.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "e2e": "playwright test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/openvaultdb/openvaultdb-com.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/openvaultdb/openvaultdb-com/issues"
+  },
+  "homepage": "https://github.com/openvaultdb/openvaultdb-com#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.61.0"
+  }
+}

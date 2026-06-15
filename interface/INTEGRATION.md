@@ -57,7 +57,8 @@ OVDB server.** The frontend never calls the OVDB server directly.
   - Runs the connect flow and stores the scoped vault token **server-side**.
   - Exposes its own REST API to the frontend:
     - `GET /api/tasks` · `POST /api/tasks {title}` · `PATCH /api/tasks/{id} {done?,title?}` · `DELETE /api/tasks/{id}`
-    - `GET /connect` → 302 to OVDB `/authorize` · `GET /callback` → exchanges code, stores token, 302 back to the frontend
+    - `GET /connect` → 302 to **OVDB Connect** (not straight to a vault server) · `GET /callback` → reads `iss`, exchanges code at `{iss}/token`, stores the connection, 302 back to the frontend
+    - `--connect-url` flag selects the OVDB Connect endpoint (default `http://localhost:5000/connect`; prod `https://openvaultdb.com/connect`)
     - `GET /api/status` → whether a vault is connected
   - On each `/api/tasks` op, calls the OVDB record endpoints with the scoped token.
   - CORS: allow origin `http://localhost:5173`.
@@ -68,28 +69,40 @@ OVDB server.** The frontend never calls the OVDB server directly.
 
 ## Connect flow (concrete)
 
+The app does **not** pin a vault server. It routes the user through **OVDB Connect**
+(openvaultdb.com), which lets the user choose which vault satisfies the request —
+a vault registered in their wallet (primary) or one entered manually. OVDB never
+touches vault data; it only forwards the request to the chosen server's `/authorize`.
+
 ```
 1. Frontend → navigate to the demo backend:  GET http://localhost:5180/connect
-2. Demo backend → 302 to OVDB:
-   GET http://localhost:8088/authorize
+2. Demo backend → 302 to OVDB Connect (NO vault, NO server URL — Connect resolves them):
+   GET http://localhost:5000/connect
        ?client_id=todo-demo.openvaultdb.app
        &redirect_uri=http://localhost:5180/callback
-       &vault=local
        &namespaceId=todo-demo.openvaultdb.app/openvaultdb/todos
        &role=editor
        &state=<random>
-3. OVDB shows a consent screen (dev: a simple Approve/Deny page), then
-   302 → http://localhost:5180/callback?code=<code>&state=<state>
-4. Demo backend → POST http://localhost:8088/token
+3. OVDB Connect: user picks a registered vault (or pastes server URL + vault id).
+   Connect verifies the server (GET {baseUrl}/.well-known/openvaultdb), then
+   302 → {vaultServer}/authorize?client_id=…&redirect_uri=…&vault=<vaultId>
+          &namespaceId=…&role=…&state=…
+4. Vault server shows a consent screen (dev: Approve/Deny), then
+   302 → http://localhost:5180/callback?code=<code>&state=<state>&iss={vaultServer}
+   `iss` (RFC 9207) tells the app which server issued the code.
+5. Demo backend → POST {iss}/token
        { grant_type: "authorization_code", code, client_id, redirect_uri }
-   ← { access_token, token_type: "Bearer", expires_in, namespaceId, scope }
-   The backend stores the token server-side and 302s back to the frontend.
-5. Frontend todo ops → demo backend /api/tasks → demo backend → OVDB record CRUD:
+   ← { access_token, token_type: "Bearer", expires_in, namespaceId, scope, vault }
+   The backend stores { baseURL=iss, vault, token } server-side and 302s to the frontend.
+6. Frontend todo ops → demo backend /api/tasks → demo backend → OVDB record CRUD
+   against the chosen server/vault:
    GET/POST/PATCH/DELETE
-   http://localhost:8088/vaults/local/ns/todo-demo.openvaultdb.app%2Fopenvaultdb%2Ftodos/collections/tasks/records[/{id}]
+   {iss}/vaults/{vault}/ns/todo-demo.openvaultdb.app%2Fopenvaultdb%2Ftodos/collections/tasks/records[/{id}]
 ```
 
 - The namespace id contains `/`; URL-encode it in the OVDB path segment (`%2F`).
+- `iss` is the issuing vault server's base URL; the app uses it for both `/token`
+  and record CRUD. The vault id comes back in the token response (`vault`).
 - The OVDB app token is an opaque bearer string scoped to `{ tasks: [read, write,
   delete] }`; the OVDB server MUST reject out-of-scope ops (e.g. a `viewer` token writing).
 

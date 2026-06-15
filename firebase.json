@@ -4,5 +4,11 @@
     "cleanUrls": true,
     "trailingSlash": false,
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"]
+  },
+  "emulators": {
+    "auth": { "port": 9099 },
+    "hosting": { "port": 8787 },
+    "ui": { "enabled": false },
+    "singleProjectMode": true
   }
 }

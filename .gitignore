@@ -150,3 +150,11 @@ specscore.local.yaml
 interface/node_modules/
 interface/generated/
 interface/package-lock.json
+
+# Playwright e2e
+.e2e-data/
+test-results/
+playwright-report/
+
+# Local git worktrees
+.worktrees/

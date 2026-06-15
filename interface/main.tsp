@@ -110,7 +110,11 @@ model AuthorizeQuery {
   @query state: string;
 }
 
-/** 302 redirect to `redirect_uri?code=...&state=...` after user consent. */
+/**
+ * 302 redirect to `redirect_uri?code=...&state=...&iss=...` after user consent.
+ * `iss` (RFC 9207) is this vault server's base URL, so the app learns which
+ * server issued the code and where to exchange it (`{iss}/token`).
+ */
 model AuthorizeRedirect {
   @statusCode statusCode: 302;
   @header location: url;
@@ -131,6 +135,8 @@ model TokenResponse {
   /** The granted namespace and per-collection ops. */
   namespaceId: NamespaceId;
   scope: Record<Op[]>;
+  /** The vault the token is scoped to (the app uses it in record paths). */
+  vault: VaultId;
 }
 
 interface Connect {
