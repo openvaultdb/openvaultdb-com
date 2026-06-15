@@ -64,14 +64,29 @@
       <section class="wrap account-areas">
         <nav class="my-tabs">
           <a class="my-tab active" href="/my/vaults">Vaults</a>
+          <a class="my-tab" href="/my/servers">Servers</a>
           <a class="my-tab" href="/my/apps">Apps</a>
         </nav>
         <div class="area">
           <div class="area-head">
             <span class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="2.5" width="19" height="19" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg></span>
             <h2>Vaults you own</h2>
+            <button class="btn-add" type="button" data-add-vault>+ Add vault</button>
           </div>
-          <div class="area-empty">No vaults yet. Vault management is coming soon.</div>
+
+          <!-- Add-vault chooser -->
+          <div class="addv" data-addv hidden>
+            <div class="addv-tabs">
+              <button class="addv-tab active" type="button" data-addv-tab="github">GitHub repo</button>
+              <button class="addv-tab" type="button" data-addv-tab="server">From a server</button>
+              <button class="btn-ghost-sm addv-close" type="button" data-addv-close>Cancel</button>
+            </div>
+            <div class="addv-panel" data-addv-panel="github"></div>
+            <div class="addv-panel" data-addv-panel="server" hidden></div>
+          </div>
+
+          <!-- Vault list -->
+          <div data-vault-list></div>
         </div>
       </section>
     </div>
@@ -122,5 +137,6 @@
     });
   </script>
   <script type="module" src="/js/auth-ui.js"></script>
+  <script type="module" src="/js/my-vaults.js"></script>
 </body>
 </html>
