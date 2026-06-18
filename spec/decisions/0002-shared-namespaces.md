@@ -1,10 +1,10 @@
 ---
 format: https://specscore.md/decision-specification
-status: Proposed
+status: In Review
 ---
 # Decision: Shared Namespaces
 
-**Status:** Proposed
+**Status:** In Review
 **Date:** 2026-06-15
 **Owner:** alexandertrakhimenok
 **Tags:** namespaces, sharing, permissions

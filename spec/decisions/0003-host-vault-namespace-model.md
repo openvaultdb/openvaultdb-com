@@ -1,11 +1,11 @@
 ---
 format: https://specscore.md/decision-specification
-status: Proposed
+status: In Review
 ---
 
 # Decision: Host / Vault / Namespace Model
 
-**Status:** Proposed
+**Status:** In Review
 **Date:** 2026-06-15
 **Owner:** alexandertrakhimenok
 **Tags:** terminology, ux, architecture
