@@ -25,16 +25,23 @@ app's data token, how an app proves its identity, and — given GitHub-backed
 1. **The OpenVaultDB account is an optional connection directory, not an
    identity provider.** It stores pointers to a user's vaults and brokers
    consent; the bare protocol works without it.
-2. **OpenVaultDB is never in any application's data-access path.** The vault is
-   the authority that issues the app's data token; OVDB Connect at most routes
-   the app to the vault and then steps out. OVDB's own GitHub OAuth is used only
-   on the account/management side (see surfaces below) and is never exposed to
-   an app.
-3. **App identity is its domain.** `client_id` is the app's authoritative
+2. **The core and self-hosted protocol remain decentralized.** In those modes,
+   the vault is the authority that issues the app's data token; OVDB Connect at
+   most routes the app to the vault and then steps out. OVDB's own GitHub OAuth
+   is used only on the account/management side and is never exposed to an app.
+3. **An app may opt into OpenVaultDB Cloud as a managed backup/export provider.**
+   This provider is outside the core protocol: the app authenticates to the
+   managed service, which owns the GitHub App principal and performs the
+   backup/export operation. The service MUST independently verify the user,
+   GitHub installation, and selected repository. Installation tokens MUST be
+   ephemeral and MUST never be exposed to the app or persisted. Choosing this
+   provider is optional and MUST NOT be required by a core or self-hosted
+   OpenVaultDB implementation.
+4. **App identity is its domain.** `client_id` is the app's authoritative
    domain, proven by the OAuth redirect URI plus a `/.well-known/openvaultdb.yaml`
    manifest (YAML; JSON alias). Namespaces are domain-bounded under the verified
    domain (`<domain>/openvaultdb/<name>` — see Decision 0002).
-4. **A manifest may delegate additional origins** via `allowed_origins`, letting
+5. **A manifest may delegate additional origins** via `allowed_origins`, letting
    sibling apps (e.g. sharing one Firebase Auth project) act under the
    authoritative domain's namespace.
 
@@ -52,18 +59,20 @@ URL), no GitHub auth, pointer stored unverified; and **picker** — an optional
 "Sign in with GitHub" that lists the user's orgs/repos, then discards the token
 and keeps only a pointer. The wallet exposes this through a single **My Vaults**
 tab; see Decision 0003 (Host / Vault / Namespace Model) for the terminology and
-information architecture.
+information architecture. Managed backup/export is a separate provider flow,
+not a fifth core authentication surface.
 
 ## Rationale
 
-Keeping the account optional and the vault as the authority is the only
-combination that preserves decentralization while improving UX: if OVDB minted
-tokens, apps would depend on it and it would cease to be optional. Domain
-identity needs no central registry, is self-verifying, and maps 1:1 onto the
-existing namespace tree, so an app can only claim a namespace it can prove it
-owns. `allowed_origins` is safe because only the controller of the authoritative
-domain can edit its manifest — a domain can pull other origins into *its own*
-namespace but cannot claim a namespace it is not named by.
+Keeping the account optional and the vault as the authority preserves
+decentralization for the core and self-hosted protocol. The separately opted-in
+managed provider improves backup/export UX without making its service, GitHub
+App, or installation credentials a protocol dependency or an app-held token.
+Domain identity needs no central registry, is self-verifying, and maps 1:1 onto
+the existing namespace tree, so an app can only claim a namespace it can prove
+it owns. `allowed_origins` is safe because only the controller of the
+authoritative domain can edit its manifest — a domain can pull other origins
+into *its own* namespace but cannot claim a namespace it is not named by.
 
 ## Declined Alternatives
 
@@ -84,11 +93,13 @@ the first conflicts with "optional," the second is unusable.
 
 ## Consequences at Decision Time
 
-- The invariant is now absolute: no "serverless exception." OVDB never brokers
-  an app's data token in any mode.
-- **Serverless (GitHub-backed vault):** GitHub is the authority. The app obtains
-  a repo-scoped token via **its own GitHub OAuth/App**, or the user supplies a
-  **fine-grained PAT**. Verified GitHub constraints (2025–2026) shape this:
+- The core/self-hosted invariant remains that the vault or direct provider is
+  the authority for the app's data token; the managed backup/export provider is
+  an explicit optional boundary and is not a core protocol requirement.
+- **Core/self-hosted serverless (GitHub-backed vault):** GitHub is the authority.
+  The app obtains a repo-scoped token via **its own GitHub OAuth/App**, or the
+  user supplies a **fine-grained PAT**. Verified GitHub constraints (2025–2026)
+  shape this:
   - GitHub supports **PKCE** (since 2025-07-14) and recommends it, but still
     **requires `client_secret` for every client** — it does not distinguish
     public from confidential clients, so PKCE alone does not enable a secretless
@@ -102,14 +113,21 @@ the first conflicts with "optional," the second is unusable.
     against GitHub's CORS-enabled REST data API.
   - Apps should prefer a **GitHub App** over a classic OAuth App for **per-repo**
     scoping (`repository_id` / selected-repo install) — true least privilege.
+- **Managed OpenVaultDB Cloud backup/export:** An opting-in app authenticates to
+  the managed service. The service owns the GitHub App principal, independently
+  verifies the user, installation, and selected repository, and mints an
+  ephemeral installation token only for the provider operation. The token is
+  never exposed to the app or persisted, and the managed flow does not replace
+  the core/self-hosted protocol.
 - **User-owned cloud:** raw cloud DBs have no namespace/consent concept, so this
   mode requires an OpenVaultDB host in front (reducing to the self-hosted case).
 - Each OpenVaultDB host must implement (or be fronted by) an OAuth-style
   authorize/token endpoint.
 - App owners must control a domain and host a manifest — a small barrier, but it
   removes any central registration step.
-- The homepage's serverless copy ("no backend to run — OpenVaultDB handles
-  GitHub sign-in") is no longer accurate and must be revised.
+- Homepage copy MUST distinguish the optional managed backup/export provider
+  from the core/self-hosted serverless path; OpenVaultDB Cloud MUST NOT be
+  presented as a requirement for direct GitHub-backed vault access.
 
 ## Observed Consequences
 
