@@ -29,14 +29,14 @@ app's data token, how an app proves its identity, and — given GitHub-backed
    the vault is the authority that issues the app's data token; OVDB Connect at
    most routes the app to the vault and then steps out. OVDB's own GitHub OAuth
    is used only on the account/management side and is never exposed to an app.
-3. **An app may opt into OpenVaultDB Cloud as a managed backup/export provider.**
-   This provider is outside the core protocol: the app authenticates to the
-   managed service, which owns the GitHub App principal and performs the
-   backup/export operation. The service MUST independently verify the user,
-   GitHub installation, and selected repository. Installation tokens MUST be
-   ephemeral and MUST never be exposed to the app or persisted. Choosing this
-   provider is optional and MUST NOT be required by a core or self-hosted
-   OpenVaultDB implementation.
+3. **An app may opt into the managed OpenVaultDB backup/export provider.** This
+   provider is outside the core protocol: the app authenticates to the managed
+   service, which owns the GitHub App principal named **OpenVaultDB** under the
+   `openvaultdb` organization and performs the backup/export operation. The
+   service MUST independently verify the user, GitHub installation, and selected
+   repository. Installation tokens MUST be ephemeral and MUST never be exposed
+   to the app or persisted. Choosing this provider is optional and MUST NOT be
+   required by a core or self-hosted OpenVaultDB implementation.
 4. **App identity is its domain.** `client_id` is the app's authoritative
    domain, proven by the OAuth redirect URI plus a `/.well-known/openvaultdb.yaml`
    manifest (YAML; JSON alias). Namespaces are domain-bounded under the verified
@@ -113,7 +113,7 @@ the first conflicts with "optional," the second is unusable.
     against GitHub's CORS-enabled REST data API.
   - Apps should prefer a **GitHub App** over a classic OAuth App for **per-repo**
     scoping (`repository_id` / selected-repo install) — true least privilege.
-- **Managed OpenVaultDB Cloud backup/export:** An opting-in app authenticates to
+- **Managed OpenVaultDB backup/export:** An opting-in app authenticates to
   the managed service. The service owns the GitHub App principal, independently
   verifies the user, installation, and selected repository, and mints an
   ephemeral installation token only for the provider operation. The token is
@@ -126,7 +126,7 @@ the first conflicts with "optional," the second is unusable.
 - App owners must control a domain and host a manifest — a small barrier, but it
   removes any central registration step.
 - Homepage copy MUST distinguish the optional managed backup/export provider
-  from the core/self-hosted serverless path; OpenVaultDB Cloud MUST NOT be
+  from the core/self-hosted serverless path; the managed OpenVaultDB provider MUST NOT be
   presented as a requirement for direct GitHub-backed vault access.
 
 ## Observed Consequences

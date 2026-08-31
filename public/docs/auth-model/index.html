@@ -255,7 +255,7 @@
       </div>
 
       <div class="callout" style="margin-top:30px;max-width:820px">
-        <strong>GitHub-backed vaults — still no OpenVaultDB in the path.</strong> When the vault is a GitHub repo, GitHub is the authority. The app obtains its repo-scoped token through <em>its own</em> GitHub OAuth/App, or the user supplies a fine-grained PAT. OpenVaultDB never brokers it. (See the GitHub specifics below for why a backendless app uses a PAT.)
+        <strong>Core/self-hosted GitHub vaults stay decentralized.</strong> When the vault is a GitHub repo, GitHub is the authority. The app obtains its repo-scoped token through <em>its own</em> GitHub OAuth/App, or the user supplies a fine-grained PAT; OpenVaultDB does not broker that core/self-hosted exchange. An app may separately opt into the managed OpenVaultDB backup/export provider, where the app authenticates to OpenVaultDB and the service owns its GitHub App principal. (See the GitHub specifics below for why a backendless app uses a PAT.)
       </div>
     </div>
   </section>
@@ -264,8 +264,8 @@
   <section class="doc-section">
     <div class="wrap">
       <span class="eyebrow">Where authority lives</span>
-      <h2>One auth model, four deployment modes.</h2>
-      <p class="intro">"The vault is the authority" resolves differently per backend — with exactly two explicit carve-outs.</p>
+      <h2>One auth model, five deployment modes.</h2>
+      <p class="intro">"The vault is the authority" resolves differently per backend, with the optional managed backup/export provider kept outside the core protocol.</p>
 
       <table class="modes">
         <thead>
@@ -285,7 +285,12 @@
           <tr>
             <td class="mode">Serverless (browser → GitHub)</td>
             <td class="auth">GitHub</td>
-            <td class="note">No vault server exists. The app gets a repo-scoped token via <em>its own</em> GitHub OAuth/App, or the user supplies a fine-grained PAT. OpenVaultDB is not involved.</td>
+            <td class="note">No vault server exists. In core/self-hosted mode the app gets a repo-scoped token via <em>its own</em> GitHub OAuth/App, or the user supplies a fine-grained PAT. OpenVaultDB is not involved in that exchange.</td>
+          </tr>
+          <tr>
+            <td class="mode">Managed OpenVaultDB backup/export</td>
+            <td class="auth">OpenVaultDB service</td>
+            <td class="note">Optional provider flow outside the core protocol. The app authenticates to OpenVaultDB; the service owns the OpenVaultDB GitHub App, independently verifies the user, installation, and selected repository, and keeps installation tokens ephemeral and undisclosed.</td>
           </tr>
           <tr>
             <td class="mode">User-owned cloud</td>
@@ -302,7 +307,7 @@
     <div class="wrap">
       <span class="eyebrow">GitHub specifics</span>
       <h2>Three ways to land a repo-scoped token in the browser.</h2>
-      <p class="intro">For a GitHub-backed vault, the app needs a token scoped to one repo. There are three interchangeable ways to get one — none of them route through OpenVaultDB.</p>
+      <p class="intro">For a core/self-hosted GitHub-backed vault, the app needs a token scoped to one repo. There are three interchangeable self-brokered ways to get one. The optional managed OpenVaultDB provider is a separate service flow, not a browser token path.</p>
 
       <table class="modes">
         <thead>
@@ -312,6 +317,7 @@
           <tr><td class="mode">App's own GitHub App</td><td class="auth">Yes — a minimal exchange endpoint</td><td class="note">Apps that already have GitHub OAuth. Prefer a GitHub App for per-repo scoping; use PKCE.</td></tr>
           <tr><td class="mode">App's own OAuth App</td><td class="auth">Yes — a minimal exchange endpoint</td><td class="note">Same, but classic OAuth Apps grant the broad <code class="codeline" style="font-family:var(--font-mono);font-size:.9em;color:var(--brass-deep);">repo</code> scope — less least-privilege.</td></tr>
           <tr class="exc"><td class="mode">User fine-grained PAT</td><td class="auth">No</td><td class="note">Fully backendless apps and personal use. The user pastes a token scoped to the repo; the browser uses it directly.</td></tr>
+          <tr><td class="mode">Managed OpenVaultDB provider</td><td class="auth">Yes — provider service</td><td class="note">Optional backup/export flow. OpenVaultDB owns its GitHub App and keeps installation credentials server-side; it does not replace the core/self-hosted authority.</td></tr>
         </tbody>
       </table>
 
