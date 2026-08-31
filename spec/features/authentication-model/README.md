@@ -12,8 +12,10 @@ status: Draft
 
 How users connect applications to vaults they own, and how applications prove
 their identity. An optional OpenVaultDB account routes apps to the user's chosen
-vault, which is the authority that issues the app's token — OpenVaultDB is never
-in an app's data path. Apps are identified by a domain they control.
+vault, which is the authority that issues the app's token for core and
+self-hosted access. An app MAY separately opt into the managed OpenVaultDB
+backup/export provider, which is outside the core protocol. Apps are identified
+by a domain they control.
 
 ## Problem
 
@@ -67,18 +69,30 @@ enumerate repositories and then discarded, with only a pointer retained.
 
 #### REQ: vault-is-authority
 
-The vault MUST be the authority that authenticates the user and issues the app's
-data token; OpenVaultDB MUST NOT mint or broker that token in any mode. For a
-vault on an OpenVaultDB host, OVDB Connect MAY route the app to the host's
-authorize endpoint and then leave the data path.
+For core and self-hosted access, the vault MUST be the authority that
+authenticates the user and issues the app's data token; OpenVaultDB MUST NOT
+mint or broker that core-protocol token. For a vault on an OpenVaultDB host,
+OVDB Connect MAY route the app to the host's authorize endpoint and then leave
+the data path. This requirement does not govern the separately opted-in managed
+OpenVaultDB backup/export provider.
 
 #### REQ: serverless-app-token
 
-For a GitHub-backed vault, the application MUST obtain its repo-scoped token via
-its own GitHub OAuth/App exchange or via a user-supplied fine-grained personal
-access token; OpenVaultDB MUST NOT broker this exchange. Because GitHub requires
-a client secret even with PKCE and its token endpoint is not CORS-enabled, a
-backendless app MUST use the personal-access-token path.
+For a core or self-hosted GitHub-backed vault, the application MUST obtain its
+repo-scoped token via its own GitHub OAuth/App exchange or via a user-supplied
+fine-grained personal access token; OpenVaultDB MUST NOT broker this exchange.
+Because GitHub requires a client secret even with PKCE and its token endpoint is
+not CORS-enabled, a backendless app MUST use the personal-access-token path.
+
+#### REQ: managed-provider-exception
+
+An application MAY opt into the managed OpenVaultDB backup/export provider as a
+separate service contract. In that flow the app authenticates to the managed
+service; the service owns the OpenVaultDB GitHub App principal and independently
+verifies the user, installation, and selected repository. Installation tokens
+MUST be ephemeral, MUST never be exposed to the app, and MUST never be
+persisted. This provider is optional and MUST NOT become a requirement of the
+core or self-hosted protocol.
 
 #### REQ: cloud-needs-server
 
@@ -157,7 +171,13 @@ rejected.
 
 **Given** a GitHub-backed vault
 **When** an app obtains access
-**Then** the repo-scoped token comes from the app's own GitHub OAuth/App exchange or a user-supplied fine-grained PAT, and OpenVaultDB never brokers it.
+**Then** the repo-scoped token comes from the app's own GitHub OAuth/App exchange or a user-supplied fine-grained PAT, and OpenVaultDB never brokers the core/self-hosted exchange.
+
+### AC: managed-provider-is-optional (verifies REQ:managed-provider-exception)
+
+**Given** an application chooses the managed OpenVaultDB backup/export provider
+**When** it authenticates to that service and installs the service's GitHub App
+**Then** the service independently verifies the user, installation, and selected repository, keeps installation tokens ephemeral and undisclosed, and the core/self-hosted protocol remains usable without this provider
 
 ### AC: backendless-app-uses-pat (verifies REQ:serverless-app-token)
 

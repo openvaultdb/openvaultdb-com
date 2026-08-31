@@ -233,14 +233,15 @@
         <span class="eyebrow">No server required</span>
         <h2 class="sl-title">Your browser writes straight to your own Git repo.</h2>
         <p class="sl-lead">
-          In serverless mode the app reads and writes your data directly from the
+          In core/self-hosted serverless mode the app reads and writes your data directly from the
           browser to a Git repository you own — authenticated with the app's own
           GitHub sign-in, or a fine-grained token you provide. OpenVaultDB stays
-          out of the data path entirely. inGitDB and INGR.io keep every change a
+          out of the core data path entirely. For an optional managed OpenVaultDB
+          backup/export flow, the service owns its GitHub App separately. inGitDB and INGR.io keep every change a
           clean, mergeable commit.
         </p>
         <ul class="sl-points">
-          <li>OpenVaultDB is never in the data path — your browser talks straight to GitHub</li>
+          <li>Core/self-hosted apps talk straight to GitHub; managed export is an optional separate service</li>
           <li>Private repos for private data, public repos for public data</li>
           <li>Your data lives in a repo you control — clone it anywhere</li>
         </ul>
