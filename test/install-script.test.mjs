@@ -9,7 +9,9 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const installer = join(root, "public", "install.sh");
+const windowsInstaller = join(root, "public", "install.ps1");
 const skillInstaller = join(root, "public", "install-skill.sh");
+const windowsSkillInstaller = join(root, "public", "install-skill.ps1");
 const canonicalSkill = join(root, "public", "agent-skills", "openvaultdb", "SKILL.md");
 
 function executable(path, source) {
@@ -105,6 +107,31 @@ test("direct installer refuses a checksum mismatch", (t) => {
   assert.notEqual(failed.result.status, 0);
   assert.match(failed.result.stderr, /checksum verification failed/);
   assert.equal(existsSync(join(failed.bin, "ovdb")), false);
+});
+
+test("Windows direct installer verifies the canonical release before installing", () => {
+  const source = readFileSync(windowsInstaller, "utf8");
+  assert.match(source, /releases\/latest/);
+  assert.match(source, /ovdb_\$\{AssetVersion\}_windows_amd64\.zip/);
+  assert.match(source, /checksums\.txt/);
+  assert.match(source, /Get-FileHash -Algorithm SHA256/);
+  assert.match(source, /SHA-256 checksum verification failed/);
+  assert.match(source, /OVDB_INSTALL_DIR/);
+  assert.match(source, /OVDB_VERSION/);
+  assert.match(source, /OpenVaultDB\\bin/);
+  assert.match(source, /PROCESSOR_ARCHITEW6432/);
+  assert.doesNotMatch(source, /\bgo install\b/);
+});
+
+test("Windows skill installer verifies canonical source and preserves changed files", () => {
+  const source = readFileSync(windowsSkillInstaller, "utf8");
+  const expected = createHash("sha256").update(readFileSync(canonicalSkill)).digest("hex");
+  assert.match(source, /ValidateSet\("codex", "claude"\)/);
+  assert.match(source, /Get-FileHash -Algorithm SHA256/);
+  assert.match(source, new RegExp(expected));
+  assert.match(source, /existing SKILL\.md differs.*-ReplaceChanged/);
+  assert.match(source, /refusing reparse-point destination/);
+  assert.doesNotMatch(source, /__SKILL_SHA256__/);
 });
 
 test("standalone skill installer verifies and installs the canonical source", (t) => {

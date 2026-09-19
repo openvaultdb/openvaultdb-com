@@ -2,12 +2,20 @@
 
 Follow these steps in order. Run one command at a time.
 
+First determine the operating system. Remember `PLATFORM` as `windows` when running in Windows PowerShell. Otherwise remember it as `unix`. Where a step gives separate commands, run only the commands for `PLATFORM`.
+
 ## 1. Inspect the CLI state
 
-Run:
+On macOS or Linux, run:
 
 ```sh
 command -v ovdb
+```
+
+On Windows, run in PowerShell:
+
+```powershell
+Get-Command ovdb -ErrorAction SilentlyContinue
 ```
 
 If this prints no path, remember that the CLI state is `absent`. Continue to step 2.
@@ -48,7 +56,7 @@ If all checks pass, remember that the CLI state is `compatible`. If any check is
 
 ## 2. Inspect available install methods
 
-Run:
+On macOS or Linux, run:
 
 ```sh
 command -v brew
@@ -56,7 +64,9 @@ command -v brew
 
 If this prints a path, Homebrew is available. If it prints no path, Homebrew is unavailable.
 
-The checksum-verified direct installer is available on macOS and Linux. It installs to `$HOME/.local/bin`, is independent of Homebrew, and does not need Go.
+On Windows, remember that Homebrew is unavailable. Do not run the Homebrew command.
+
+The checksum-verified direct installer is available on macOS, Linux, and Windows. On macOS and Linux it installs to `$HOME/.local/bin`. On Windows it installs to `%LOCALAPPDATA%\OpenVaultDB\bin`. It is independent of Homebrew and does not need Go.
 
 The standalone official-skill installer supports Codex and Claude Code. It does not require `ovdb`. If you are Codex, remember `HARNESS` as `codex`. If you are Claude Code, remember `HARNESS` as `claude`. For another agent, skills-only is unavailable.
 
@@ -76,7 +86,7 @@ If the CLI state is `outdated`, also say that it predates AI onboarding. Option 
 
 If the person chooses abort, stop cleanly. Do not install a skill. Report that setup was not changed.
 
-If the person chooses skills only, continue to the standalone skill commands below.
+If the person chooses skills only, continue to the standalone skill subsection for `PLATFORM` below.
 
 If the person chooses Homebrew, run:
 
@@ -92,9 +102,9 @@ brew upgrade --cask ovdb
 
 Then continue to step 4.
 
-If the person chooses direct install, skip the standalone skill subsection and continue to `Direct install` below.
+If the person chooses direct install, skip the standalone skill subsection and continue to the direct-install subsection for `PLATFORM` below.
 
-### Standalone skill install
+### Standalone skill install on macOS or Linux
 
 Run:
 
@@ -144,7 +154,39 @@ rm "$HOME/.cache/openvaultdb/install-skill.sh"
 
 If the CLI state is `compatible`, continue to step 6. If it is `absent` or `outdated`, stop. Report that the skill is installed, but CLI-dependent setup remains unavailable until a compatible `ovdb` is installed.
 
-### Direct install
+### Standalone skill install on Windows
+
+In PowerShell, run:
+
+```powershell
+$installer = Join-Path $env:TEMP "openvaultdb-install-skill.ps1"
+Invoke-WebRequest https://openvaultdb.com/install-skill.ps1 -OutFile $installer
+& $installer -Harness HARNESS
+```
+
+Replace `HARNESS` with `codex` or `claude`, as selected in step 2. Continue only if the output says that the official OpenVaultDB skill was installed or is already up to date, and prints the canonical source URL plus its verified SHA-256 checksum.
+
+If the installer says the existing `SKILL.md` differs from the official source, ask:
+
+> The installed OpenVaultDB skill has local changes. Replace it with the checksum-verified official skill?
+
+If the person says yes, run:
+
+```powershell
+& $installer -Harness HARNESS -ReplaceChanged
+```
+
+If the person says no, stop. Keep the existing skill unchanged.
+
+After a successful or already-up-to-date result, run:
+
+```powershell
+Remove-Item $installer
+```
+
+If the CLI state is `compatible`, continue to step 6. If it is `absent` or `outdated`, stop. Report that the skill is installed, but CLI-dependent setup remains unavailable until a compatible `ovdb` is installed.
+
+### Direct install on macOS or Linux
 
 Run:
 
@@ -182,9 +224,22 @@ rm "$HOME/.cache/openvaultdb/install.sh"
 
 Continue to step 4.
 
+### Direct install on Windows
+
+In PowerShell, run:
+
+```powershell
+$installer = Join-Path $env:TEMP "openvaultdb-install.ps1"
+Invoke-WebRequest https://openvaultdb.com/install.ps1 -OutFile $installer
+& $installer
+Remove-Item $installer
+```
+
+The installer downloads the matching official GitHub release ZIP and `checksums.txt`. It verifies the SHA-256 checksum before installing. Continue to step 4.
+
 ## 4. Verify the installed CLI
 
-Run:
+On macOS or Linux, run:
 
 ```sh
 command -v ovdb
@@ -197,6 +252,20 @@ export PATH="$HOME/.local/bin:$PATH"
 ```
 
 This changes `PATH` only for the current shell. Do not change shell startup files without permission.
+
+On Windows, run in PowerShell:
+
+```powershell
+Get-Command ovdb -ErrorAction SilentlyContinue
+```
+
+If this prints no command after direct install, run:
+
+```powershell
+$env:PATH = "$env:LOCALAPPDATA\OpenVaultDB\bin;$env:PATH"
+```
+
+This changes `PATH` only for the current PowerShell session. Do not change the persistent user or machine `PATH` without permission.
 
 Run `ovdb version` and the three capability checks from step 1 again.
 

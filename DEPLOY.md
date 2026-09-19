@@ -83,7 +83,12 @@ curl -fsSIL https://openvaultdb.com/agent-instructions/install
 curl -fsSIL https://openvaultdb.com/agent-instructions/onboarding
 curl -fsSIL https://openvaultdb.com/agent-instructions/configure
 curl -fsSIL https://openvaultdb.com/install.sh
+curl -fsSIL https://openvaultdb.com/install.ps1
 curl -fsSIL https://openvaultdb.com/install-skill.sh
+curl -fsSIL https://openvaultdb.com/install-skill.ps1
+curl -fsSIL https://openvaultdb.com/robots.txt
+curl -fsSIL https://openvaultdb.com/sitemap.xml
+curl -fsSIL https://openvaultdb.com/llms.txt
 curl -fsSIL https://openvaultdb.com/agent-skills/openvaultdb/SKILL.md
 ```
 

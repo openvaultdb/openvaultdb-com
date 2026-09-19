@@ -8,6 +8,9 @@ const contentDir = join(root, "content", "agent-instructions");
 const publicDir = join(root, "public");
 const skillSourcePath = join(root, "content", "agent-skills", "openvaultdb", "SKILL.md");
 const skillInstallerTemplatePath = join(root, "scripts", "install-skill.template.sh");
+const windowsInstallerTemplatePath = join(root, "scripts", "install.template.ps1");
+const windowsSkillInstallerTemplatePath = join(root, "scripts", "install-skill.template.ps1");
+const discoveryDir = join(root, "content", "discovery");
 const homeStart = "  <!-- BEGIN GENERATED AI INSTALL -->";
 const homeEnd = "  <!-- END GENERATED AI INSTALL -->";
 
@@ -209,14 +212,28 @@ function homeInstallSection() {
   <section class="home-install" aria-labelledby="home-install-title">
     <div class="wrap">
       <div class="home-install-copy">
-        <span class="eyebrow">AI onboarding preview</span>
-        <h2 id="home-install-title">Give your agent one small prompt.</h2>
-        <p>It will follow the official steps, verify that the installed release supports this flow, and stop on errors.</p>
+        <span class="eyebrow">Install OpenVaultDB</span>
+        <h2 id="home-install-title">Ask your agent—or run one command.</h2>
+        <p>The direct installers download the matching official release, verify its SHA-256 checksum, and need no Go toolchain.</p>
         <a class="btn btn-ghost" href="/install">See full install options</a>
       </div>
-      <div class="home-prompt">
-        <pre><code id="home-short-prompt">${escapeHTML(shortPrompt)}</code></pre>
-        <button class="btn btn-primary" type="button" data-copy-target="home-short-prompt" aria-live="polite">Copy prompt</button>
+      <div class="home-install-options">
+        <article class="home-install-option home-prompt">
+          <div class="home-install-option-head"><span>AI agent</span><strong>Recommended</strong></div>
+          <pre><code id="home-short-prompt">${escapeHTML(shortPrompt)}</code></pre>
+          <button class="btn btn-primary" type="button" data-copy-target="home-short-prompt" aria-live="polite">Copy prompt</button>
+        </article>
+        <article class="home-install-option">
+          <div class="home-install-option-head"><span>macOS or Linux</span><strong>Terminal</strong></div>
+          <pre><code id="home-unix-install">(p=$(mktemp) &amp;&amp; trap 'rm -f "$p"' EXIT &amp;&amp; curl -fsSL https://openvaultdb.com/install.sh -o "$p" &amp;&amp; sh "$p")</code></pre>
+          <button class="btn btn-ghost" type="button" data-copy-target="home-unix-install" aria-live="polite">Copy command</button>
+        </article>
+        <article class="home-install-option">
+          <div class="home-install-option-head"><span>Windows</span><strong>PowerShell</strong></div>
+          <pre><code id="home-windows-install">$p=Join-Path $env:TEMP ("ovdb-"+[guid]::NewGuid()+".ps1"); try { irm https://openvaultdb.com/install.ps1 -OutFile $p -EA Stop; &amp; $p } finally { Remove-Item $p -EA SilentlyContinue }</code></pre>
+          <button class="btn btn-ghost" type="button" data-copy-target="home-windows-install" aria-live="polite">Copy command</button>
+        </article>
+        <p class="home-install-trust">These shortcuts trust the installer served by <code>openvaultdb.com</code>. <a href="/install.sh">Review shell source</a> · <a href="/install.ps1">Review PowerShell source</a>. Each installer verifies the downloaded release checksum before installing it. Prefer <a href="/agent-instructions/install">Homebrew through the guided install</a> when you want package-manager provenance.</p>
       </div>
     </div>
   </section>
@@ -240,6 +257,13 @@ function generatedSkillInstaller() {
   );
 }
 
+function generatedWindowsSkillInstaller() {
+  return readFileSync(windowsSkillInstallerTemplatePath, "utf8").replaceAll(
+    "__SKILL_SHA256__",
+    canonicalSkillSHA256(),
+  );
+}
+
 export function buildOutputs() {
   const instructions = readInstructions();
   const outputs = new Map();
@@ -249,7 +273,12 @@ export function buildOutputs() {
   outputs.set("install/index.html", installPage(instructions));
   outputs.set("index.html", generatedHomepage());
   outputs.set("agent-skills/openvaultdb/SKILL.md", canonicalSkill);
+  outputs.set("install.ps1", readFileSync(windowsInstallerTemplatePath, "utf8"));
   outputs.set("install-skill.sh", generatedSkillInstaller());
+  outputs.set("install-skill.ps1", generatedWindowsSkillInstaller());
+  for (const name of ["robots.txt", "sitemap.xml", "llms.txt"]) {
+    outputs.set(name, readFileSync(join(discoveryDir, name), "utf8"));
+  }
   return outputs;
 }
 

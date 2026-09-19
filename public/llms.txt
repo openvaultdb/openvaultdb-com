@@ -1,0 +1,17 @@
+# OpenVaultDB
+
+> User-owned, portable databases with pluggable storage engines.
+
+## Installation
+
+- [Install options](https://openvaultdb.com/install): Human and AI-assisted setup choices.
+- [Canonical AI install instructions](https://openvaultdb.com/agent-instructions/install): Detect, authorize, install, and verify the OpenVaultDB CLI and optional AI skill.
+- [Onboarding instructions](https://openvaultdb.com/agent-instructions/onboarding): Start the local server and create a useful first database.
+- [Configuration instructions](https://openvaultdb.com/agent-instructions/configure): Change and verify local server settings.
+
+## Canonical installers
+
+- [macOS and Linux installer](https://openvaultdb.com/install.sh): Checksum-verifying shell installer.
+- [Windows installer](https://openvaultdb.com/install.ps1): Checksum-verifying PowerShell installer.
+- [AI skill installer](https://openvaultdb.com/install-skill.sh): Installer for the official OpenVaultDB agent skill.
+- [Windows AI skill installer](https://openvaultdb.com/install-skill.ps1): PowerShell installer for the official OpenVaultDB agent skill.

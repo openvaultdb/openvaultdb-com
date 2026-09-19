@@ -27,7 +27,12 @@ test("generated static routes match the canonical instruction sources", () => {
       "install/index.html",
       "index.html",
       "agent-skills/openvaultdb/SKILL.md",
+      "install.ps1",
       "install-skill.sh",
+      "install-skill.ps1",
+      "robots.txt",
+      "sitemap.xml",
+      "llms.txt",
     ],
   );
   for (const [path, expected] of outputs) {
@@ -42,15 +47,22 @@ test("install page copies the short prompt and every canonical instruction", () 
   for (const name of instructionOrder) {
     assert.ok(installPage.includes(escapeHTML(instructions[name])), `missing ${name} source`);
   }
+  assert.ok(installPage.includes('href="/agent-instructions/install"'));
 });
 
-test("homepage shows the exact short prompt with copy and install actions", () => {
+test("homepage shows the AI prompt and canonical direct installers", () => {
   const homepage = buildOutputs().get("index.html");
   assert.ok(homepage.includes(`<code id="home-short-prompt">${escapeHTML(shortPrompt)}</code>`));
   assert.ok(homepage.includes('data-copy-target="home-short-prompt"'));
+  assert.ok(homepage.includes('<code id="home-unix-install">(p=$(mktemp) &amp;&amp; trap \'rm -f "$p"\' EXIT &amp;&amp; curl -fsSL https://openvaultdb.com/install.sh -o "$p" &amp;&amp; sh "$p")</code>'));
+  assert.ok(homepage.includes('<code id="home-windows-install">$p=Join-Path $env:TEMP ("ovdb-"+[guid]::NewGuid()+".ps1"); try { irm https://openvaultdb.com/install.ps1 -OutFile $p -EA Stop; &amp; $p } finally { Remove-Item $p -EA SilentlyContinue }</code>'));
+  assert.match(homepage, /These shortcuts trust the installer served by/);
+  assert.match(homepage, /Homebrew through the guided install/);
+  assert.ok(homepage.includes('data-copy-target="home-unix-install"'));
+  assert.ok(homepage.includes('data-copy-target="home-windows-install"'));
   assert.ok(homepage.includes('href="/install"'));
   assert.ok(homepage.includes('src="/js/copy-text.js"'));
-  assert.match(homepage, /AI onboarding preview/);
+  assert.match(homepage, /Install OpenVaultDB/);
 });
 
 test("standalone skill artifacts come from the canonical public source", () => {
@@ -66,6 +78,11 @@ test("instruction journey names its gates, stops and verifications", () => {
   const instructions = readInstructions();
   assert.match(instructions.install, /ovdb version/);
   assert.match(instructions.install, /https:\/\/openvaultdb\.com\/install\.sh/);
+  assert.match(instructions.install, /https:\/\/openvaultdb\.com\/install\.ps1/);
+  assert.match(instructions.install, /https:\/\/openvaultdb\.com\/install-skill\.ps1/);
+  assert.match(instructions.install, /Get-Command ovdb -ErrorAction SilentlyContinue/);
+  assert.match(instructions.install, /Homebrew is unavailable.*Windows/s);
+  assert.match(instructions.install, /Do not change the persistent user or machine `PATH`/);
   assert.match(instructions.install, /does not need Go/);
   assert.match(instructions.install, /1\. Install or update the CLI with Homebrew/);
   assert.match(instructions.install, /2\. Install or update the CLI with the checksum-verified direct script/);
@@ -73,6 +90,7 @@ test("instruction journey names its gates, stops and verifications", () => {
   assert.match(instructions.install, /4\. Abort setup/);
   assert.match(instructions.install, /install-skill\.sh.*--harness HARNESS/s);
   assert.match(instructions.install, /--replace-changed/);
+  assert.match(instructions.install, /-ReplaceChanged/);
   assert.match(instructions.install, /rm "\$HOME\/\.cache\/openvaultdb\/install-skill\.sh"/);
   assert.match(instructions.install, /root `\.skills\[\]` array.*selected item's `\.targets\[\]` array/s);
   assert.match(instructions.install, /CLI-dependent setup remains unavailable/);
@@ -112,4 +130,20 @@ test("generated pages link every cold static route in the journey", () => {
   ]) {
     assert.ok(all.includes(`href="${route}"`), `missing link to ${route}`);
   }
+});
+
+test("crawler discovery points to the canonical AI install journey", () => {
+  const sitemap = readFileSync(join(root, "public", "sitemap.xml"), "utf8");
+  const robots = readFileSync(join(root, "public", "robots.txt"), "utf8");
+  const llms = readFileSync(join(root, "public", "llms.txt"), "utf8");
+
+  assert.match(sitemap, /https:\/\/openvaultdb\.com\/install/);
+  assert.match(sitemap, /https:\/\/openvaultdb\.com\/agent-instructions\/install/);
+  assert.match(sitemap, /https:\/\/openvaultdb\.com\/agent-instructions\/onboarding/);
+  assert.match(sitemap, /https:\/\/openvaultdb\.com\/agent-instructions\/configure/);
+  assert.match(robots, /User-agent: \*\nAllow: \/\n/);
+  assert.match(robots, /Sitemap: https:\/\/openvaultdb\.com\/sitemap\.xml/);
+  assert.match(llms, /Canonical AI install instructions/);
+  assert.match(llms, /https:\/\/openvaultdb\.com\/install\.sh/);
+  assert.match(llms, /https:\/\/openvaultdb\.com\/install\.ps1/);
 });
