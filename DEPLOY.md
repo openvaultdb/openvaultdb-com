@@ -28,10 +28,11 @@ unit tests, and executes a Wrangler deployment dry run. The tests cover the
 Worker-to-`ASSETS` route, security/cache headers, Cloudflare configuration, and
 the cold static installation routes.
 
-To inspect a local Worker preview, choose an unused port and pass it explicitly;
-do not assume the default port is free:
+To inspect a local Worker preview, start with the example port below. The
+example port may already be in use; if it is, choose another unused port:
 
 ```sh
+PORT=8976
 npx wrangler dev --local --port "$PORT"
 ```
 

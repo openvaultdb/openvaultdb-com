@@ -116,3 +116,17 @@ test("Firebase deploys rules only while client services and local emulation rema
   assert.match(client, /firebase-auth\.js/);
   assert.match(client, /firebase-firestore\.js/);
 });
+
+test("website verification covers every public asset change", () => {
+  const workflow = readFileSync(
+    join(root, ".github/workflows/verify-agent-instructions.yml"),
+    "utf8",
+  );
+  assert.equal(workflow.match(/- "public\/\*\*"/g)?.length, 2);
+});
+
+test("local Worker preview example assigns its configurable port", () => {
+  const deployGuide = readFileSync(join(root, "DEPLOY.md"), "utf8");
+  assert.match(deployGuide, /PORT=\d+\nnpx wrangler dev --local --port "\$PORT"/);
+  assert.match(deployGuide, /example port may already be in use/i);
+});
