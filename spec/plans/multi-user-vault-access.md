@@ -35,7 +35,7 @@ deferred.
 
 **Verifies:** multi-user-vault-access#ac:persona-distinction
 **Depends-On:** —
-**Status:** pending
+**Status:** planning
 
 Define and parse the two principal kinds — email principal (`someone@example.com`
 ≡ `mailto:`) and provider-account principal (`acct:someone@github.com`) — as
@@ -46,7 +46,7 @@ user-id with the handle as display only. This is the type every grant references
 
 **Verifies:** multi-user-vault-access#ac:account-verified-by-oauth, multi-user-vault-access#ac:org-domain-declared-method
 **Depends-On:** 1
-**Status:** pending
+**Status:** planning
 
 Map an authenticated wallet login to its canonical principal and verify it
 against the principal's authority: OAuth for built-in providers, email control
@@ -57,7 +57,7 @@ for email domains, and the method an org domain declares in its
 
 **Verifies:** multi-user-vault-access#ac:namespace-grant-saved, multi-user-vault-access#ac:coadmin-can-grant-not-migrate
 **Depends-On:** 1
-**Status:** pending
+**Status:** planning
 
 Define the grant record `(principal, scope, role)` across the three nested scopes
 (vault / namespace / app-on-namespace), with co-user/co-admin at the broad tiers
@@ -68,7 +68,7 @@ that namespace co-admin may re-grant but is not the schema owner (no migrate).
 
 **Verifies:** multi-user-vault-access#ac:intersection-wins, multi-user-vault-access#ac:union-of-matching-grants
 **Depends-On:** 2, 3
-**Status:** pending
+**Status:** planning
 
 Resolve all grants matching a principal as the union of their scopes, then
 compute a user's effective access through an app as the intersection of that
@@ -78,7 +78,7 @@ union with the app's namespace ACL.
 
 **Verifies:** multi-user-vault-access#ac:wildcard-coadmin-rejected
 **Depends-On:** 3, 4
-**Status:** pending
+**Status:** planning
 
 Support wildcard principals (`*@authority`, `acct:*@authority`) that match any
 subject the authority vouches for, and reject any attempt to grant a wildcard the
@@ -88,7 +88,7 @@ co-admin role (cap to co-user / named roles).
 
 **Verifies:** multi-user-vault-access#ac:revoke-invalidates
 **Depends-On:** 3
-**Status:** pending
+**Status:** planning
 
 Let the vault owner and scope co-admins add, scope, and revoke grants from the
 wallet, with revocation invalidating the affected principal's access (and any
@@ -98,7 +98,7 @@ issued token).
 
 **Verifies:** multi-user-vault-access#ac:enforced-at-connect
 **Depends-On:** 2, 4, 5
-**Status:** pending
+**Status:** planning
 
 At connect time, map the authenticated login to its canonical principal, resolve
 its grants, and issue access limited to the resolved scope intersected with the

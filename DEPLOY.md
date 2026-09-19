@@ -15,7 +15,7 @@ Firebase Hosting is not a production target.
 
 ## Build and verify
 
-Use Node.js 20 or newer. From a clean checkout:
+Use Node.js 22 or newer. From a clean checkout:
 
 ```sh
 npm ci
