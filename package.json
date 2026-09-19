@@ -10,6 +10,9 @@
     "build": "node scripts/build-agent-instructions.mjs",
     "build:agent-instructions": "node scripts/build-agent-instructions.mjs",
     "test": "node --test test/*.test.mjs",
+    "check": "npm run build && npm test && npm run worker:dry-run",
+    "worker:dry-run": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
+    "deploy:cloudflare": "npm run check && wrangler deploy",
     "e2e": "playwright test"
   },
   "repository": {
@@ -25,6 +28,7 @@
   },
   "homepage": "https://github.com/openvaultdb/openvaultdb-com#readme",
   "devDependencies": {
-    "@playwright/test": "^1.61.1"
+    "@playwright/test": "^1.61.1",
+    "wrangler": "^4.135.0"
   }
 }

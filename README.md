@@ -32,12 +32,18 @@ Learn more at https://openvaultdb.com
 └── infrastructure/ Deployment and infrastructure configuration
 ```
 
-## Deployment
+## Hosting and deployment
 
-The repository still contains a legacy Firebase deployment workflow. It is
-not the target hosting architecture: the public web surface must move to the
-OpenVaultDB Cloudflare landing worker before this onboarding flow is called
-production-ready. This MVP does not deploy or perform that hosting cutover.
+The public website is configured as the `openvaultdb-com` Cloudflare Workers
+Static Assets Worker. [`wrangler.jsonc`](wrangler.jsonc) binds `public/` as
+`ASSETS`, runs [`worker/index.mjs`](worker/index.mjs) before every asset, keeps
+clean URLs without trailing slashes, and declares `openvaultdb.com` as its
+custom domain. The Worker controls the site's security and cache headers.
+
+Firebase Authentication and Firestore remain browser dependencies. The
+Firebase GitHub workflow deploys Firestore rules only; it no longer publishes
+Firebase Hosting. The `hosting` block in `firebase.json` exists solely for the
+local Playwright Firebase emulator.
 
 The canonical AI installation instructions live in
 `content/agent-instructions`; the canonical standalone skill lives in
@@ -46,14 +52,16 @@ The canonical AI installation instructions live in
 installer before publishing:
 
 ```sh
-npm run build
-npm test
+npm ci
+npm run check
 ```
 
-The read-only `Verify AI installation instructions` workflow checks this on
-matching pushes and pull requests. It is not an authoritative deployment gate
-and does not legitimize the legacy Firebase deployment; launch still requires
-the separate Cloudflare cutover.
+The read-only `Verify website` workflow checks generated content, unit tests,
+and a Wrangler dry run on matching pushes and pull requests. There is no
+Cloudflare deployment workflow: the repository does not have the broad account
+token that such a workflow would require. The landing owner deploys a reviewed
+release with an already-authenticated local Wrangler session as documented in
+[DEPLOY.md](DEPLOY.md).
 
 Release order matters: first publish an `ovdb` release whose normal help
 contains the documented onboarding commands, then publish the generated web

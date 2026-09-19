@@ -1,96 +1,128 @@
-# Deploying openvaultdb.com to Firebase Hosting
+# Deploying openvaultdb.com
 
-This site is a static, build-less collection of pages under `public/`
-(`index.html`, the `docs/` pages, the `account/` page, `styles.css`, `js/`,
-`favicon.svg`). It deploys to **Firebase Hosting** (project `openvaultdb`).
+The public website is a Cloudflare Workers Static Assets application. Static
+files live under `public/`; `worker/index.mjs` runs before every request, fetches
+the matching asset through the `ASSETS` binding, and applies response headers.
+The production Worker and custom domain are declared in `wrangler.jsonc`:
 
-There is no build step — `public/` is served as-is.
+- Worker: `openvaultdb-com`
+- custom domain: `openvaultdb.com`
+- static assets: `public/`
+- clean URL policy: drop trailing slashes
 
-## Files
+Firebase Authentication and Firestore remain in use by the browser code.
+Firebase Hosting is not a production target.
 
-```
-openvaultdb-com/
-├── public/                     ← everything served to the browser
-│   ├── index.html
-│   ├── styles.css
-│   ├── favicon.svg
-│   ├── js/                     ← Firebase init + auth UI (ES modules, CDN SDK)
-│   ├── docs/ …
-│   └── account/index.html      ← signed-in user page (My Vaults / My Apps)
-├── firebase.json               ← Hosting config (public dir, clean URLs)
-├── .firebaserc                 ← default project: openvaultdb
-└── .github/workflows/firebase-deploy.yml
-```
+## Build and verify
 
-## One-time setup
-
-1. Install the Firebase CLI and sign in:
-   ```sh
-   npm install -g firebase-tools
-   firebase login
-   ```
-
-2. CI auth is **keyless**, via Workload Identity Federation (the org policy
-   `iam.disableServiceAccountKeyCreation` forbids long-lived SA keys). The
-   workflow uses `google-github-actions/auth@v2` against a WIF provider. The
-   one-time GCP setup (already applied) was:
-   ```sh
-   # service account + Firebase Hosting Admin
-   gcloud iam service-accounts create github-deploy --project=openvaultdb
-   gcloud projects add-iam-policy-binding openvaultdb \
-     --member="serviceAccount:github-deploy@openvaultdb.iam.gserviceaccount.com" \
-     --role="roles/firebasehosting.admin" --condition=None
-   # WIF pool + GitHub OIDC provider (restricted to the openvaultdb org)
-   gcloud iam workload-identity-pools create github --project=openvaultdb --location=global
-   gcloud iam workload-identity-pools providers create-oidc github-provider \
-     --project=openvaultdb --location=global --workload-identity-pool=github \
-     --issuer-uri="https://token.actions.githubusercontent.com" \
-     --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository,attribute.repository_owner=assertion.repository_owner" \
-     --attribute-condition="assertion.repository_owner=='openvaultdb'"
-   # let this repo impersonate the SA
-   gcloud iam service-accounts add-iam-policy-binding github-deploy@openvaultdb.iam.gserviceaccount.com \
-     --project=openvaultdb --role=roles/iam.workloadIdentityUser \
-     --member="principalSet://iam.googleapis.com/projects/323159488879/locations/global/workloadIdentityPools/github/attribute.repository/openvaultdb/openvaultdb-com"
-   ```
-   No GitHub secrets are required.
-
-## Preview locally
+Use Node.js 20 or newer. From a clean checkout:
 
 ```sh
-firebase emulators:start --only hosting
-# or:
-firebase serve --only hosting
+npm ci
+npm run check
+git diff --exit-code
 ```
-Serves `public/` at `http://localhost:5000`.
 
-## Deploy
+`npm run check` regenerates the canonical AI instruction pages, runs all Node
+unit tests, and executes a Wrangler deployment dry run. The tests cover the
+Worker-to-`ASSETS` route, security/cache headers, Cloudflare configuration, and
+the cold static installation routes.
 
-Automatic: every push to `main` runs
-`.github/workflows/firebase-deploy.yml`, which deploys `public/` to the **live**
-channel via `FirebaseExtended/action-hosting-deploy`.
+To inspect a local Worker preview, choose an unused port and pass it explicitly;
+do not assume the default port is free:
 
-Manual:
 ```sh
-firebase deploy --only hosting
+npx wrangler dev --local --port "$PORT"
 ```
 
-## Attach the custom domain (openvaultdb.com)
+The multi-service Playwright journey still uses Firebase's local Hosting, Auth,
+and Firestore emulators. The `hosting` block in `firebase.json` and its fixed
+emulator ports are local-test configuration only. Never run `firebase deploy
+--only hosting`.
 
-DNS currently points at Cloudflare and must be moved to Firebase Hosting:
+## Production deployment
 
-1. Firebase console → **Hosting** → **Add custom domain** → `openvaultdb.com`
-   (and `www.openvaultdb.com` if wanted).
-2. Firebase shows the DNS records to set (a `TXT` for verification, then `A`
-   records — or the provided records). Apply them at your DNS provider.
-3. Firebase provisions the TLS certificate automatically once DNS propagates.
+There is intentionally no GitHub Actions deployment for Cloudflare. Deploying a
+custom-domain Worker from CI would require a broad Cloudflare account token that
+this repository does not have. The landing owner uses the already-authenticated
+local Wrangler session:
 
-## Auth notes
+```sh
+npx wrangler whoami
+npm run deploy:cloudflare
+```
 
-- Sign-in uses Firebase Authentication (GitHub, Google, email/password). Enable
-  each provider in the Firebase console: **Authentication → Sign-in method**.
-- `openvaultdb.firebaseapp.com`, `openvaultdb.web.app`, and `localhost` are
-  authorized redirect domains by default. Add `openvaultdb.com` under
-  **Authentication → Settings → Authorized domains** once the custom domain is
-  live.
-- The web `apiKey` in `public/js/firebase-init.js` is not a secret; it is safe to
-  commit (Firebase access is governed by Auth + security rules, not the key).
+`npm run deploy:cloudflare` reruns the full check before `wrangler deploy`.
+Wrangler applies the `openvaultdb.com` custom-domain declaration. If it reports
+a DNS or existing-route conflict, stop and inspect the authoritative Cloudflare
+DNS and Worker-route state. Remove or replace only records proven to belong to
+the retired Firebase Hosting route; do not guess or broadly delete DNS.
+
+Before changing traffic, confirm `openvaultdb.com` remains listed under Firebase
+Authentication's authorized domains. The hosting cutover does not change the
+browser's Firebase project or authentication providers.
+
+The compatible `ovdb` CLI release must be public before publishing the AI
+installation pages that depend on it.
+
+## Post-deploy verification
+
+Record the deployed Worker version:
+
+```sh
+npx wrangler versions list
+```
+
+Verify the apex and cold routes, following canonical clean-URL redirects:
+
+```sh
+curl -fsSIL https://openvaultdb.com/
+curl -fsSIL https://openvaultdb.com/install
+curl -fsSIL https://openvaultdb.com/agent-instructions/install
+curl -fsSIL https://openvaultdb.com/agent-instructions/onboarding
+curl -fsSIL https://openvaultdb.com/agent-instructions/configure
+curl -fsSIL https://openvaultdb.com/install.sh
+curl -fsSIL https://openvaultdb.com/install-skill.sh
+curl -fsSIL https://openvaultdb.com/agent-skills/openvaultdb/SKILL.md
+```
+
+For each final response, verify the expected status and these Worker-owned
+headers:
+
+```text
+Cache-Control: public, max-age=0, must-revalidate
+Permissions-Policy: camera=(), geolocation=(), microphone=()
+Referrer-Policy: strict-origin-when-cross-origin
+Strict-Transport-Security: max-age=31536000
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+```
+
+Finally, open the homepage, sign in with a Firebase test account, and verify a
+Firestore-backed vault list. This confirms the hosting cutover did not remove
+Firebase Auth or Firestore client behavior.
+
+If the Worker release is faulty, use Wrangler's version history and roll back
+to the last verified Worker version:
+
+```sh
+npx wrangler rollback
+```
+
+Do not fall back to Firebase Hosting implicitly.
+
+## Firestore rules
+
+`.github/workflows/firebase-deploy.yml` is intentionally limited to Firestore
+rules and uses the existing keyless Google Workload Identity Federation setup.
+It runs only when the rules or Firebase deployment configuration changes.
+
+For an authorized manual rules deployment:
+
+```sh
+npx --yes firebase-tools@latest deploy --only firestore:rules --project openvaultdb --non-interactive
+```
+
+The Firebase web configuration in `public/js/firebase-init.js` is public client
+configuration, not a server credential. Access remains governed by Firebase
+Authentication and `firestore.rules`.

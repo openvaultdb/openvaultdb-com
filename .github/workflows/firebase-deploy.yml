@@ -1,11 +1,16 @@
-name: Deploy to Firebase Hosting
+name: Deploy Firestore rules
 
-# Static site — no build step. Publishes public/ (hosting) and firestore.rules
-# to the live project on push to main. Auth is keyless via Workload Identity
-# Federation (no service-account key, per the org policy that disables SA keys).
+# Website hosting is owned by the Cloudflare Worker and is never deployed from
+# this workflow. Firebase remains the Auth/Firestore backend; this publishes
+# only Firestore rules through the existing keyless Google identity.
 on:
   push:
     branches: [main]
+    paths:
+      - "firestore.rules"
+      - "firebase.json"
+      - ".firebaserc"
+      - ".github/workflows/firebase-deploy.yml"
 
 permissions:
   contents: read
@@ -28,5 +33,5 @@ jobs:
         with:
           node-version: 20
 
-      - name: Deploy Firebase Hosting + Firestore rules (live)
-        run: npx --yes firebase-tools@latest deploy --only hosting,firestore:rules --project openvaultdb --non-interactive
+      - name: Deploy Firestore rules
+        run: npx --yes firebase-tools@latest deploy --only firestore:rules --project openvaultdb --non-interactive

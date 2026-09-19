@@ -1,4 +1,4 @@
-name: Verify AI installation instructions
+name: Verify website
 
 on:
   pull_request:
@@ -12,11 +12,19 @@ on:
       - "public/agent-skills/**"
       - "public/install/**"
       - "public/agent-instructions/**"
+      - "public/js/firebase-init.js"
+      - "firebase.json"
+      - "firestore.rules"
       - "scripts/build-agent-instructions.mjs"
       - "scripts/install-skill.template.sh"
       - "test/**"
       - "package.json"
       - "package-lock.json"
+      - "worker/**"
+      - "wrangler.jsonc"
+      - "DEPLOY.md"
+      - "README.md"
+      - ".github/workflows/firebase-deploy.yml"
       - ".github/workflows/verify-agent-instructions.yml"
   push:
     branches: [main]
@@ -30,11 +38,19 @@ on:
       - "public/agent-skills/**"
       - "public/install/**"
       - "public/agent-instructions/**"
+      - "public/js/firebase-init.js"
+      - "firebase.json"
+      - "firestore.rules"
       - "scripts/build-agent-instructions.mjs"
       - "scripts/install-skill.template.sh"
       - "test/**"
       - "package.json"
       - "package-lock.json"
+      - "worker/**"
+      - "wrangler.jsonc"
+      - "DEPLOY.md"
+      - "README.md"
+      - ".github/workflows/firebase-deploy.yml"
       - ".github/workflows/verify-agent-instructions.yml"
 
 permissions:
@@ -53,3 +69,4 @@ jobs:
       - run: npm run build
       - run: git diff --exit-code
       - run: npm test
+      - run: npm run worker:dry-run
