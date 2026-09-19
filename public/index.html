@@ -38,6 +38,7 @@
       </a>
 
       <nav class="nav" id="nav">
+        <a href="/install">Install</a>
         <a href="#principle">Principle</a>
         <a href="#features">Capabilities</a>
         <a href="#architecture">Architecture</a>
@@ -68,11 +69,11 @@
           they manage — but the vault, and everything in it, belongs to you.
         </p>
         <div class="actions reveal d4">
-          <a class="btn btn-primary" href="#principle">
-            Read the concept
-            <svg viewBox="0 0 16 16" fill="none"><path d="M3 7l5 5 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <a class="btn btn-primary" href="/install">
+            Install with AI
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </a>
-          <a class="btn btn-ghost" href="#architecture">See the architecture</a>
+          <a class="btn btn-ghost" href="#principle">Read the concept</a>
         </div>
       </div>
 
@@ -113,6 +114,26 @@
       </div>
     </div>
   </section>
+
+  <!-- BEGIN GENERATED AI INSTALL -->
+  <section class="home-install" aria-labelledby="home-install-title">
+    <div class="wrap">
+      <div class="home-install-copy">
+        <span class="eyebrow">AI onboarding preview</span>
+        <h2 id="home-install-title">Give your agent one small prompt.</h2>
+        <p>It will follow the official steps, verify that the installed release supports this flow, and stop on errors.</p>
+        <a class="btn btn-ghost" href="/install">See full install options</a>
+      </div>
+      <div class="home-prompt">
+        <pre><code id="home-short-prompt">Install and set up OpenVaultDB on this machine.
+
+Follow the official instructions:
+https://openvaultdb.com/agent-instructions/install</code></pre>
+        <button class="btn btn-primary" type="button" data-copy-target="home-short-prompt" aria-live="polite">Copy prompt</button>
+      </div>
+    </div>
+  </section>
+    <!-- END GENERATED AI INSTALL -->
 
   <div class="wrap"><div class="divider"></div></div>
 
@@ -447,6 +468,7 @@
         </div>
         <div class="foot-col">
           <h5>Docs</h5>
+          <a href="/install">Install with AI</a>
           <a href="/docs/">Overview</a>
           <a href="/docs/auth-model">Authentication model</a>
         </div>
@@ -479,5 +501,6 @@
     });
   </script>
   <script type="module" src="/js/auth-ui.js"></script>
+  <script src="/js/copy-text.js" defer></script>
 </body>
 </html>

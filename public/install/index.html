@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Install · OpenVaultDB</title>
+  <meta name="description" content="Install and set up OpenVaultDB with an AI agent.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/agent-instructions.css">
+</head>
+<body class="doc-page install-page">
+  <header class="site-header"><div class="wrap doc-nav">
+    <a class="brand" href="/" aria-label="OpenVaultDB home"><b>Open<span>Vault</span>DB</b></a>
+    <nav aria-label="Main navigation"><a href="/install">Install</a><a href="/docs/">Docs</a><a href="https://github.com/openvaultdb">GitHub ↗</a></nav>
+  </div></header>
+  <main class="doc-shell wrap">
+      <div class="doc-kicker">AI-assisted setup</div>
+      <h1>Install OpenVaultDB</h1>
+      <p class="doc-lead">Copy one prompt into your coding or terminal agent. It will use deterministic <code>ovdb</code> commands and stop on errors.</p>
+      <section class="copy-panel" aria-labelledby="short-title">
+        <div class="copy-panel-head"><div><div class="option-label">Recommended</div><h2 id="short-title">Short prompt</h2></div><button class="btn btn-primary" type="button" data-copy-target="short-prompt" aria-live="polite">Copy short prompt</button></div>
+        <pre><code id="short-prompt">Install and set up OpenVaultDB on this machine.
+
+Follow the official instructions:
+https://openvaultdb.com/agent-instructions/install</code></pre>
+      </section>
+      <section class="copy-panel" aria-labelledby="full-title">
+        <div class="copy-panel-head"><div><div class="option-label">Self-contained · no further instruction-page access</div><h2 id="full-title">Full instructions</h2></div><button class="btn btn-ghost" type="button" data-copy-target="full-instructions" aria-live="polite">Copy full instructions</button></div>
+        <pre class="full-instructions"><code id="full-instructions"># Install OpenVaultDB
+
+Follow these steps in order. Run one command at a time.
+
+## 1. Inspect the CLI state
+
+Run:
+
+```sh
+command -v ovdb
+```
+
+If this prints no path, remember that the CLI state is `absent`. Continue to step 2.
+
+If this prints a path, run:
+
+```sh
+ovdb version
+```
+
+If the command fails, stop. Report the command and its complete error.
+
+Then run:
+
+```sh
+ovdb --help
+```
+
+The `COMMANDS` section must contain `server`, `config`, `demo`, and `skills`.
+
+Then run:
+
+```sh
+ovdb status --help
+```
+
+The description must contain `Show the local OVDB setup`. The flags must contain `--json`.
+
+Then run:
+
+```sh
+ovdb databases create --help
+```
+
+The flags must contain `--engine` and `--json`.
+
+If all checks pass, remember that the CLI state is `compatible`. If any check is missing, remember that the CLI state is `outdated`.
+
+## 2. Inspect available install methods
+
+Run:
+
+```sh
+command -v brew
+```
+
+If this prints a path, Homebrew is available. If it prints no path, Homebrew is unavailable.
+
+The checksum-verified direct installer is available on macOS and Linux. It installs to `$HOME/.local/bin`, is independent of Homebrew, and does not need Go.
+
+The standalone official-skill installer supports Codex and Claude Code. It does not require `ovdb`. If you are Codex, remember `HARNESS` as `codex`. If you are Claude Code, remember `HARNESS` as `claude`. For another agent, skills-only is unavailable.
+
+## 3. Ask for one action
+
+Report the CLI state and whether Homebrew is available. If the CLI is `compatible`, say that no CLI update is required. Ask:
+
+&gt; Choose one:
+&gt; 1. Install or update the CLI with Homebrew, then offer the official skill.
+&gt; 2. Install or update the CLI with the checksum-verified direct script, then offer the official skill.
+&gt; 3. Install or update the official skill only. Do not change the CLI. This writes to the selected agent's skill configuration.
+&gt; 4. Abort setup.
+
+Mark option 1 unavailable if Homebrew is unavailable. Mark option 3 unavailable unless `HARNESS` is `codex` or `claude`. Do not renumber the remaining options. Wait for the answer.
+
+If the CLI state is `outdated`, also say that it predates AI onboarding. Option 3 can still install the skill, but CLI-dependent actions remain unavailable until a compatible CLI is installed.
+
+If the person chooses abort, stop cleanly. Do not install a skill. Report that setup was not changed.
+
+If the person chooses skills only, continue to the standalone skill commands below.
+
+If the person chooses Homebrew, run:
+
+```sh
+brew install --cask openvaultdb/tap/ovdb
+```
+
+If Homebrew reports that the cask is already installed, run:
+
+```sh
+brew upgrade --cask ovdb
+```
+
+Then continue to step 4.
+
+If the person chooses direct install, skip the standalone skill subsection and continue to `Direct install` below.
+
+### Standalone skill install
+
+Run:
+
+```sh
+command -v curl
+```
+
+If this prints no path, stop. Say that the standalone skill installer needs `curl`.
+
+Run:
+
+```sh
+mkdir -p &quot;$HOME/.cache/openvaultdb&quot;
+```
+
+Then run:
+
+```sh
+curl -fsSLo &quot;$HOME/.cache/openvaultdb/install-skill.sh&quot; https://openvaultdb.com/install-skill.sh
+```
+
+Replace `HARNESS` below with `codex` or `claude`, as selected in step 2. Run:
+
+```sh
+sh &quot;$HOME/.cache/openvaultdb/install-skill.sh&quot; --harness HARNESS
+```
+
+Continue only if the output says that the official OpenVaultDB skill was installed or is already up to date, and prints the canonical source URL plus its verified SHA-256 checksum.
+
+If the installer says the existing `SKILL.md` differs from the official source, ask:
+
+&gt; The installed OpenVaultDB skill has local changes. Replace it with the checksum-verified official skill?
+
+If the person says yes, run:
+
+```sh
+sh &quot;$HOME/.cache/openvaultdb/install-skill.sh&quot; --harness HARNESS --replace-changed
+```
+
+If the person says no, stop. Keep the existing skill unchanged.
+
+After a successful or already-up-to-date result, run:
+
+```sh
+rm &quot;$HOME/.cache/openvaultdb/install-skill.sh&quot;
+```
+
+If the CLI state is `compatible`, continue to step 6. If it is `absent` or `outdated`, stop. Report that the skill is installed, but CLI-dependent setup remains unavailable until a compatible `ovdb` is installed.
+
+### Direct install
+
+Run:
+
+```sh
+command -v curl
+```
+
+If this prints no path, stop. Say that the direct installer needs `curl`. Do not install another package manager without permission.
+
+Run:
+
+```sh
+mkdir -p &quot;$HOME/.cache/openvaultdb&quot;
+```
+
+Then run:
+
+```sh
+curl -fsSLo &quot;$HOME/.cache/openvaultdb/install.sh&quot; https://openvaultdb.com/install.sh
+```
+
+Then run:
+
+```sh
+sh &quot;$HOME/.cache/openvaultdb/install.sh&quot;
+```
+
+The installer downloads the matching official GitHub release archive and `checksums.txt`. It verifies the SHA-256 checksum before installing.
+
+After it succeeds, run:
+
+```sh
+rm &quot;$HOME/.cache/openvaultdb/install.sh&quot;
+```
+
+Continue to step 4.
+
+## 4. Verify the installed CLI
+
+Run:
+
+```sh
+command -v ovdb
+```
+
+If this prints no path after direct install, run:
+
+```sh
+export PATH=&quot;$HOME/.local/bin:$PATH&quot;
+```
+
+This changes `PATH` only for the current shell. Do not change shell startup files without permission.
+
+Run `ovdb version` and the three capability checks from step 1 again.
+
+If any command fails or any capability is missing, stop. Report the command and its complete output. Say that a compatible CLI release must be published or installed before setup can continue. Do not build from source unless the person explicitly asks.
+
+## 5. Offer the official AI skill
+
+Run:
+
+```sh
+ovdb skills list --json
+```
+
+In the root `.skills[]` array, select the item whose `.id` is `openvaultdb`. In that selected item's `.targets[]` array, select the target whose `.harness` names the AI agent you are using now.
+
+If that agent is not listed or the selected target's `.detected` is not `true`, report that skills are not supported for this agent. Skip the skill. Continue to step 6.
+
+If the selected target's `.installed` is `true` and its `.state` is `installed`, say the skill is already up to date. Do not ask to install it again. Continue to step 6.
+
+Ask the person:
+
+&gt; Install the official OpenVaultDB skill for this AI agent? This writes to the agent's skill configuration.
+
+If the person says yes, take the selected target's `.harness` value. Replace `HARNESS` below with that value. Run:
+
+```sh
+ovdb skills install openvaultdb --harness HARNESS --yes --json
+```
+
+If the person says no, skip this step. The web instructions work without the skill.
+
+If skill installation reports that the agent is unsupported or not detected, report it and continue. If it reports another error, stop and report the complete error.
+
+## 6. Continue
+
+If these are the full copied instructions, continue to the `Set up OpenVaultDB` section below.
+
+Otherwise, follow the onboarding instructions:
+
+https://openvaultdb.com/agent-instructions/onboarding
+
+Installation is successful only when `ovdb version` succeeds, all capability checks pass, and the person's selected CLI action is complete.
+
+---
+
+# Set up OpenVaultDB
+
+Follow these steps in order. Run one command at a time.
+
+## 1. Inspect the current setup
+
+Run:
+
+```sh
+ovdb status --json
+```
+
+Read `.server.state`, `.server.address`, and `.databases`. Do not change anything yet.
+
+If the command fails, stop. Report the command and its complete error.
+
+## 2. Start the local server
+
+Run:
+
+```sh
+ovdb server start --json
+```
+
+Starting an already running server is safe.
+
+If you are in a sandbox and the error is `server_start_failed`, or its reason contains `operation not permitted` or `permission denied`, do not retry with another port. Ask the person to run `ovdb server start` in their own terminal. Stop until they confirm it succeeded.
+
+For any other error, stop. Report the command and its complete error.
+
+## 3. Verify real connectivity
+
+Run:
+
+```sh
+ovdb server status --json
+```
+
+Continue only if `.server.state` is `running` and `.server.address` is not empty.
+
+If it does not, stop. Report the complete output.
+
+## 4. Choose the first database
+
+Ask the person:
+
+&gt; Would you like the TODO demo, or an empty database? The TODO demo is recommended for a first try.
+
+Do not choose for them. Wait for the answer.
+
+### TODO demo
+
+Tell the person that this creates a local database named `todo`. Ask for confirmation.
+
+After they confirm, run:
+
+```sh
+ovdb demo install --yes --json
+```
+
+Then run:
+
+```sh
+ovdb demo status --json
+```
+
+Continue only if `.installed` is `true`, `.database` is not empty, and `.state` is `mounted`.
+
+Ask whether to install the optional TODO AI skill. If the person says yes, run:
+
+```sh
+ovdb skills install todo-demo --yes --json
+```
+
+To try to give the person the TODO app links, run:
+
+```sh
+ovdb demo open --print-url --json
+```
+
+If `.url` and `.fallback_url` are returned, show both. Explain that `.url` is single-use and valid until `.expires_at`.
+
+If the command reports that this build has no web console or TODO app, do not fail the setup. Report that the database is ready but this CLI build has no browser app. Show the install options from the error. Give this useful CLI example instead:
+
+```sh
+ovdb list /lists/to-buy/items --db todo --json
+```
+
+### Empty database
+
+Ask for a short database name. Use lower-case letters, numbers, and hyphens only.
+
+Tell the person that this creates files on this machine. Wait for confirmation.
+
+Replace `NAME` below with the confirmed name. Run:
+
+```sh
+ovdb databases create NAME --engine ingitdb --json
+```
+
+Then run:
+
+```sh
+ovdb databases --json
+```
+
+In the root `.databases[]` array, select the item whose `.id` is the confirmed name. Continue only if that selected item's `.state` is `mounted`.
+
+If any database or demo command fails, stop and report the command and its complete error. The missing-browser-app case described above is the only exception.
+
+## 5. Complete one useful action
+
+Ask permission to create one sample record in the chosen database. Explain that this verifies both writing and reading. If the person says no, skip the sample and report that database connectivity was verified but record read/write was not tested.
+
+For the TODO demo, run:
+
+```sh
+ovdb add /lists/to-buy/items '{&quot;title&quot;:&quot;Try OpenVaultDB&quot;,&quot;done&quot;:false}' --db todo --json
+```
+
+Read `.key` from the result. Replace `KEY` below with that exact absolute path. Run:
+
+```sh
+ovdb get KEY --db todo --json
+```
+
+Continue only if `.path` equals `KEY`, `.data.title` is `Try OpenVaultDB`, and `.data.done` is `false`.
+
+For an empty database, replace `NAME` with the confirmed database name. Run:
+
+```sh
+ovdb set /welcome/status '{&quot;message&quot;:&quot;OpenVaultDB is ready&quot;}' --db NAME --json
+```
+
+Then run:
+
+```sh
+ovdb get /welcome/status --db NAME --json
+```
+
+Continue only if `.path` is `/welcome/status` and `.data.message` is `OpenVaultDB is ready`.
+
+If a write or read fails, stop. Report the command and its complete error.
+
+## 6. Final verification
+
+Run:
+
+```sh
+ovdb status --json
+```
+
+Setup is successful only when:
+
+- `.server.state` is `running`;
+- `.server.address` is not empty;
+- `.databases` contains at least one item; and
+- the selected item from the root `.databases[]` array has `.state` equal to `mounted`.
+
+Report `.server.address`, the selected database item's `.id` and `.location`, and a useful item from the root `.next[]` array.
+
+Also report whether the sample record check passed or was declined.
+
+Do not register with OpenVaultDB Cloud. Cloud registration is optional and is not part of this onboarding flow.
+
+To change the local server port later, follow:
+
+https://openvaultdb.com/agent-instructions/configure
+
+---
+
+# Configure OpenVaultDB
+
+For this MVP, change only the local server port. The server stays bound to the local machine.
+
+Follow these steps in order. Run one command at a time.
+
+## 1. Inspect the server
+
+Run:
+
+```sh
+ovdb server status --json
+```
+
+Then run:
+
+```sh
+ovdb config get server.port --json
+```
+
+Read `.config.server.port`. If it is missing, the current configured value is the default port, `6832`.
+
+If either command fails, stop. Report the command and its complete error.
+
+## 2. Ask for the new port
+
+Ask the person for a port from 1024 to 65535.
+
+Do not choose a port for them. Do not change firewall, router, or public network settings.
+
+Replace `PORT` below with the confirmed number. Run:
+
+```sh
+ovdb config set server.port PORT --json
+```
+
+Continue only if `.config.server.port` equals the confirmed number. `.changed` is `true` when the file changed and `false` when it already had that value.
+
+If the command fails, stop. Report the command and its complete error.
+
+## 3. Apply and verify
+
+Run:
+
+```sh
+ovdb server restart --json
+```
+
+If you are in a sandbox and the error is `server_start_failed`, or its reason contains `operation not permitted` or `permission denied`, do not retry with another port. Ask the person to run `ovdb server restart` in their own terminal. Stop until they confirm it succeeded.
+
+Then run:
+
+```sh
+ovdb server status --json
+```
+
+Configuration is successful only when `.server.state` is `running`, `.server.port` equals the confirmed number, and `.server.address` uses that port.
+
+Report the new address.</code></pre>
+      </section>
+      <section class="route-links" aria-labelledby="route-title"><h2 id="route-title">Read the instructions online</h2>
+        <a href="/agent-instructions/install"><strong>Install</strong><span>Get and verify the CLI, then offer the official skill.</span></a>
+        <a href="/agent-instructions/onboarding"><strong>Onboarding</strong><span>Start the server and create a useful first database.</span></a>
+        <a href="/agent-instructions/configure"><strong>Configure</strong><span>Change and verify the local server port.</span></a>
+      </section>
+    </main>
+  <script src="/js/copy-text.js" defer></script>
+</body>
+</html>

@@ -34,7 +34,34 @@ Learn more at https://openvaultdb.com
 
 ## Deployment
 
-Changes pushed to the `main` branch are automatically deployed to the OpenVaultDB website.
+The repository still contains a legacy Firebase deployment workflow. It is
+not the target hosting architecture: the public web surface must move to the
+OpenVaultDB Cloudflare landing worker before this onboarding flow is called
+production-ready. This MVP does not deploy or perform that hosting cutover.
+
+The canonical AI installation instructions live in
+`content/agent-instructions`; the canonical standalone skill lives in
+`content/agent-skills`. Generate the cold-static `/install`,
+`/agent-instructions/*`, homepage prompt, public skill, and verified skill
+installer before publishing:
+
+```sh
+npm run build
+npm test
+```
+
+The read-only `Verify AI installation instructions` workflow checks this on
+matching pushes and pull requests. It is not an authoritative deployment gate
+and does not legitimize the legacy Firebase deployment; launch still requires
+the separate Cloudflare cutover.
+
+Release order matters: first publish an `ovdb` release whose normal help
+contains the documented onboarding commands, then publish the generated web
+pages. The install instructions verify that command surface and stop on an
+older release.
+
+Maintainers can run the versioned Luna clean-room procedure in
+[docs/ai-installation-acceptance.md](docs/ai-installation-acceptance.md).
 
 ## Related Projects
 

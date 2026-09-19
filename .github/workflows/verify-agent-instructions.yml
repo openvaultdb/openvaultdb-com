@@ -1,0 +1,55 @@
+name: Verify AI installation instructions
+
+on:
+  pull_request:
+    paths:
+      - "content/agent-instructions/**"
+      - "content/agent-skills/**"
+      - "docs/ai-installation-acceptance.md"
+      - "public/index.html"
+      - "public/install.sh"
+      - "public/install-skill.sh"
+      - "public/agent-skills/**"
+      - "public/install/**"
+      - "public/agent-instructions/**"
+      - "scripts/build-agent-instructions.mjs"
+      - "scripts/install-skill.template.sh"
+      - "test/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/verify-agent-instructions.yml"
+  push:
+    branches: [main]
+    paths:
+      - "content/agent-instructions/**"
+      - "content/agent-skills/**"
+      - "docs/ai-installation-acceptance.md"
+      - "public/index.html"
+      - "public/install.sh"
+      - "public/install-skill.sh"
+      - "public/agent-skills/**"
+      - "public/install/**"
+      - "public/agent-instructions/**"
+      - "scripts/build-agent-instructions.mjs"
+      - "scripts/install-skill.template.sh"
+      - "test/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/verify-agent-instructions.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: git diff --exit-code
+      - run: npm test

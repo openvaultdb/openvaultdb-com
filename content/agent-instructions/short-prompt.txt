@@ -1,0 +1,4 @@
+Install and set up OpenVaultDB on this machine.
+
+Follow the official instructions:
+https://openvaultdb.com/agent-instructions/install

@@ -146,6 +146,7 @@ a { color: inherit; text-decoration: none; }
 .btn-ghost { border-color: var(--line-2); color: var(--navy); background: var(--surface); }
 .btn-ghost:hover { border-color: var(--navy); transform: translateY(-2px); }
 .btn svg { width: 16px; height: 16px; }
+.btn:disabled { cursor: wait; opacity: .72; transform: none; }
 
 /* ---------- Hero ---------- */
 .hero { position: relative; padding: clamp(56px, 10vh, 116px) 0 88px; }
@@ -209,6 +210,31 @@ a { color: inherit; text-decoration: none; }
 .vault .ring-spin { animation: spin 60s linear infinite; }
 .vault .ring-spin-rev { animation: spin 90s linear infinite reverse; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* ---------- AI install prompt ---------- */
+.home-install { padding: 28px 0 76px; }
+.home-install .wrap {
+  display: grid; grid-template-columns: .85fr 1.15fr; gap: 48px; align-items: center;
+}
+.home-install h2 {
+  color: var(--navy); font-family: var(--font-display); font-size: clamp(28px, 4vw, 42px);
+  line-height: 1.12; letter-spacing: -.02em; margin: 14px 0;
+}
+.home-install-copy p { color: var(--text-soft); margin: 0 0 22px; }
+.home-prompt {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--r);
+  box-shadow: var(--shadow-lg); padding: 22px;
+}
+.home-prompt pre {
+  background: var(--navy); border-radius: 9px; color: #f8f4ea; font-family: var(--font-mono);
+  font-size: 14px; line-height: 1.65; margin: 0 0 16px; overflow-x: auto; padding: 20px;
+  white-space: pre-wrap; word-break: break-word;
+}
+.home-prompt .btn { width: 100%; justify-content: center; }
+
+@media (max-width: 760px) {
+  .home-install .wrap { grid-template-columns: 1fr; gap: 28px; }
+}
 
 /* ---------- Section scaffolding ---------- */
 section { position: relative; padding: 90px 0; }

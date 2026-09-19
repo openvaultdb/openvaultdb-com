@@ -7,7 +7,9 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node scripts/build-agent-instructions.mjs",
+    "build:agent-instructions": "node scripts/build-agent-instructions.mjs",
+    "test": "node --test test/*.test.mjs",
     "e2e": "playwright test"
   },
   "repository": {

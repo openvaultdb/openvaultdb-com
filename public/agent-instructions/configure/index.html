@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Configure instructions · OpenVaultDB</title>
+  <meta name="description" content="Official OpenVaultDB configure instructions for AI agents.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/agent-instructions.css">
+</head>
+<body class="doc-page ">
+  <header class="site-header"><div class="wrap doc-nav">
+    <a class="brand" href="/" aria-label="OpenVaultDB home"><b>Open<span>Vault</span>DB</b></a>
+    <nav aria-label="Main navigation"><a href="/install">Install</a><a href="/docs/">Docs</a><a href="https://github.com/openvaultdb">GitHub ↗</a></nav>
+  </div></header>
+  <main class="doc-shell wrap">
+      <div class="doc-kicker">Official AI agent instructions</div>
+      <div class="doc-actions"><button class="btn btn-primary" type="button" data-copy-target="instruction-source" aria-live="polite">Copy these instructions</button><a class="btn btn-ghost" href="/install">All install options</a></div>
+      <article class="instruction-content"><h1>Configure OpenVaultDB</h1>
+<p>For this MVP, change only the local server port. The server stays bound to the local machine.</p>
+<p>Follow these steps in order. Run one command at a time.</p>
+<h2>1. Inspect the server</h2>
+<p>Run:</p>
+<pre><code>ovdb server status --json</code></pre>
+<p>Then run:</p>
+<pre><code>ovdb config get server.port --json</code></pre>
+<p>Read <code>.config.server.port</code>. If it is missing, the current configured value is the default port, <code>6832</code>.</p>
+<p>If either command fails, stop. Report the command and its complete error.</p>
+<h2>2. Ask for the new port</h2>
+<p>Ask the person for a port from 1024 to 65535.</p>
+<p>Do not choose a port for them. Do not change firewall, router, or public network settings.</p>
+<p>Replace <code>PORT</code> below with the confirmed number. Run:</p>
+<pre><code>ovdb config set server.port PORT --json</code></pre>
+<p>Continue only if <code>.config.server.port</code> equals the confirmed number. <code>.changed</code> is <code>true</code> when the file changed and <code>false</code> when it already had that value.</p>
+<p>If the command fails, stop. Report the command and its complete error.</p>
+<h2>3. Apply and verify</h2>
+<p>Run:</p>
+<pre><code>ovdb server restart --json</code></pre>
+<p>If you are in a sandbox and the error is <code>server_start_failed</code>, or its reason contains <code>operation not permitted</code> or <code>permission denied</code>, do not retry with another port. Ask the person to run <code>ovdb server restart</code> in their own terminal. Stop until they confirm it succeeded.</p>
+<p>Then run:</p>
+<pre><code>ovdb server status --json</code></pre>
+<p>Configuration is successful only when <code>.server.state</code> is <code>running</code>, <code>.server.port</code> equals the confirmed number, and <code>.server.address</code> uses that port.</p>
+<p>Report the new address.</p></article>
+      <textarea id="instruction-source" class="copy-source" aria-hidden="true" tabindex="-1"># Configure OpenVaultDB
+
+For this MVP, change only the local server port. The server stays bound to the local machine.
+
+Follow these steps in order. Run one command at a time.
+
+## 1. Inspect the server
+
+Run:
+
+```sh
+ovdb server status --json
+```
+
+Then run:
+
+```sh
+ovdb config get server.port --json
+```
+
+Read `.config.server.port`. If it is missing, the current configured value is the default port, `6832`.
+
+If either command fails, stop. Report the command and its complete error.
+
+## 2. Ask for the new port
+
+Ask the person for a port from 1024 to 65535.
+
+Do not choose a port for them. Do not change firewall, router, or public network settings.
+
+Replace `PORT` below with the confirmed number. Run:
+
+```sh
+ovdb config set server.port PORT --json
+```
+
+Continue only if `.config.server.port` equals the confirmed number. `.changed` is `true` when the file changed and `false` when it already had that value.
+
+If the command fails, stop. Report the command and its complete error.
+
+## 3. Apply and verify
+
+Run:
+
+```sh
+ovdb server restart --json
+```
+
+If you are in a sandbox and the error is `server_start_failed`, or its reason contains `operation not permitted` or `permission denied`, do not retry with another port. Ask the person to run `ovdb server restart` in their own terminal. Stop until they confirm it succeeded.
+
+Then run:
+
+```sh
+ovdb server status --json
+```
+
+Configuration is successful only when `.server.state` is `running`, `.server.port` equals the confirmed number, and `.server.address` uses that port.
+
+Report the new address.</textarea>
+      <div class="doc-actions"><a class="btn btn-ghost" href="/agent-instructions/onboarding">Back to onboarding</a></div>
+    </main>
+  <script src="/js/copy-text.js" defer></script>
+</body>
+</html>

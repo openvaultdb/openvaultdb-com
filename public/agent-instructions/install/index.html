@@ -1,0 +1,365 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Install instructions · OpenVaultDB</title>
+  <meta name="description" content="Official OpenVaultDB install instructions for AI agents.">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/agent-instructions.css">
+</head>
+<body class="doc-page ">
+  <header class="site-header"><div class="wrap doc-nav">
+    <a class="brand" href="/" aria-label="OpenVaultDB home"><b>Open<span>Vault</span>DB</b></a>
+    <nav aria-label="Main navigation"><a href="/install">Install</a><a href="/docs/">Docs</a><a href="https://github.com/openvaultdb">GitHub ↗</a></nav>
+  </div></header>
+  <main class="doc-shell wrap">
+      <div class="doc-kicker">Official AI agent instructions</div>
+      <div class="doc-actions"><button class="btn btn-primary" type="button" data-copy-target="instruction-source" aria-live="polite">Copy these instructions</button><a class="btn btn-ghost" href="/install">All install options</a></div>
+      <article class="instruction-content"><h1>Install OpenVaultDB</h1>
+<p>Follow these steps in order. Run one command at a time.</p>
+<h2>1. Inspect the CLI state</h2>
+<p>Run:</p>
+<pre><code>command -v ovdb</code></pre>
+<p>If this prints no path, remember that the CLI state is <code>absent</code>. Continue to step 2.</p>
+<p>If this prints a path, run:</p>
+<pre><code>ovdb version</code></pre>
+<p>If the command fails, stop. Report the command and its complete error.</p>
+<p>Then run:</p>
+<pre><code>ovdb --help</code></pre>
+<p>The <code>COMMANDS</code> section must contain <code>server</code>, <code>config</code>, <code>demo</code>, and <code>skills</code>.</p>
+<p>Then run:</p>
+<pre><code>ovdb status --help</code></pre>
+<p>The description must contain <code>Show the local OVDB setup</code>. The flags must contain <code>--json</code>.</p>
+<p>Then run:</p>
+<pre><code>ovdb databases create --help</code></pre>
+<p>The flags must contain <code>--engine</code> and <code>--json</code>.</p>
+<p>If all checks pass, remember that the CLI state is <code>compatible</code>. If any check is missing, remember that the CLI state is <code>outdated</code>.</p>
+<h2>2. Inspect available install methods</h2>
+<p>Run:</p>
+<pre><code>command -v brew</code></pre>
+<p>If this prints a path, Homebrew is available. If it prints no path, Homebrew is unavailable.</p>
+<p>The checksum-verified direct installer is available on macOS and Linux. It installs to <code>$HOME/.local/bin</code>, is independent of Homebrew, and does not need Go.</p>
+<p>The standalone official-skill installer supports Codex and Claude Code. It does not require <code>ovdb</code>. If you are Codex, remember <code>HARNESS</code> as <code>codex</code>. If you are Claude Code, remember <code>HARNESS</code> as <code>claude</code>. For another agent, skills-only is unavailable.</p>
+<h2>3. Ask for one action</h2>
+<p>Report the CLI state and whether Homebrew is available. If the CLI is <code>compatible</code>, say that no CLI update is required. Ask:</p>
+<blockquote>Choose one:</blockquote>
+<blockquote>1. Install or update the CLI with Homebrew, then offer the official skill.</blockquote>
+<blockquote>2. Install or update the CLI with the checksum-verified direct script, then offer the official skill.</blockquote>
+<blockquote>3. Install or update the official skill only. Do not change the CLI. This writes to the selected agent's skill configuration.</blockquote>
+<blockquote>4. Abort setup.</blockquote>
+<p>Mark option 1 unavailable if Homebrew is unavailable. Mark option 3 unavailable unless <code>HARNESS</code> is <code>codex</code> or <code>claude</code>. Do not renumber the remaining options. Wait for the answer.</p>
+<p>If the CLI state is <code>outdated</code>, also say that it predates AI onboarding. Option 3 can still install the skill, but CLI-dependent actions remain unavailable until a compatible CLI is installed.</p>
+<p>If the person chooses abort, stop cleanly. Do not install a skill. Report that setup was not changed.</p>
+<p>If the person chooses skills only, continue to the standalone skill commands below.</p>
+<p>If the person chooses Homebrew, run:</p>
+<pre><code>brew install --cask openvaultdb/tap/ovdb</code></pre>
+<p>If Homebrew reports that the cask is already installed, run:</p>
+<pre><code>brew upgrade --cask ovdb</code></pre>
+<p>Then continue to step 4.</p>
+<p>If the person chooses direct install, skip the standalone skill subsection and continue to <code>Direct install</code> below.</p>
+<h3>Standalone skill install</h3>
+<p>Run:</p>
+<pre><code>command -v curl</code></pre>
+<p>If this prints no path, stop. Say that the standalone skill installer needs <code>curl</code>.</p>
+<p>Run:</p>
+<pre><code>mkdir -p &quot;$HOME/.cache/openvaultdb&quot;</code></pre>
+<p>Then run:</p>
+<pre><code>curl -fsSLo &quot;$HOME/.cache/openvaultdb/install-skill.sh&quot; https://openvaultdb.com/install-skill.sh</code></pre>
+<p>Replace <code>HARNESS</code> below with <code>codex</code> or <code>claude</code>, as selected in step 2. Run:</p>
+<pre><code>sh &quot;$HOME/.cache/openvaultdb/install-skill.sh&quot; --harness HARNESS</code></pre>
+<p>Continue only if the output says that the official OpenVaultDB skill was installed or is already up to date, and prints the canonical source URL plus its verified SHA-256 checksum.</p>
+<p>If the installer says the existing <code>SKILL.md</code> differs from the official source, ask:</p>
+<blockquote>The installed OpenVaultDB skill has local changes. Replace it with the checksum-verified official skill?</blockquote>
+<p>If the person says yes, run:</p>
+<pre><code>sh &quot;$HOME/.cache/openvaultdb/install-skill.sh&quot; --harness HARNESS --replace-changed</code></pre>
+<p>If the person says no, stop. Keep the existing skill unchanged.</p>
+<p>After a successful or already-up-to-date result, run:</p>
+<pre><code>rm &quot;$HOME/.cache/openvaultdb/install-skill.sh&quot;</code></pre>
+<p>If the CLI state is <code>compatible</code>, continue to step 6. If it is <code>absent</code> or <code>outdated</code>, stop. Report that the skill is installed, but CLI-dependent setup remains unavailable until a compatible <code>ovdb</code> is installed.</p>
+<h3>Direct install</h3>
+<p>Run:</p>
+<pre><code>command -v curl</code></pre>
+<p>If this prints no path, stop. Say that the direct installer needs <code>curl</code>. Do not install another package manager without permission.</p>
+<p>Run:</p>
+<pre><code>mkdir -p &quot;$HOME/.cache/openvaultdb&quot;</code></pre>
+<p>Then run:</p>
+<pre><code>curl -fsSLo &quot;$HOME/.cache/openvaultdb/install.sh&quot; https://openvaultdb.com/install.sh</code></pre>
+<p>Then run:</p>
+<pre><code>sh &quot;$HOME/.cache/openvaultdb/install.sh&quot;</code></pre>
+<p>The installer downloads the matching official GitHub release archive and <code>checksums.txt</code>. It verifies the SHA-256 checksum before installing.</p>
+<p>After it succeeds, run:</p>
+<pre><code>rm &quot;$HOME/.cache/openvaultdb/install.sh&quot;</code></pre>
+<p>Continue to step 4.</p>
+<h2>4. Verify the installed CLI</h2>
+<p>Run:</p>
+<pre><code>command -v ovdb</code></pre>
+<p>If this prints no path after direct install, run:</p>
+<pre><code>export PATH=&quot;$HOME/.local/bin:$PATH&quot;</code></pre>
+<p>This changes <code>PATH</code> only for the current shell. Do not change shell startup files without permission.</p>
+<p>Run <code>ovdb version</code> and the three capability checks from step 1 again.</p>
+<p>If any command fails or any capability is missing, stop. Report the command and its complete output. Say that a compatible CLI release must be published or installed before setup can continue. Do not build from source unless the person explicitly asks.</p>
+<h2>5. Offer the official AI skill</h2>
+<p>Run:</p>
+<pre><code>ovdb skills list --json</code></pre>
+<p>In the root <code>.skills[]</code> array, select the item whose <code>.id</code> is <code>openvaultdb</code>. In that selected item's <code>.targets[]</code> array, select the target whose <code>.harness</code> names the AI agent you are using now.</p>
+<p>If that agent is not listed or the selected target's <code>.detected</code> is not <code>true</code>, report that skills are not supported for this agent. Skip the skill. Continue to step 6.</p>
+<p>If the selected target's <code>.installed</code> is <code>true</code> and its <code>.state</code> is <code>installed</code>, say the skill is already up to date. Do not ask to install it again. Continue to step 6.</p>
+<p>Ask the person:</p>
+<blockquote>Install the official OpenVaultDB skill for this AI agent? This writes to the agent's skill configuration.</blockquote>
+<p>If the person says yes, take the selected target's <code>.harness</code> value. Replace <code>HARNESS</code> below with that value. Run:</p>
+<pre><code>ovdb skills install openvaultdb --harness HARNESS --yes --json</code></pre>
+<p>If the person says no, skip this step. The web instructions work without the skill.</p>
+<p>If skill installation reports that the agent is unsupported or not detected, report it and continue. If it reports another error, stop and report the complete error.</p>
+<h2>6. Continue</h2>
+<p>If these are the full copied instructions, continue to the <code>Set up OpenVaultDB</code> section below.</p>
+<p>Otherwise, follow the onboarding instructions:</p>
+<p><a href="https://openvaultdb.com/agent-instructions/onboarding">https://openvaultdb.com/agent-instructions/onboarding</a></p>
+<p>Installation is successful only when <code>ovdb version</code> succeeds, all capability checks pass, and the person's selected CLI action is complete.</p></article>
+      <textarea id="instruction-source" class="copy-source" aria-hidden="true" tabindex="-1"># Install OpenVaultDB
+
+Follow these steps in order. Run one command at a time.
+
+## 1. Inspect the CLI state
+
+Run:
+
+```sh
+command -v ovdb
+```
+
+If this prints no path, remember that the CLI state is `absent`. Continue to step 2.
+
+If this prints a path, run:
+
+```sh
+ovdb version
+```
+
+If the command fails, stop. Report the command and its complete error.
+
+Then run:
+
+```sh
+ovdb --help
+```
+
+The `COMMANDS` section must contain `server`, `config`, `demo`, and `skills`.
+
+Then run:
+
+```sh
+ovdb status --help
+```
+
+The description must contain `Show the local OVDB setup`. The flags must contain `--json`.
+
+Then run:
+
+```sh
+ovdb databases create --help
+```
+
+The flags must contain `--engine` and `--json`.
+
+If all checks pass, remember that the CLI state is `compatible`. If any check is missing, remember that the CLI state is `outdated`.
+
+## 2. Inspect available install methods
+
+Run:
+
+```sh
+command -v brew
+```
+
+If this prints a path, Homebrew is available. If it prints no path, Homebrew is unavailable.
+
+The checksum-verified direct installer is available on macOS and Linux. It installs to `$HOME/.local/bin`, is independent of Homebrew, and does not need Go.
+
+The standalone official-skill installer supports Codex and Claude Code. It does not require `ovdb`. If you are Codex, remember `HARNESS` as `codex`. If you are Claude Code, remember `HARNESS` as `claude`. For another agent, skills-only is unavailable.
+
+## 3. Ask for one action
+
+Report the CLI state and whether Homebrew is available. If the CLI is `compatible`, say that no CLI update is required. Ask:
+
+&gt; Choose one:
+&gt; 1. Install or update the CLI with Homebrew, then offer the official skill.
+&gt; 2. Install or update the CLI with the checksum-verified direct script, then offer the official skill.
+&gt; 3. Install or update the official skill only. Do not change the CLI. This writes to the selected agent's skill configuration.
+&gt; 4. Abort setup.
+
+Mark option 1 unavailable if Homebrew is unavailable. Mark option 3 unavailable unless `HARNESS` is `codex` or `claude`. Do not renumber the remaining options. Wait for the answer.
+
+If the CLI state is `outdated`, also say that it predates AI onboarding. Option 3 can still install the skill, but CLI-dependent actions remain unavailable until a compatible CLI is installed.
+
+If the person chooses abort, stop cleanly. Do not install a skill. Report that setup was not changed.
+
+If the person chooses skills only, continue to the standalone skill commands below.
+
+If the person chooses Homebrew, run:
+
+```sh
+brew install --cask openvaultdb/tap/ovdb
+```
+
+If Homebrew reports that the cask is already installed, run:
+
+```sh
+brew upgrade --cask ovdb
+```
+
+Then continue to step 4.
+
+If the person chooses direct install, skip the standalone skill subsection and continue to `Direct install` below.
+
+### Standalone skill install
+
+Run:
+
+```sh
+command -v curl
+```
+
+If this prints no path, stop. Say that the standalone skill installer needs `curl`.
+
+Run:
+
+```sh
+mkdir -p &quot;$HOME/.cache/openvaultdb&quot;
+```
+
+Then run:
+
+```sh
+curl -fsSLo &quot;$HOME/.cache/openvaultdb/install-skill.sh&quot; https://openvaultdb.com/install-skill.sh
+```
+
+Replace `HARNESS` below with `codex` or `claude`, as selected in step 2. Run:
+
+```sh
+sh &quot;$HOME/.cache/openvaultdb/install-skill.sh&quot; --harness HARNESS
+```
+
+Continue only if the output says that the official OpenVaultDB skill was installed or is already up to date, and prints the canonical source URL plus its verified SHA-256 checksum.
+
+If the installer says the existing `SKILL.md` differs from the official source, ask:
+
+&gt; The installed OpenVaultDB skill has local changes. Replace it with the checksum-verified official skill?
+
+If the person says yes, run:
+
+```sh
+sh &quot;$HOME/.cache/openvaultdb/install-skill.sh&quot; --harness HARNESS --replace-changed
+```
+
+If the person says no, stop. Keep the existing skill unchanged.
+
+After a successful or already-up-to-date result, run:
+
+```sh
+rm &quot;$HOME/.cache/openvaultdb/install-skill.sh&quot;
+```
+
+If the CLI state is `compatible`, continue to step 6. If it is `absent` or `outdated`, stop. Report that the skill is installed, but CLI-dependent setup remains unavailable until a compatible `ovdb` is installed.
+
+### Direct install
+
+Run:
+
+```sh
+command -v curl
+```
+
+If this prints no path, stop. Say that the direct installer needs `curl`. Do not install another package manager without permission.
+
+Run:
+
+```sh
+mkdir -p &quot;$HOME/.cache/openvaultdb&quot;
+```
+
+Then run:
+
+```sh
+curl -fsSLo &quot;$HOME/.cache/openvaultdb/install.sh&quot; https://openvaultdb.com/install.sh
+```
+
+Then run:
+
+```sh
+sh &quot;$HOME/.cache/openvaultdb/install.sh&quot;
+```
+
+The installer downloads the matching official GitHub release archive and `checksums.txt`. It verifies the SHA-256 checksum before installing.
+
+After it succeeds, run:
+
+```sh
+rm &quot;$HOME/.cache/openvaultdb/install.sh&quot;
+```
+
+Continue to step 4.
+
+## 4. Verify the installed CLI
+
+Run:
+
+```sh
+command -v ovdb
+```
+
+If this prints no path after direct install, run:
+
+```sh
+export PATH=&quot;$HOME/.local/bin:$PATH&quot;
+```
+
+This changes `PATH` only for the current shell. Do not change shell startup files without permission.
+
+Run `ovdb version` and the three capability checks from step 1 again.
+
+If any command fails or any capability is missing, stop. Report the command and its complete output. Say that a compatible CLI release must be published or installed before setup can continue. Do not build from source unless the person explicitly asks.
+
+## 5. Offer the official AI skill
+
+Run:
+
+```sh
+ovdb skills list --json
+```
+
+In the root `.skills[]` array, select the item whose `.id` is `openvaultdb`. In that selected item's `.targets[]` array, select the target whose `.harness` names the AI agent you are using now.
+
+If that agent is not listed or the selected target's `.detected` is not `true`, report that skills are not supported for this agent. Skip the skill. Continue to step 6.
+
+If the selected target's `.installed` is `true` and its `.state` is `installed`, say the skill is already up to date. Do not ask to install it again. Continue to step 6.
+
+Ask the person:
+
+&gt; Install the official OpenVaultDB skill for this AI agent? This writes to the agent's skill configuration.
+
+If the person says yes, take the selected target's `.harness` value. Replace `HARNESS` below with that value. Run:
+
+```sh
+ovdb skills install openvaultdb --harness HARNESS --yes --json
+```
+
+If the person says no, skip this step. The web instructions work without the skill.
+
+If skill installation reports that the agent is unsupported or not detected, report it and continue. If it reports another error, stop and report the complete error.
+
+## 6. Continue
+
+If these are the full copied instructions, continue to the `Set up OpenVaultDB` section below.
+
+Otherwise, follow the onboarding instructions:
+
+https://openvaultdb.com/agent-instructions/onboarding
+
+Installation is successful only when `ovdb version` succeeds, all capability checks pass, and the person's selected CLI action is complete.</textarea>
+      <div class="doc-actions"><a class="btn btn-primary" href="/agent-instructions/onboarding">Continue to onboarding</a></div>
+    </main>
+  <script src="/js/copy-text.js" defer></script>
+</body>
+</html>
