@@ -14,7 +14,6 @@ on:
       - "test/**"
       - "package.json"
       - "package-lock.json"
-      - "worker/**"
       - "wrangler.jsonc"
       - "DEPLOY.md"
       - "README.md"
@@ -34,7 +33,6 @@ on:
       - "test/**"
       - "package.json"
       - "package-lock.json"
-      - "worker/**"
       - "wrangler.jsonc"
       - "DEPLOY.md"
       - "README.md"
@@ -59,15 +57,10 @@ jobs:
       - run: npm run build
       - run: git diff --exit-code
       - run: npm test
-      - run: npm run worker:dry-run
-      - name: Verify exact Worker bytes for publication
-        # Standalone JavaScript: no imports or transpilation; publish these bytes.
-        run: |
-          npm exec --no -- wrangler deploy --no-bundle --dry-run --config wrangler.jsonc --outdir .wrangler/artifact-check
-          cmp worker/index.mjs .wrangler/artifact-check/index.mjs
+      - run: npm run site:dry-run
       - name: Package verified release
         # tar preserves dotfiles, _headers, _redirects, and file permissions.
-        run: tar -czf site.tar.gz public worker wrangler.jsonc package.json package-lock.json
+        run: tar -czf site.tar.gz public wrangler.jsonc package.json package-lock.json
       - name: Record artifact provenance
         run: |
           printf '%s\n' "$GITHUB_SHA" > source-sha.txt
@@ -129,4 +122,4 @@ jobs:
             echo "::error::Configure the CLOUDFLARE_API_TOKEN secret for production publishing."
             exit 1
           fi
-          npm exec --no -- wrangler deploy --no-bundle --config wrangler.jsonc
+          npm exec --no -- wrangler deploy --config wrangler.jsonc

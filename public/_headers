@@ -1,0 +1,10 @@
+# Security and cache headers for every static asset. Served by Cloudflare static
+# assets with no Worker script (wrangler.jsonc has no `main`), so requests are
+# free and never count against the Workers request quota.
+/*
+  Cache-Control: public, max-age=0, must-revalidate
+  Permissions-Policy: camera=(), geolocation=(), microphone=()
+  Referrer-Policy: strict-origin-when-cross-origin
+  Strict-Transport-Security: max-age=31536000
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY

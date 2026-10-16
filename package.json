@@ -10,8 +10,8 @@
     "build": "node scripts/build-agent-instructions.mjs",
     "build:agent-instructions": "node scripts/build-agent-instructions.mjs",
     "test": "node --test test/*.test.mjs",
-    "check": "npm run build && npm test && npm run worker:dry-run",
-    "worker:dry-run": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
+    "check": "npm run build && npm test && npm run site:dry-run",
+    "site:dry-run": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
     "deploy:cloudflare": "npm run check && wrangler deploy",
     "e2e": "playwright test"
   },

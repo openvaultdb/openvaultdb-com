@@ -1,8 +1,10 @@
 # Deploying openvaultdb.com
 
 The public website is a Cloudflare Workers Static Assets application. Static
-files live under `public/`; `worker/index.mjs` runs before every request, fetches
-the matching asset through the `ASSETS` binding, and applies response headers.
+files live under `public/` and are served by Cloudflare static assets with no
+Worker script (`wrangler.jsonc` has no `main`), so requests are free and never
+count against the Workers request quota. Security and cache headers come from
+`public/_headers`.
 The production Worker and custom domain are declared in `wrangler.jsonc`:
 
 - Worker: `openvaultdb-com`
@@ -25,10 +27,10 @@ git diff --exit-code
 
 `npm run check` regenerates the canonical AI instruction pages, runs all Node
 unit tests, and executes a Wrangler deployment dry run. The tests cover the
-Worker-to-`ASSETS` route, security/cache headers, Cloudflare configuration, and
+assets-only configuration, `_headers` security/cache rules, Cloudflare configuration, and
 the cold static installation routes.
 
-To inspect a local Worker preview, start with the example port below. The
+To inspect a local preview, start with the example port below. The
 example port may already be in use; if it is, choose another unused port:
 
 ```sh
@@ -47,24 +49,19 @@ emulator ports are local-test configuration only. Never run `firebase deploy
 runs for pull requests, main pushes, and manual dispatches. Its verify job
 installs the lockfile, generates canonical static routes once with `npm run
 build`, checks generated-content drift, runs all Node tests, and dry-runs
-Wrangler. It archives `public/`, `worker/`, `wrangler.jsonc`, `package.json`, and
+Wrangler. It archives `public/`, `wrangler.jsonc`, `package.json`, and
 `package-lock.json` as `site.tar.gz` in the `site-<source SHA>` artifact. Tar
 preserves dotfiles, `_headers`, and `_redirects` when present.
 
 Automatic publication is disabled unless `CLOUDFLARE_DEPLOY_ENABLED` is `true`.
 When enabled, only a main push or manual dispatch on main publishes. The
 production job downloads that same run's artifact, installs the locked Wrangler dependency
-with `npm ci`, and runs `npm exec --no -- wrangler deploy --no-bundle --config
+with `npm ci`, and runs `npm exec --no -- wrangler deploy --config
 wrangler.jsonc`. It does not regenerate or rebuild the site. In particular,
 CI does not run `npm run deploy:cloudflare`, which repeats the build and tests.
 The publish job verifies the recorded source SHA and archive SHA-256 before
 extracting. Artifacts are retained for 14 days; production deployments are
 serialized.
-
-The Worker is standalone JavaScript with no imports or transpilation. Before
-archiving, CI dry-runs it with `--no-bundle` and compares the emitted entrypoint
-byte-for-byte with the archived source. Publication also uses `--no-bundle`,
-so Wrangler uploads those verified bytes without compiling them again.
 
 ### CI credentials and activation
 
@@ -101,10 +98,10 @@ sha256sum --check site.tar.gz.sha256
 # macOS alternative: shasum -a 256 --check site.tar.gz.sha256
 tar -xzf site.tar.gz
 npm ci
-npm exec --no -- wrangler deploy --no-bundle --config wrangler.jsonc
+npm exec --no -- wrangler deploy --config wrangler.jsonc
 ```
 
-Use the downloaded assets, Worker code, and configuration together. Do not
+Use the downloaded assets and configuration together. Do not
 rebuild source before publishing this artifact.
 
 ## Manual deployment
@@ -154,7 +151,7 @@ curl -fsSIL https://openvaultdb.com/llms.txt
 curl -fsSIL https://openvaultdb.com/agent-skills/openvaultdb/SKILL.md
 ```
 
-For each final response, verify the expected status and these Worker-owned
+For each final response, verify the expected status and these `_headers`-owned
 headers:
 
 ```text
