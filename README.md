@@ -60,12 +60,12 @@ npm ci
 npm run check
 ```
 
-The read-only `Verify website` workflow checks generated content, unit tests,
-and a Wrangler dry run on matching pushes and pull requests. There is no
-Cloudflare deployment workflow: the repository does not have the broad account
-token that such a workflow would require. The landing owner deploys a reviewed
-release with an already-authenticated local Wrangler session as documented in
-[DEPLOY.md](DEPLOY.md).
+The `Build and deploy website` GitHub Actions workflow generates and verifies
+one release artifact on pull requests, main pushes, and manual dispatches.
+Artifacts remain available while automatic publication is disabled. Once scoped
+credentials are configured and `CLOUDFLARE_DEPLOY_ENABLED` is `true`, main pushes
+or manual runs on main deploy the same artifact with Wrangler, without
+rebuilding. See [DEPLOY.md](DEPLOY.md) for activation and artifact publication.
 
 Release order matters: first publish an `ovdb` release whose normal help
 contains the documented onboarding commands, then publish the generated web

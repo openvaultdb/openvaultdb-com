@@ -43,21 +43,83 @@ emulator ports are local-test configuration only. Never run `firebase deploy
 
 ## Production deployment
 
-There is intentionally no GitHub Actions deployment for Cloudflare. Deploying a
-custom-domain Worker from CI would require a broad Cloudflare account token that
-this repository does not have. The landing owner uses the already-authenticated
-local Wrangler session:
+[Build and deploy website](.github/workflows/verify-agent-instructions.yml)
+runs for pull requests, main pushes, and manual dispatches. Its verify job
+installs the lockfile, generates canonical static routes once with `npm run
+build`, checks generated-content drift, runs all Node tests, and dry-runs
+Wrangler. It archives `public/`, `worker/`, `wrangler.jsonc`, `package.json`, and
+`package-lock.json` as `site.tar.gz` in the `site-<source SHA>` artifact. Tar
+preserves dotfiles, `_headers`, and `_redirects` when present.
+
+Automatic publication is disabled unless `CLOUDFLARE_DEPLOY_ENABLED` is `true`.
+When enabled, only a main push or manual dispatch on main publishes. The
+production job downloads that same run's artifact, installs the locked Wrangler dependency
+with `npm ci`, and runs `npm exec --no -- wrangler deploy --no-bundle --config
+wrangler.jsonc`. It does not regenerate or rebuild the site. In particular,
+CI does not run `npm run deploy:cloudflare`, which repeats the build and tests.
+The publish job verifies the recorded source SHA and archive SHA-256 before
+extracting. Artifacts are retained for 14 days; production deployments are
+serialized.
+
+The Worker is standalone JavaScript with no imports or transpilation. Before
+archiving, CI dry-runs it with `--no-bundle` and compares the emitted entrypoint
+byte-for-byte with the archived source. Publication also uses `--no-bundle`,
+so Wrangler uploads those verified bytes without compiling them again.
+
+### CI credentials and activation
+
+Set the GitHub `CLOUDFLARE_API_TOKEN` secret (repository or `production`
+environment) to a token authorized to deploy this Worker and its declared
+routes in the production Cloudflare account. `CLOUDFLARE_ACCOUNT_ID` is an
+optional GitHub variable; the workflow defaults to the public account identifier
+`01c8a86fc1064f063eb5dd9d101d7001`. Build jobs do not receive the token.
+
+Automatic production publication is **disabled** until scoped credentials are
+configured and the GitHub variable `CLOUDFLARE_DEPLOY_ENABLED` is set to `true`.
+First-run activation is **not executed**. Build artifacts remain available
+while the publish job is skipped. The landing owner can publish a verified
+GitHub build artifact using an authenticated local Wrangler session instead
+of copying an account credential into GitHub.
+
+After a verified artifact is published, record the run's source SHA, archive
+checksum, Wrangler version receipt, and public routes. Disable the old
+Cloudflare Git production build trigger. Do not configure a Cloudflare build
+command or rebuild in the publish job.
+
+## Publish a GitHub build artifact
+
+This procedure is **not executed** until a successful build run is available.
+Choose a successful main run for the intended source SHA. Download its
+`site-<source SHA>` artifact with `gh run download <run-id> --name
+site-<source SHA> --dir <empty-release-directory>`, then enter that directory:
 
 ```sh
-npx wrangler whoami
+# Replace with the exact source SHA of the successful GitHub build run.
+EXPECTED_SOURCE_SHA='<source-sha>'
+test "$(cat source-sha.txt)" = "$EXPECTED_SOURCE_SHA"
+sha256sum --check site.tar.gz.sha256
+# macOS alternative: shasum -a 256 --check site.tar.gz.sha256
+tar -xzf site.tar.gz
+npm ci
+npm exec --no -- wrangler deploy --no-bundle --config wrangler.jsonc
+```
+
+Use the downloaded assets, Worker code, and configuration together. Do not
+rebuild source before publishing this artifact.
+
+## Manual deployment
+
+For an authorized local deployment:
+
+```sh
 npm run deploy:cloudflare
 ```
 
-`npm run deploy:cloudflare` reruns the full check before `wrangler deploy`.
+This local convenience command reruns the full check before deploying.
 Wrangler applies the `openvaultdb.com` custom-domain declaration. If it reports
 a DNS or existing-route conflict, stop and inspect the authoritative Cloudflare
 DNS and Worker-route state. Remove or replace only records proven to belong to
-the retired Firebase Hosting route; do not guess or broadly delete DNS.
+the retired Firebase Hosting route.
 
 Before changing traffic, confirm `openvaultdb.com` remains listed under Firebase
 Authentication's authorized domains. The hosting cutover does not change the
