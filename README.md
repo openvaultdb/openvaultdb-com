@@ -15,6 +15,10 @@ We build with our own tooling:
 - **[DataTug](https://datatug.io)** — query & explore data
 <!-- /dev-approach -->
 
+## DataTug session-storage architecture
+
+The OpenVaultDB session-storage architecture for [DataTug](https://datatug.app) is under development. Read [how DataTug’s development tools were built](https://datatug.app/en/under-the-hood/tools-we-built/).
+
 ## About OpenVaultDB
 
 OpenVaultDB is an open platform for user-owned application databases. It enables applications to store and access data in user-controlled storage through standard APIs, portable storage backends, and open specifications.
