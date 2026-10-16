@@ -1,9 +1,45 @@
 name: Build and deploy website
 
 on:
+  pull_request:
+    paths:
+      - "content/agent-instructions/**"
+      - "content/agent-skills/**"
+      - "docs/ai-installation-acceptance.md"
+      - "public/**"
+      - "firebase.json"
+      - "firestore.rules"
+      - "scripts/build-agent-instructions.mjs"
+      - "scripts/install-skill.template.sh"
+      - "test/**"
+      - "package.json"
+      - "package-lock.json"
+      - "worker/**"
+      - "wrangler.jsonc"
+      - "DEPLOY.md"
+      - "README.md"
+      - ".github/workflows/firebase-deploy.yml"
+      - ".github/workflows/verify-agent-instructions.yml"
   push:
     branches: [main]
-  pull_request:
+    paths:
+      - "content/agent-instructions/**"
+      - "content/agent-skills/**"
+      - "docs/ai-installation-acceptance.md"
+      - "public/**"
+      - "firebase.json"
+      - "firestore.rules"
+      - "scripts/build-agent-instructions.mjs"
+      - "scripts/install-skill.template.sh"
+      - "test/**"
+      - "package.json"
+      - "package-lock.json"
+      - "worker/**"
+      - "wrangler.jsonc"
+      - "DEPLOY.md"
+      - "README.md"
+      - ".github/workflows/firebase-deploy.yml"
+      - ".github/workflows/verify-agent-instructions.yml"
   workflow_dispatch:
 
 permissions:
