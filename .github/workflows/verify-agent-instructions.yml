@@ -24,6 +24,11 @@ jobs:
       - run: git diff --exit-code
       - run: npm test
       - run: npm run worker:dry-run
+      - name: Verify exact Worker bytes for publication
+        # Standalone JavaScript: no imports or transpilation; publish these bytes.
+        run: |
+          npm exec --no -- wrangler deploy --no-bundle --dry-run --config wrangler.jsonc --outdir .wrangler/artifact-check
+          cmp worker/index.mjs .wrangler/artifact-check/index.mjs
       - name: Package verified release
         # tar preserves dotfiles, _headers, _redirects, and file permissions.
         run: tar -czf site.tar.gz public worker wrangler.jsonc package.json package-lock.json
@@ -42,6 +47,15 @@ jobs:
           if-no-files-found: error
           retention-days: 14
           compression-level: 0
+      - name: Report artifact availability
+        if: vars.CLOUDFLARE_DEPLOY_ENABLED != 'true'
+        run: |
+          {
+            echo '### Website artifact built'
+            echo "Artifact: site-$GITHUB_SHA"
+            echo 'Automatic publication is disabled (CLOUDFLARE_DEPLOY_ENABLED is not true).'
+            echo 'The landing owner can download this artifact and publish it with authenticated Wrangler without rebuilding.'
+          } >> "$GITHUB_STEP_SUMMARY"
 
   deploy:
     needs: verify
@@ -79,4 +93,4 @@ jobs:
             echo "::error::Configure the CLOUDFLARE_API_TOKEN secret for production publishing."
             exit 1
           fi
-          npm exec --no -- wrangler deploy --config wrangler.jsonc
+          npm exec --no -- wrangler deploy --no-bundle --config wrangler.jsonc

@@ -54,12 +54,17 @@ preserves dotfiles, `_headers`, and `_redirects` when present.
 Automatic publication is disabled unless `CLOUDFLARE_DEPLOY_ENABLED` is `true`.
 When enabled, only a main push or manual dispatch on main publishes. The
 production job downloads that same run's artifact, installs the locked Wrangler dependency
-with `npm ci`, and runs `npm exec --no -- wrangler deploy --config
+with `npm ci`, and runs `npm exec --no -- wrangler deploy --no-bundle --config
 wrangler.jsonc`. It does not regenerate or rebuild the site. In particular,
 CI does not run `npm run deploy:cloudflare`, which repeats the build and tests.
 The publish job verifies the recorded source SHA and archive SHA-256 before
 extracting. Artifacts are retained for 14 days; production deployments are
 serialized.
+
+The Worker is standalone JavaScript with no imports or transpilation. Before
+archiving, CI dry-runs it with `--no-bundle` and compares the emitted entrypoint
+byte-for-byte with the archived source. Publication also uses `--no-bundle`,
+so Wrangler uploads those verified bytes without compiling them again.
 
 ### CI credentials and activation
 
@@ -96,7 +101,7 @@ sha256sum --check site.tar.gz.sha256
 # macOS alternative: shasum -a 256 --check site.tar.gz.sha256
 tar -xzf site.tar.gz
 npm ci
-npm exec --no -- wrangler deploy --config wrangler.jsonc
+npm exec --no -- wrangler deploy --no-bundle --config wrangler.jsonc
 ```
 
 Use the downloaded assets, Worker code, and configuration together. Do not
