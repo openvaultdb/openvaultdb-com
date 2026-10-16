@@ -1,6 +1,6 @@
 name: Deploy Firestore rules
 
-# Website hosting is owned by the Cloudflare Worker and is never deployed from
+# Website hosting is owned by Cloudflare static assets and is never deployed from
 # this workflow. Firebase remains the Auth/Firestore backend; this publishes
 # only Firestore rules through the existing keyless Google identity.
 on:

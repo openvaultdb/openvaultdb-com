@@ -39,10 +39,10 @@ Learn more at https://openvaultdb.com
 ## Hosting and deployment
 
 The public website is configured as the `openvaultdb-com` Cloudflare Workers
-Static Assets Worker. [`wrangler.jsonc`](wrangler.jsonc) binds `public/` as
-`ASSETS`, runs [`worker/index.mjs`](worker/index.mjs) before every asset, keeps
-clean URLs without trailing slashes, and declares `openvaultdb.com` as its
-custom domain. The Worker controls the site's security and cache headers.
+Static Assets Worker with no Worker script. [`wrangler.jsonc`](wrangler.jsonc)
+serves `public/` as static assets, keeps clean URLs without trailing slashes, and
+declares `openvaultdb.com` as its custom domain. [`public/_headers`](public/_headers)
+sets the site's security and cache headers.
 
 Firebase Authentication and Firestore remain browser dependencies. The
 Firebase GitHub workflow deploys Firestore rules only; it no longer publishes
