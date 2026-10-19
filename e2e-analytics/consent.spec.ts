@@ -138,4 +138,5 @@ test("privacy page mentions Google Fonts and the Firebase SDK", async ({ page })
   const text = await page.locator("main").innerText();
   expect(text).toContain("Google Fonts");
   expect(text).toContain("Firebase SDK");
+  expect(text).toContain("apis.google.com");
 });

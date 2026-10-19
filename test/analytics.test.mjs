@@ -242,5 +242,6 @@ test("privacy page discloses Google Fonts and the Firebase SDK", () => {
   const t = readFileSync("public/privacy/index.html", "utf8");
   assert.match(t, /Google Fonts/);
   assert.match(t, /Firebase SDK/);
+  assert.match(t, /apis\.google\.com/);
   assert.match(t, /IP address/);
 });
