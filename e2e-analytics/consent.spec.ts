@@ -118,3 +118,24 @@ test("privacy link lands on the analytics section", async ({ page }) => {
   await expect(page).toHaveURL(`${ORIGIN}/privacy/#analytics`);
   await expect(page.locator("#analytics")).toBeVisible();
 });
+
+test("connect query values never reach Google", async ({ page }) => {
+  const seen = await boot(page);
+  const q = "?client_id=cid123&redirect_uri=https%3A%2F%2Fapp.example%2Fcb&state=st4te";
+  await page.goto(`${ORIGIN}/connect/${q}`);
+  await banner(page).getByRole("button", { name: "Accept analytics" }).click();
+  await expect.poll(() => googleHits(seen).length).toBe(1);
+  const layer = await page.evaluate(() => JSON.stringify((window as any).dataLayer.map((a: any) => Array.from(a))));
+  for (const v of ["cid123", "st4te", "app.example"]) {
+    expect(layer).not.toContain(v);
+    expect(googleHits(seen).join()).not.toContain(v);
+  }
+});
+
+test("privacy page mentions Google Fonts and the Firebase SDK", async ({ page }) => {
+  await boot(page);
+  await page.goto(`${ORIGIN}/privacy/`);
+  const text = await page.locator("main").innerText();
+  expect(text).toContain("Google Fonts");
+  expect(text).toContain("Firebase SDK");
+});

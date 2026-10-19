@@ -95,12 +95,14 @@ test("Accept: consent default denied then update, scrubbed config, gtag.js once"
   assert.deepEqual(c[0], ["consent", "default", { analytics_storage: "denied", ad_storage: "denied", ad_user_data: "denied", ad_personalization: "denied" }]);
   assert.deepEqual(c[1], ["consent", "update", { analytics_storage: "granted" }]);
   assert.equal(c[2][0], "js");
+  assert.equal(c[4][0], "set");
   assert.deepEqual(c[3], ["config", "G-B2RWRSXVZE", {
     allow_google_signals: false,
     allow_ad_personalization_signals: false,
     page_location: "https://openvaultdb.com/docs/",
     page_referrer: "https://example.org/a/b",
   }]);
+  assert.deepEqual(c[4], ["set", { page_location: "https://openvaultdb.com/docs/", page_referrer: "https://example.org/a/b" }]);
   assert.deepEqual(e.scripts(), ["https://www.googletagmanager.com/gtag/js?id=G-B2RWRSXVZE"]);
   assert.equal(e.win["ga-disable-G-B2RWRSXVZE"], false);
 });
@@ -140,7 +142,7 @@ test("withdrawal after grant: consent denied, ga-disable set, host and parent co
 });
 
 test("localhost and 127.0.0.1: banner shows, no tag even after Accept", () => {
-  for (const host of ["localhost", "127.0.0.1"]) {
+  for (const host of ["localhost", "127.0.0.1", "[::1]", "app.localhost", "x.y.localhost"]) {
     const e = env({ host, href: `http://${host}/` });
     create(e.win).start();
     assert.ok(e.banner());
@@ -213,4 +215,32 @@ test("privacy page states the analytics terms", () => {
   for (const s of ['id="analytics"', "Google Ireland Limited", "_ga_&lt;id&gt;", "two years", "14 months", "consent", "Analytics choices"]) {
     assert.ok(t.includes(s), s);
   }
+});
+
+test("connect query values never reach any gtag call", () => {
+  const q = "?client_id=cid123&redirect_uri=https%3A%2F%2Fapp.example%2Fcb&state=st4te";
+  const e = env({ href: `https://openvaultdb.com/connect/${q}#f`, referrer: `https://app.example/x${q}` });
+  create(e.win).start();
+  e.banner().button("Accept analytics").click();
+  const all = JSON.stringify(calls(e.win));
+  for (const v of ["cid123", "app.example%2Fcb", "st4te", "client_id", "state="]) assert.ok(!all.includes(v), v);
+  assert.ok(calls(e.win).some((c) => c[0] === "set"));
+});
+
+test("choice cleared in another tab while GA runs here is treated as withdrawal", () => {
+  const e = env({ stored: "granted", cookies: [["_ga"], ["_ga_Q"]] });
+  create(e.win).start();
+  e.store.delete(KEY);
+  e.listeners.storage({ key: KEY });
+  assert.deepEqual(calls(e.win).at(-1), ["consent", "update", { analytics_storage: "denied" }]);
+  assert.equal(e.win["ga-disable-G-B2RWRSXVZE"], true);
+  assert.deepEqual(e.jar, []);
+  assert.ok(e.banner());
+});
+
+test("privacy page discloses Google Fonts and the Firebase SDK", () => {
+  const t = readFileSync("public/privacy/index.html", "utf8");
+  assert.match(t, /Google Fonts/);
+  assert.match(t, /Firebase SDK/);
+  assert.match(t, /IP address/);
 });

@@ -25,7 +25,8 @@
 
     function isLocal() {
       var h = loc.hostname;
-      return h === "localhost" || h === "127.0.0.1" || h === "" || /\.local$/.test(h);
+      return h === "localhost" || h === "127.0.0.1" || h === "[::1]" || h === "::1" ||
+        h === "" || /\.local$/.test(h) || /\.localhost$/.test(h);
     }
 
     function readStored() {
@@ -92,6 +93,10 @@
       var ref = doc.referrer ? scrub(doc.referrer) : "";
       if (ref) cfg.page_referrer = ref;
       gtag("config", GA_ID, cfg);
+      // Enhanced-measurement events read page_location/page_referrer from here.
+      var set = { page_location: cfg.page_location };
+      if (ref) set.page_referrer = ref;
+      gtag("set", set);
       var s = doc.createElement("script");
       s.async = true;
       s.src = "https://www.googletagmanager.com/gtag/js?id=" + GA_ID;
@@ -200,7 +205,7 @@
         var v = readStored();
         if (v === "granted") { hideBanner(); apply("granted"); }
         else if (v === "denied") { hideBanner(); withdraw(); }
-        else { showBanner(false); }
+        else { withdraw(); showBanner(false); } // choice cleared elsewhere
       });
     }
 
