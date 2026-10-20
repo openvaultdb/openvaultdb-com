@@ -22,6 +22,8 @@
     var loaded = false;
     var banner = null;
     var opener = null;
+    var observer = null;
+    var pointerActive = false; // a pointer/touch press is in progress; cleared on keydown only
 
     function isLocal() {
       var h = loc.hostname;
@@ -138,6 +140,81 @@
     function hideBanner() {
       if (banner && banner.parentNode) banner.parentNode.removeChild(banner);
       banner = null;
+      stopGuards();
+      var el = doc.documentElement;
+      if (el && el.classList) el.classList.remove("has-consent-banner");
+      if (el && el.style && el.style.removeProperty) el.style.removeProperty("--consent-banner-h");
+    }
+
+    // While the banner is open the page reserves its height plus the 16px bottom
+    // gutter as bottom padding (--consent-banner-h on <html>, used by styles.css), so
+    // the banner never covers content and the footer links stay reachable.
+    function reserveSpace() {
+      var el = doc.documentElement;
+      if (!el || !el.classList || !banner || !banner.getBoundingClientRect) return;
+      var top = banner.getBoundingClientRect().top;
+      var h = Math.ceil((win.innerHeight || 0) - top);
+      el.classList.add("has-consent-banner");
+      if (el.style && h > 0) el.style.setProperty("--consent-banner-h", h + "px");
+    }
+
+    // Focus not obscured (WCAG 2.4.11): a control that takes keyboard focus under the
+    // banner is scrolled clear of it. Pointer or touch focus is left alone, since
+    // scrolling between press and release would swallow the click. The flag has no
+    // timer (a long press must not expire it) and is cleared only by a key press,
+    // which starts every keyboard-driven focus.
+    function onPointer() { pointerActive = true; }
+    function onKey() { pointerActive = false; }
+    function keepFocusClear(e) {
+      var t = e.target;
+      if (pointerActive || !banner || !t || !t.getBoundingClientRect) return;
+      if (banner.contains && banner.contains(t)) return;
+      var top = banner.getBoundingClientRect().top;
+      var r = t.getBoundingClientRect();
+      if (r.bottom <= top - 8) return;
+      win.scrollBy({ top: r.top + r.height / 2 - top / 2, behavior: "instant" });
+    }
+    function startGuards() {
+      if (win.ResizeObserver) {
+        observer = new win.ResizeObserver(reserveSpace);
+        observer.observe(banner);
+      }
+      if (win.addEventListener) win.addEventListener("resize", reserveSpace);
+      if (doc.addEventListener) {
+        doc.addEventListener("focusin", keepFocusClear);
+        doc.addEventListener("pointerdown", onPointer, true);
+        doc.addEventListener("touchstart", onPointer, true);
+        doc.addEventListener("keydown", onKey, true);
+      }
+    }
+    function stopGuards() {
+      if (observer) { observer.disconnect(); observer = null; }
+      if (win.removeEventListener) win.removeEventListener("resize", reserveSpace);
+      if (doc.removeEventListener) {
+        doc.removeEventListener("focusin", keepFocusClear);
+        doc.removeEventListener("pointerdown", onPointer, true);
+        doc.removeEventListener("touchstart", onPointer, true);
+        doc.removeEventListener("keydown", onKey, true);
+      }
+      pointerActive = false;
+    }
+
+    // After a choice focus goes to the control that reopened the banner, else the
+    // footer "Analytics choices" control, else <main>, never back to <body>.
+    function returnFocus() {
+      var target = opener;
+      if (!target && doc.querySelector) {
+        target = doc.querySelector("footer [data-analytics-choices]") ||
+          doc.querySelector("[data-analytics-choices]");
+        if (target && target.hidden) target = null;
+        if (!target) {
+          target = doc.querySelector("main");
+          if (target && target.setAttribute && !target.hasAttribute("tabindex")) {
+            target.setAttribute("tabindex", "-1");
+          }
+        }
+      }
+      if (target && target.focus) target.focus({ preventScroll: true });
     }
 
     function button(label, value) {
@@ -151,7 +228,7 @@
 
     function showBanner(focus) {
       if (banner) {
-        if (focus) banner.focus();
+        if (focus) banner.focus({ preventScroll: true });
         return;
       }
       banner = doc.createElement("section");
@@ -172,8 +249,11 @@
       row.appendChild(button("Reject", "denied"));
       banner.appendChild(p);
       banner.appendChild(row);
-      doc.body.appendChild(banner);
-      if (focus) banner.focus();
+      // First child of <body>, so keyboard users reach it early; CSS fixes it to the bottom.
+      doc.body.insertBefore(banner, doc.body.firstChild || null);
+      reserveSpace();
+      startGuards();
+      if (focus) banner.focus({ preventScroll: true });
     }
 
     function decide(value) {
@@ -181,7 +261,7 @@
       hideBanner();
       if (value === "granted") apply("granted");
       else withdraw();
-      if (opener) opener.focus();
+      returnFocus();
     }
 
     function wireOpeners() {
