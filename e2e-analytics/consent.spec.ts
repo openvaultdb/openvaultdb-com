@@ -143,7 +143,7 @@ test("privacy page mentions Google Fonts and the Firebase SDK", async ({ page })
 
 // ---- Banner layout, reservation and focus (contract 4b) ----
 const VIEWPORTS: [number, number][] = [[320, 568], [375, 667], [390, 844], [1280, 800], [1366, 768]];
-const PAGES = ["/", "/docs/", "/connect/", "/privacy/"];
+const PAGES = ["/", "/docs/", "/docs/auth-model/", "/connect/", "/my/vaults/", "/privacy/"];
 
 const atCentre = (loc: Locator) => loc.evaluate((el) => {
   const r = el.getBoundingClientRect();
@@ -185,7 +185,8 @@ for (const [w, h] of VIEWPORTS) {
         expect(b.width).toBeLessThanOrEqual(448 + 1);
         expect(Math.round(w - (b.x + b.width))).toBe(16); // bottom-right corner card
       }
-      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(w);
+      // /docs/auth-model/ has a wide table that overflows with or without the banner (pre-existing)
+      if (path !== "/docs/auth-model/") expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(w);
       // reserved = banner height plus the 16px gutter
       expect(await reservedVar(page)).toBe(`${Math.ceil(h - b.y)}px`);
       expect(await page.evaluate(() => getComputedStyle(document.body).paddingBottom)).toBe(`${Math.ceil(h - b.y)}px`);
@@ -213,7 +214,10 @@ for (const [w, h] of VIEWPORTS) {
       if (!el || el === document.body || el.closest(".consent-banner")) return { skip: true, name: "", ok: true };
       const r = el.getBoundingClientRect();
       const top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
-      return { skip: false, name: (el.textContent || el.id || el.tagName).trim().slice(0, 30), ok: !!top && !top.closest(".consent-banner") };
+      const hdr = document.querySelector("header");
+      const hb = hdr && !el.closest("header") && ["sticky", "fixed"].includes(getComputedStyle(hdr).position) ? hdr.getBoundingClientRect().bottom : 0;
+      const clearOfHeader = r.top >= hb - 1; // WCAG 2.4.12: not under the sticky header either
+      return { skip: false, name: (el.textContent || el.id || el.tagName).trim().slice(0, 30), ok: !!top && !top.closest(".consent-banner") && clearOfHeader };
     });
     for (const path of PAGES) {
       await page.goto(`${ORIGIN}${path}`);
@@ -289,7 +293,7 @@ test("the banner is first in the DOM and a few Tab presses away; focus returns t
 });
 
 // A pointer press must reach click: focus that follows it may not scroll the page.
-async function pressNearBanner(page: Page, loc: Locator, gap: number, tap: boolean | "held") {
+async function pressNearBanner(page: Page, loc: Locator, gap: number, tap: boolean | "held" | number) {
   const pos = await loc.evaluate((el, gap) => {
     el.scrollIntoView({ block: "end", behavior: "instant" as ScrollBehavior });
     const bannerTop = document.querySelector(".consent-banner")!.getBoundingClientRect().top;
@@ -304,6 +308,11 @@ async function pressNearBanner(page: Page, loc: Locator, gap: number, tap: boole
     const cdp = await page.context().newCDPSession(page);
     await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: pos.x, y: pos.y }] });
     await page.waitForTimeout(700);
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
+  } else if (typeof tap === "number") {
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: pos.x, y: pos.y }] });
+    await page.waitForTimeout(tap);
     await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] });
   } else if (tap) await page.touchscreen.tap(pos.x, pos.y);
   else await page.mouse.click(pos.x, pos.y);
@@ -335,8 +344,8 @@ test.describe("mouse click at 1280x800", () => {
 test.describe("touch tap at 375x667", () => {
   test.use({ hasTouch: true, viewport: { width: 375, height: 667 } });
   for (const gap of [-4, 6]) {
-    for (const mode of [true, "held"] as const) {
-      test(`controls whose edge is ${gap} px from the banner still receive the ${mode === "held" ? "held (700 ms) " : ""}tap`, async ({ page }) => {
+    for (const mode of [true, "held", 300, 1500] as const) {
+      test(`controls whose edge is ${gap} px from the banner still receive the ${mode === "held" ? "held (700 ms) " : typeof mode === "number" ? `held (${mode} ms) ` : ""}tap`, async ({ page }) => {
         await boot(page);
         for (const [path, pick] of NEAR_BANNER) {
           await page.goto(`${ORIGIN}${path}`);
@@ -414,4 +423,83 @@ test("banner text uses system fonts, so a web-font swap cannot resize it (CLS)",
   const fonts = await banner(page).evaluate((el) =>
     [el, el.querySelector("p")!, ...Array.from(el.querySelectorAll("button, a"))].map((e) => getComputedStyle(e).fontFamily));
   for (const f of fonts) expect(f).not.toMatch(/Source Sans|Libre Franklin|IBM Plex/);
+});
+
+// The same walk with smooth scrolling left ON (as in production), waiting for each scroll to settle.
+test("Tab and Shift+Tab with smooth scrolling on keep controls clear of banner and header (375x667 /connect/)", async ({ page }) => {
+  test.setTimeout(90_000);
+  await page.setViewportSize({ width: 375, height: 667 });
+  await boot(page);
+  await page.goto(`${ORIGIN}/connect/`);
+  await expect(banner(page)).toBeVisible();
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollBehavior)).toBe("smooth");
+  for (const key of ["Tab", "Shift+Tab"]) {
+    for (let i = 0; i < 40; i++) {
+      await page.keyboard.press(key);
+      if (i > 0 && await page.evaluate(() => document.activeElement === document.body)) break;
+      await settledY(page);
+      const bad = await page.evaluate(() => {
+        const el = document.activeElement as HTMLElement;
+        if (!el || el.closest(".consent-banner") || el.closest("header")) return "";
+        const r = el.getBoundingClientRect();
+        const hb = document.querySelector("header")!.getBoundingClientRect().bottom;
+        const top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+        return !top || top.closest(".consent-banner") || r.top < hb - 1 ? (el.textContent || el.className).trim().slice(0, 30) : "";
+      });
+      expect(bad, `${key} ${i + 1}`).toBe("");
+    }
+  }
+});
+
+// The Firebase sign-in modal sits above the banner on phones: every control must be hittable.
+const FIREBASE_STUB = (url: string) => {
+  const names: Record<string, string[]> = {
+    "firebase-app.js": ["initializeApp"],
+    "firebase-auth.js": ["getAuth", "connectAuthEmulator", "GithubAuthProvider", "GoogleAuthProvider", "signInWithPopup",
+      "signInWithEmailAndPassword", "createUserWithEmailAndPassword", "onAuthStateChanged", "signOut"],
+    "firebase-firestore.js": ["getFirestore", "initializeFirestore", "connectFirestoreEmulator", "collection", "getDocs", "addDoc", "deleteDoc", "doc"],
+  };
+  const file = url.split("/").pop()!;
+  return (names[file] || []).map((n) => n === "onAuthStateChanged"
+    ? "export function onAuthStateChanged(a, cb) { setTimeout(() => cb(null)); return () => {}; }"
+    : `export function ${n}() { return {}; }`).join("\n");
+};
+for (const [w, h] of [[320, 568], [375, 667]]) {
+  for (const path of ["/connect/", "/my/vaults/"]) {
+    test(`sign-in modal controls are all hittable with the banner open at ${w}x${h} on ${path}`, async ({ page }) => {
+      await page.setViewportSize({ width: w, height: h });
+      await boot(page);
+      await page.route("https://www.gstatic.com/firebasejs/**", (r) =>
+        r.fulfill({ contentType: "text/javascript", body: FIREBASE_STUB(r.request().url()) }));
+      await page.goto(`${ORIGIN}${path}`);
+      await expect(banner(page)).toBeVisible();
+      await page.locator("[data-auth-open], .btn-signin").first().click();
+      const overlay = page.locator(".auth-overlay");
+      await expect(overlay).toBeVisible();
+      const controls = overlay.locator("button, input, a");
+      const n = await controls.count();
+      expect(n).toBeGreaterThanOrEqual(6);
+      for (let i = 0; i < n; i++) {
+        const c = controls.nth(i);
+        await c.scrollIntoViewIfNeeded();
+        const hit = await c.evaluate((el) => {
+          const r = el.getBoundingClientRect();
+          const top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
+          return !!top && (top === el || el.contains(top));
+        });
+        expect(hit, `control ${i}: ${await c.evaluate((e) => (e.textContent || (e as HTMLInputElement).placeholder || e.className).trim().slice(0, 30))}`).toBe(true);
+      }
+    });
+  }
+}
+
+test("a choice made in another tab moves focus out of the banner, not to body", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 667 });
+  await boot(page);
+  await page.goto(`${ORIGIN}/`);
+  await expect(banner(page)).toBeVisible();
+  await banner(page).getByRole("button", { name: "Reject" }).focus();
+  await page.evaluate((k) => { localStorage.setItem(k, "denied"); window.dispatchEvent(new StorageEvent("storage", { key: k })); }, "openvaultdb.analytics-consent.v1");
+  await expect(banner(page)).toHaveCount(0);
+  expect(await page.evaluate(() => document.activeElement?.textContent?.trim())).toBe("Analytics choices");
 });

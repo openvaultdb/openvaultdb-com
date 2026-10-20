@@ -165,14 +165,31 @@
     // which starts every keyboard-driven focus.
     function onPointer() { pointerActive = true; }
     function onKey() { pointerActive = false; }
+    // A sticky or fixed page header is a second obstruction at the top edge.
+    function headerBottom() {
+      var h = doc.querySelector ? doc.querySelector("header") : null;
+      if (!h || !h.getBoundingClientRect || !win.getComputedStyle) return 0;
+      var pos = win.getComputedStyle(h).position;
+      return pos === "sticky" || pos === "fixed" ? Math.max(0, h.getBoundingClientRect().bottom) : 0;
+    }
     function keepFocusClear(e) {
       var t = e.target;
       if (pointerActive || !banner || !t || !t.getBoundingClientRect) return;
       if (banner.contains && banner.contains(t)) return;
+      if (t.closest && t.closest(".auth-overlay")) return; // the sign-in modal sits above the banner
       var top = banner.getBoundingClientRect().top;
+      var hb = headerBottom();
       var r = t.getBoundingClientRect();
-      if (r.bottom <= top - 8) return;
-      win.scrollBy({ top: r.top + r.height / 2 - top / 2, behavior: "instant" });
+      if (r.bottom > top - 8) {
+        // centre it between header and banner, but never above the header's lower edge
+        // (a control taller than the free band starts just below the header)
+        var want = Math.max(hb + 8, (hb + top) / 2 - r.height / 2);
+        win.scrollBy({ top: r.top - want, behavior: "instant" });
+      } else if (r.top < hb + 8 && r.bottom > 0) {
+        win.scrollBy({ top: r.top - hb - 8, behavior: "instant" });
+      } else if (r.bottom <= 0) {
+        return; // off-screen above: the browser's own focus scroll brings it in
+      }
     }
     function startGuards() {
       if (win.ResizeObserver) {
@@ -283,8 +300,9 @@
       win.addEventListener("storage", function (e) {
         if (e.key !== KEY && e.key !== null) return;
         var v = readStored();
-        if (v === "granted") { hideBanner(); apply("granted"); }
-        else if (v === "denied") { hideBanner(); withdraw(); }
+        var hadFocus = !!(banner && banner.contains && doc.activeElement && banner.contains(doc.activeElement));
+        if (v === "granted") { hideBanner(); apply("granted"); if (hadFocus) returnFocus(); }
+        else if (v === "denied") { hideBanner(); withdraw(); if (hadFocus) returnFocus(); }
         else { withdraw(); showBanner(false); } // choice cleared elsewhere
       });
     }

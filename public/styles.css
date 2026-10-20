@@ -569,7 +569,7 @@ section { position: relative; padding: 90px 0; }
 .btn-signout:hover { border-color: var(--navy); color: var(--navy); }
 
 .auth-overlay {
-  position: fixed; inset: 0; z-index: 100;
+  position: fixed; inset: 0; z-index: 1001; /* above the consent banner (1000) */
   background: rgba(22,41,59,.5); backdrop-filter: blur(4px);
   display: grid; place-items: center; padding: 20px;
 }
@@ -842,9 +842,10 @@ html.has-consent-banner body { padding-bottom: var(--consent-banner-h, 0px); }
 .consent-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .consent-btn {
   flex: 1 1 100px; min-height: 40px; padding: 6px 12px; cursor: pointer;
-  font: 600 14.5px system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; color: var(--navy);
+  font: 600 14.5px var(--font-body, inherit); color: var(--navy);
   background: var(--surface-2); border: 1.5px solid var(--navy); border-radius: 8px;
 }
+.consent-banner .consent-btn { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 .consent-btn:hover { background: var(--band); }
 .consent-btn:focus-visible, .linklike:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 .linklike {
