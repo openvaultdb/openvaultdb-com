@@ -13,7 +13,8 @@
     "check": "npm run build && npm test && npm run site:dry-run",
     "site:dry-run": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
     "deploy:cloudflare": "npm run check && wrangler deploy",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "e2e:analytics": "playwright test -c playwright.analytics.config.ts"
   },
   "repository": {
     "type": "git",

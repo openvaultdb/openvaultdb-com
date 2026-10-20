@@ -51,6 +51,7 @@ test("Wrangler config is assets-only (no Worker script) and keeps clean static r
     "docs/index.html",
     "connect/index.html",
     "my/index.html",
+    "privacy/index.html",
   ]) {
     assert.equal(existsSync(join(root, "public", path)), true, `missing public/${path}`);
   }

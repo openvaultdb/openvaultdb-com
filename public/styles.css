@@ -808,3 +808,30 @@ a.ov-sub:hover { color: var(--brass-deep); }
 .vault-check:hover { border-color: var(--brass-bright); }
 .vault-check input { width: 16px; height: 16px; }
 .vault-check .repo-name { font-weight: 600; }
+
+/* ---- Analytics consent banner (js/analytics.js) ---- */
+.consent-banner {
+  position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 1000;
+  max-width: 640px; margin: 0 auto; padding: 16px 18px;
+  background: var(--surface); color: var(--text); border: 1px solid var(--line-2);
+  border-radius: var(--r); box-shadow: var(--shadow-lg, 0 10px 30px -10px rgba(22,41,59,.35));
+  font-size: 14.5px; line-height: 1.5;
+}
+.consent-banner:focus { outline: none; }
+.consent-banner:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.consent-banner p { margin: 0 0 12px; color: var(--text-soft); }
+.consent-banner a { color: var(--brass-deep); text-decoration: underline; }
+.consent-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.consent-btn {
+  flex: 1 1 120px; min-height: 40px; padding: 8px 14px; cursor: pointer;
+  font: 600 14.5px var(--font-body, inherit); color: var(--navy);
+  background: var(--surface-2); border: 1.5px solid var(--navy); border-radius: 8px;
+}
+.consent-btn:hover { background: var(--band); }
+.consent-btn:focus-visible, .linklike:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+.linklike {
+  background: none; border: 0; padding: 0; margin: 0; cursor: pointer;
+  font: inherit; color: inherit; text-decoration: underline;
+}
+.legal a, .legal .linklike { color: inherit; }
+.legal a:hover, .legal .linklike:hover { color: var(--brass-bright); }
