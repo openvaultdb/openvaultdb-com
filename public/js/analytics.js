@@ -176,7 +176,11 @@
       var t = e.target;
       if (pointerActive || !banner || !t || !t.getBoundingClientRect) return;
       if (banner.contains && banner.contains(t)) return;
-      if (t.closest && t.closest(".auth-overlay")) return; // the sign-in modal sits above the banner
+      // the sign-in modal sits above the banner; while it is open the page behind is inert
+      if (t.closest && t.closest(".auth-overlay")) return;
+      if (doc.documentElement.hasAttribute && doc.documentElement.hasAttribute("data-auth-modal-open")) return;
+      // the sticky header is always fully visible: focusing inside it never scrolls the page
+      if (t.closest && t.closest("header")) return;
       var top = banner.getBoundingClientRect().top;
       var hb = headerBottom();
       var r = t.getBoundingClientRect();

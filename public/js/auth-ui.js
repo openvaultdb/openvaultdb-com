@@ -91,13 +91,43 @@ function setEmailMode(mode) {
   showError("");
 }
 
+// While the modal is open the rest of the page (the consent banner included) is inert, Tab
+// wraps inside the modal and Escape closes it, returning focus to whatever opened it.
+let modalOpener = null;
+let inertSet = [];
+function modalKeydown(e) {
+  if (!modal || modal.hidden) return;
+  if (e.key === "Escape") { e.preventDefault(); closeModal(); return; }
+  if (e.key !== "Tab") return;
+  const items = Array.from(modal.querySelectorAll("button, input, a[href]")).filter((el) => !el.hidden && el.offsetParent !== null);
+  if (!items.length) return;
+  const first = items[0];
+  const last = items[items.length - 1];
+  const active = document.activeElement;
+  if (e.shiftKey && (active === first || !modal.contains(active))) { e.preventDefault(); last.focus(); }
+  else if (!e.shiftKey && (active === last || !modal.contains(active))) { e.preventDefault(); first.focus(); }
+}
 function openModal() {
   if (!modal) buildModal();
   showError("");
+  modalOpener = document.activeElement;
   modal.hidden = false;
+  inertSet = Array.from(document.body.children).filter((el) => el !== modal && !el.inert);
+  inertSet.forEach((el) => { el.inert = true; });
+  document.documentElement.setAttribute("data-auth-modal-open", "");
+  document.addEventListener("keydown", modalKeydown, true);
   modal.querySelector('input[name="email"]').focus();
 }
-function closeModal() { if (modal) modal.hidden = true; }
+function closeModal() {
+  if (!modal || modal.hidden) return;
+  modal.hidden = true;
+  inertSet.forEach((el) => { el.inert = false; });
+  inertSet = [];
+  document.documentElement.removeAttribute("data-auth-modal-open");
+  document.removeEventListener("keydown", modalKeydown, true);
+  if (modalOpener && modalOpener.isConnected && modalOpener.focus) modalOpener.focus({ preventScroll: true });
+  modalOpener = null;
+}
 
 function showError(msg) {
   if (!errorEl) return;

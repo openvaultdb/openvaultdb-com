@@ -576,6 +576,7 @@ section { position: relative; padding: 90px 0; }
 .auth-overlay[hidden] { display: none; }
 .auth-dialog {
   position: relative; width: 100%; max-width: 380px;
+  max-height: calc(100vh - 40px); max-height: calc(100dvh - 40px); overflow-y: auto;
   background: var(--surface); border: 1px solid var(--line);
   border-radius: 16px; box-shadow: var(--shadow-lg); padding: 30px 28px 24px;
 }

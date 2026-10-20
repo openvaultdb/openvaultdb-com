@@ -143,7 +143,7 @@ test("privacy page mentions Google Fonts and the Firebase SDK", async ({ page })
 
 // ---- Banner layout, reservation and focus (contract 4b) ----
 const VIEWPORTS: [number, number][] = [[320, 568], [375, 667], [390, 844], [1280, 800], [1366, 768]];
-const PAGES = ["/", "/docs/", "/docs/auth-model/", "/connect/", "/my/vaults/", "/privacy/"];
+const PAGES = ["/", "/docs/", "/docs/auth-model/", "/connect/", "/my/vaults/", "/my/apps/", "/privacy/"];
 
 const atCentre = (loc: Locator) => loc.evaluate((el) => {
   const r = el.getBoundingClientRect();
@@ -440,9 +440,9 @@ test("Tab and Shift+Tab with smooth scrolling on keep controls clear of banner a
       await settledY(page);
       const bad = await page.evaluate(() => {
         const el = document.activeElement as HTMLElement;
-        if (!el || el.closest(".consent-banner") || el.closest("header")) return "";
+        if (!el || el.closest(".consent-banner")) return "";
         const r = el.getBoundingClientRect();
-        const hb = document.querySelector("header")!.getBoundingClientRect().bottom;
+        const hb = el.closest("header") ? 0 : document.querySelector("header")!.getBoundingClientRect().bottom;
         const top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2);
         return !top || top.closest(".consent-banner") || r.top < hb - 1 ? (el.textContent || el.className).trim().slice(0, 30) : "";
       });
@@ -503,3 +503,96 @@ test("a choice made in another tab moves focus out of the banner, not to body", 
   await expect(banner(page)).toHaveCount(0);
   expect(await page.evaluate(() => document.activeElement?.textContent?.trim())).toBe("Analytics choices");
 });
+
+test("focusing a control inside the sticky header does not scroll the page (1280x800 /privacy/)", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await boot(page);
+  await page.goto(`${ORIGIN}/privacy/`);
+  await expect(banner(page)).toBeVisible();
+  await page.evaluate(() => window.scrollTo({ top: 300, behavior: "instant" as ScrollBehavior }));
+  const before = await settledY(page);
+  expect(before).toBeGreaterThan(0);
+  const links = page.locator("header a, header button");
+  const n = await links.count();
+  for (let i = 0; i < n; i++) {
+    await links.nth(i).focus();
+    expect(await settledY(page), `header control ${i}`).toBe(before);
+  }
+  // and by keyboard from the first control after the header
+  await page.evaluate(() => window.scrollTo({ top: 300, behavior: "instant" as ScrollBehavior }));
+  await page.locator("main a, main button").first().focus({ timeout: 5000 });
+  const afterMain = await settledY(page);
+  await page.keyboard.press("Shift+Tab");
+  expect(await page.evaluate(() => !!document.activeElement?.closest("header"))).toBe(true);
+  expect(await settledY(page)).toBe(afterMain);
+});
+
+test("the /privacy/ in-page Analytics choices button keeps the brand font, unlike the banner", async ({ page }) => {
+  await boot(page);
+  await page.goto(`${ORIGIN}/privacy/`);
+  await expect(banner(page)).toBeVisible();
+  const fam = await page.evaluate(() => ({
+    banner: getComputedStyle(document.querySelector(".consent-banner .consent-btn")!).fontFamily,
+    inPage: getComputedStyle(document.querySelector("main .consent-btn")!).fontFamily,
+  }));
+  expect(fam.inPage).not.toBe(fam.banner);
+  expect(fam.inPage).toContain("Source Sans 3");
+});
+
+test("a control inside an .auth-overlay is never scrolled by the focus helper", async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 667 });
+  await boot(page);
+  await page.goto(`${ORIGIN}/`);
+  await expect(banner(page)).toBeVisible();
+  // an overlay-like box (not the real modal, so no data-auth-modal-open) whose control sits under the banner
+  await page.evaluate(() => {
+    const o = document.createElement("div");
+    o.className = "auth-overlay";
+    o.style.cssText = "position:fixed;left:0;right:0;bottom:0;height:60px;z-index:1;background:none;padding:0";
+    o.innerHTML = '<button id="fake-modal-btn" style="position:absolute;bottom:10px;left:10px">x</button>';
+    document.body.appendChild(o);
+    window.scrollTo({ top: 1000, behavior: "instant" as ScrollBehavior });
+  });
+  const before = await settledY(page);
+  await page.locator("#fake-modal-btn").focus();
+  expect(await settledY(page)).toBe(before);
+});
+
+// Modal containment: the rest of the page, banner included, is inert while the sign-in modal is open.
+for (const [w, h] of [[320, 568], [375, 667], [390, 844], [1280, 800], [568, 320]]) {
+  for (const path of ["/connect/", "/my/vaults/"]) {
+    test(`sign-in modal traps Tab, closes on Escape and leaves the page alone at ${w}x${h} on ${path}`, async ({ page }) => {
+      await page.setViewportSize({ width: w, height: h });
+      await boot(page);
+      await page.route("https://www.gstatic.com/firebasejs/**", (r) =>
+        r.fulfill({ contentType: "text/javascript", body: FIREBASE_STUB(r.request().url()) }));
+      await page.goto(`${ORIGIN}${path}`);
+      await expect(banner(page)).toBeVisible();
+      const opener = page.locator("[data-auth-open], .btn-signin").first();
+      await opener.focus();
+      const before = await settledY(page);
+      await page.keyboard.press("Enter");
+      const overlay = page.locator(".auth-overlay");
+      await expect(overlay).toBeVisible();
+      const inside = () => page.evaluate(() => !!document.activeElement?.closest(".auth-overlay"));
+      for (const key of ["Tab", "Shift+Tab"]) {
+        for (let i = 0; i < 12; i++) {
+          await page.keyboard.press(key);
+          expect(await inside(), `${key} ${i + 1} stays in the modal`).toBe(true);
+        }
+      }
+      expect(await settledY(page), "page did not scroll while the modal is open").toBe(before);
+      // modal card scrolls when the viewport is short (landscape phone)
+      const card = await page.locator(".auth-dialog").boundingBox();
+      expect(card!.y + card!.height).toBeLessThanOrEqual(h + 1);
+      await page.keyboard.press("Escape");
+      await expect(overlay).toBeHidden();
+      expect(await page.evaluate(() => document.activeElement === document.querySelector("[data-auth-open], .btn-signin"))).toBe(true);
+      expect(await settledY(page)).toBe(before);
+      // the page and a working banner are back
+      expect(await page.evaluate(() => document.querySelectorAll("[inert]").length)).toBe(0);
+      await banner(page).getByRole("button", { name: "Reject" }).click();
+      await expect(banner(page)).toHaveCount(0);
+    });
+  }
+}
