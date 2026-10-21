@@ -11,6 +11,13 @@ class El {
   }
   setAttribute(k, v) { this.attrs[k] = v; }
   appendChild(c) { c.parentNode = this; this.children.push(c); return c; }
+  get firstChild() { return this.children[0] || null; }
+  insertBefore(c, ref) {
+    c.parentNode = this;
+    const i = ref ? this.children.indexOf(ref) : -1;
+    if (i < 0) this.children.push(c); else this.children.splice(i, 0, c);
+    return c;
+  }
   removeChild(c) { this.children = this.children.filter((x) => x !== c); c.parentNode = null; }
   addEventListener(t, f) { this.handlers[t] = f; }
   click() { this.handlers.click.call(this); }
@@ -32,8 +39,11 @@ function env({ host = "openvaultdb.com", href = "https://openvaultdb.com/docs/?q
   const head = new El("head"), body = new El("body");
   const opener = new El("button");
   const listeners = {};
+  const docListeners = new Set();
   const doc = {
-    head, body, referrer, createElement: (t) => new El(t),
+    head, body, referrer,
+    addEventListener: (t) => docListeners.add(t),
+    removeEventListener: (t) => docListeners.delete(t), createElement: (t) => new El(t),
     createTextNode: (t) => ({ textContent: t }),
     querySelectorAll: () => [opener],
     get cookie() { return [...new Set(jar.map((c) => c.name))].map((n) => `${n}=1`).join("; "); },
@@ -56,7 +66,7 @@ function env({ host = "openvaultdb.com", href = "https://openvaultdb.com/docs/?q
   };
   const scripts = () => head.children.filter((c) => c.tag === "script").map((c) => c.src);
   const banner = () => body.find((c) => c.attrs.role === "region");
-  return { win, doc, store, jar, scripts, banner, opener, listeners };
+  return { win, doc, store, jar, scripts, banner, opener, listeners, docListeners };
 }
 
 const calls = (win) => (win.dataLayer || []).map((a) => Array.from(a));
@@ -244,4 +254,25 @@ test("privacy page discloses Google Fonts and the Firebase SDK", () => {
   assert.match(t, /Firebase SDK/);
   assert.match(t, /apis\.google\.com/);
   assert.match(t, /IP address/);
+});
+
+test("banner is the first child of body; page-level listeners exist only while it is open", () => {
+  const e = env();
+  e.doc.body.appendChild(new El("main"));
+  create(e.win).start();
+  assert.equal(e.doc.body.children[0], e.banner());
+  assert.deepEqual([...e.docListeners].sort(), ["focusin", "keydown", "pointerdown", "touchstart"]);
+  e.banner().button("Reject").click();
+  assert.equal(e.docListeners.size, 0);
+});
+
+test("a first-visit choice moves focus off body without scrolling (preventScroll)", () => {
+  const e = env();
+  const calls = [];
+  e.opener.focus = (o) => calls.push(o);
+  e.doc.querySelector = (sel) => (sel === "footer [data-analytics-choices]" ? e.opener : null);
+  e.opener.hidden = false;
+  create(e.win).start();
+  e.banner().button("Reject").click();
+  assert.deepEqual(calls, [{ preventScroll: true }]);
 });

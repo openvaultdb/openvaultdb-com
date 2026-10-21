@@ -22,6 +22,8 @@
     var loaded = false;
     var banner = null;
     var opener = null;
+    var observer = null;
+    var pointerActive = false; // a pointer/touch press is in progress; cleared on keydown only
 
     function isLocal() {
       var h = loc.hostname;
@@ -138,6 +140,102 @@
     function hideBanner() {
       if (banner && banner.parentNode) banner.parentNode.removeChild(banner);
       banner = null;
+      stopGuards();
+      var el = doc.documentElement;
+      if (el && el.classList) el.classList.remove("has-consent-banner");
+      if (el && el.style && el.style.removeProperty) el.style.removeProperty("--consent-banner-h");
+    }
+
+    // While the banner is open the page reserves its height plus the 16px bottom
+    // gutter as bottom padding (--consent-banner-h on <html>, used by styles.css), so
+    // the banner never covers content and the footer links stay reachable.
+    function reserveSpace() {
+      var el = doc.documentElement;
+      if (!el || !el.classList || !banner || !banner.getBoundingClientRect) return;
+      var top = banner.getBoundingClientRect().top;
+      var h = Math.ceil((win.innerHeight || 0) - top);
+      el.classList.add("has-consent-banner");
+      if (el.style && h > 0) el.style.setProperty("--consent-banner-h", h + "px");
+    }
+
+    // Focus not obscured (WCAG 2.4.11): a control that takes keyboard focus under the
+    // banner is scrolled clear of it. Pointer or touch focus is left alone, since
+    // scrolling between press and release would swallow the click. The flag has no
+    // timer (a long press must not expire it) and is cleared only by a key press,
+    // which starts every keyboard-driven focus.
+    function onPointer() { pointerActive = true; }
+    function onKey() { pointerActive = false; }
+    // A sticky or fixed page header is a second obstruction at the top edge.
+    function headerBottom() {
+      var h = doc.querySelector ? doc.querySelector("header") : null;
+      if (!h || !h.getBoundingClientRect || !win.getComputedStyle) return 0;
+      var pos = win.getComputedStyle(h).position;
+      return pos === "sticky" || pos === "fixed" ? Math.max(0, h.getBoundingClientRect().bottom) : 0;
+    }
+    function keepFocusClear(e) {
+      var t = e.target;
+      if (pointerActive || !banner || !t || !t.getBoundingClientRect) return;
+      if (banner.contains && banner.contains(t)) return;
+      // the sign-in modal sits above the banner; while it is open the page behind is inert
+      if (t.closest && t.closest(".auth-overlay")) return;
+      if (doc.documentElement.hasAttribute && doc.documentElement.hasAttribute("data-auth-modal-open")) return;
+      // the sticky header is always fully visible: focusing inside it never scrolls the page
+      if (t.closest && t.closest("header")) return;
+      var top = banner.getBoundingClientRect().top;
+      var hb = headerBottom();
+      var r = t.getBoundingClientRect();
+      if (r.bottom > top - 8) {
+        // centre it between header and banner, but never above the header's lower edge
+        // (a control taller than the free band starts just below the header)
+        var want = Math.max(hb + 8, (hb + top) / 2 - r.height / 2);
+        win.scrollBy({ top: r.top - want, behavior: "instant" });
+      } else if (r.top < hb + 8 && r.bottom > 0) {
+        win.scrollBy({ top: r.top - hb - 8, behavior: "instant" });
+      } else if (r.bottom <= 0) {
+        return; // off-screen above: the browser's own focus scroll brings it in
+      }
+    }
+    function startGuards() {
+      if (win.ResizeObserver) {
+        observer = new win.ResizeObserver(reserveSpace);
+        observer.observe(banner);
+      }
+      if (win.addEventListener) win.addEventListener("resize", reserveSpace);
+      if (doc.addEventListener) {
+        doc.addEventListener("focusin", keepFocusClear);
+        doc.addEventListener("pointerdown", onPointer, true);
+        doc.addEventListener("touchstart", onPointer, true);
+        doc.addEventListener("keydown", onKey, true);
+      }
+    }
+    function stopGuards() {
+      if (observer) { observer.disconnect(); observer = null; }
+      if (win.removeEventListener) win.removeEventListener("resize", reserveSpace);
+      if (doc.removeEventListener) {
+        doc.removeEventListener("focusin", keepFocusClear);
+        doc.removeEventListener("pointerdown", onPointer, true);
+        doc.removeEventListener("touchstart", onPointer, true);
+        doc.removeEventListener("keydown", onKey, true);
+      }
+      pointerActive = false;
+    }
+
+    // After a choice focus goes to the control that reopened the banner, else the
+    // footer "Analytics choices" control, else <main>, never back to <body>.
+    function returnFocus() {
+      var target = opener;
+      if (!target && doc.querySelector) {
+        target = doc.querySelector("footer [data-analytics-choices]") ||
+          doc.querySelector("[data-analytics-choices]");
+        if (target && target.hidden) target = null;
+        if (!target) {
+          target = doc.querySelector("main");
+          if (target && target.setAttribute && !target.hasAttribute("tabindex")) {
+            target.setAttribute("tabindex", "-1");
+          }
+        }
+      }
+      if (target && target.focus) target.focus({ preventScroll: true });
     }
 
     function button(label, value) {
@@ -151,7 +249,7 @@
 
     function showBanner(focus) {
       if (banner) {
-        if (focus) banner.focus();
+        if (focus) banner.focus({ preventScroll: true });
         return;
       }
       banner = doc.createElement("section");
@@ -172,8 +270,11 @@
       row.appendChild(button("Reject", "denied"));
       banner.appendChild(p);
       banner.appendChild(row);
-      doc.body.appendChild(banner);
-      if (focus) banner.focus();
+      // First child of <body>, so keyboard users reach it early; CSS fixes it to the bottom.
+      doc.body.insertBefore(banner, doc.body.firstChild || null);
+      reserveSpace();
+      startGuards();
+      if (focus) banner.focus({ preventScroll: true });
     }
 
     function decide(value) {
@@ -181,7 +282,7 @@
       hideBanner();
       if (value === "granted") apply("granted");
       else withdraw();
-      if (opener) opener.focus();
+      returnFocus();
     }
 
     function wireOpeners() {
@@ -203,8 +304,9 @@
       win.addEventListener("storage", function (e) {
         if (e.key !== KEY && e.key !== null) return;
         var v = readStored();
-        if (v === "granted") { hideBanner(); apply("granted"); }
-        else if (v === "denied") { hideBanner(); withdraw(); }
+        var hadFocus = !!(banner && banner.contains && doc.activeElement && banner.contains(doc.activeElement));
+        if (v === "granted") { hideBanner(); apply("granted"); if (hadFocus) returnFocus(); }
+        else if (v === "denied") { hideBanner(); withdraw(); if (hadFocus) returnFocus(); }
         else { withdraw(); showBanner(false); } // choice cleared elsewhere
       });
     }

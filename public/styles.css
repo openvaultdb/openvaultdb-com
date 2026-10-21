@@ -569,13 +569,14 @@ section { position: relative; padding: 90px 0; }
 .btn-signout:hover { border-color: var(--navy); color: var(--navy); }
 
 .auth-overlay {
-  position: fixed; inset: 0; z-index: 100;
+  position: fixed; inset: 0; z-index: 1001; /* above the consent banner (1000) */
   background: rgba(22,41,59,.5); backdrop-filter: blur(4px);
   display: grid; place-items: center; padding: 20px;
 }
 .auth-overlay[hidden] { display: none; }
 .auth-dialog {
   position: relative; width: 100%; max-width: 380px;
+  max-height: calc(100vh - 40px); max-height: calc(100dvh - 40px); overflow-y: auto;
   background: var(--surface); border: 1px solid var(--line);
   border-radius: 16px; box-shadow: var(--shadow-lg); padding: 30px 28px 24px;
 }
@@ -810,23 +811,42 @@ a.ov-sub:hover { color: var(--brass-deep); }
 .vault-check .repo-name { font-weight: 600; }
 
 /* ---- Analytics consent banner (js/analytics.js) ---- */
+/* A compact corner card on wide screens and a short bottom bar on phones. While it
+   is open the page reserves its height plus the 16px gutter (--consent-banner-h on
+   <html>) as bottom padding, so it never covers content and the footer stays reachable. */
 .consent-banner {
   position: fixed; left: 16px; right: 16px; bottom: 16px; z-index: 1000;
-  max-width: 640px; margin: 0 auto; padding: 16px 18px;
+  max-height: 35vh; max-height: 35dvh; overflow-y: auto; margin: 0; padding: 12px 14px;
   background: var(--surface); color: var(--text); border: 1px solid var(--line-2);
   border-radius: var(--r); box-shadow: var(--shadow-lg, 0 10px 30px -10px rgba(22,41,59,.35));
-  font-size: 14.5px; line-height: 1.5;
+  font-size: 13.5px; line-height: 1.4;
+  /* System fonts, not the web font: the banner is painted before the web font arrives, and
+     the swap would resize a bottom-fixed box and register as layout shift (CLS 0.11 on /privacy/). */
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+@media (min-width: 768px) {
+  .consent-banner { left: auto; width: 28rem; max-width: calc(100vw - 32px); padding: 16px 18px; font-size: 14.5px; line-height: 1.5; }
+}
+html.has-consent-banner body { padding-bottom: var(--consent-banner-h, 0px); }
+/* the open phone menu travels with the sticky header: keep it clear of the banner */
+@media (max-width: 680px) {
+  html.has-consent-banner .nav.open {
+    max-height: calc(100vh - 66px - var(--consent-banner-h, 0px) - 8px);
+    max-height: calc(100dvh - 66px - var(--consent-banner-h, 0px) - 8px);
+    overflow-y: auto;
+  }
 }
 .consent-banner:focus { outline: none; }
 .consent-banner:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
-.consent-banner p { margin: 0 0 12px; color: var(--text-soft); }
+.consent-banner p { margin: 0 0 8px; color: var(--text-soft); }
 .consent-banner a { color: var(--brass-deep); text-decoration: underline; }
 .consent-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 .consent-btn {
-  flex: 1 1 120px; min-height: 40px; padding: 8px 14px; cursor: pointer;
+  flex: 1 1 100px; min-height: 40px; padding: 6px 12px; cursor: pointer;
   font: 600 14.5px var(--font-body, inherit); color: var(--navy);
   background: var(--surface-2); border: 1.5px solid var(--navy); border-radius: 8px;
 }
+.consent-banner .consent-btn { font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 .consent-btn:hover { background: var(--band); }
 .consent-btn:focus-visible, .linklike:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
 .linklike {
