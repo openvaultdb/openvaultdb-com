@@ -78,7 +78,7 @@ Maintainers can run the versioned Luna clean-room procedure in
 ## Related Projects
 
 - OpenVaultDB — Protocol and platform
-- [DTQL](https://dtql.org) — Query language
+- [TugQL](https://tugql.org) — Query language
 - [DALgo](https://dalgo.io) — Data abstraction layer
 - [inGitDB](https://ingitdb.com) — Git-backed storage engine
 - [INGR.io](https://ingr.io) — Git-friendly storage format

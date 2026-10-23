@@ -255,7 +255,7 @@ https://openvaultdb.com/agent-instructions/install</code></pre>
         <article class="card">
           <div class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="19" cy="18" r="2.4" stroke="currentColor" stroke-width="1.6"/></svg></div>
           <h3>Portable query API</h3>
-          <p>DTQL exposes only portable functionality across every backend — so queries that work on Git work on Postgres, SQLite, or Firestore too.</p>
+          <p>TugQL exposes only portable functionality across every backend — so queries that work on Git work on Postgres, SQLite, or Firestore too.</p>
         </article>
       </div>
     </div>
@@ -296,7 +296,7 @@ https://openvaultdb.com/agent-instructions/install</code></pre>
       <div class="sl-flow" aria-label="Serverless data flow: browser to your GitHub repository">
         <div class="sl-node">
           <span class="sl-k">Your browser</span>
-          <span class="sl-v">app + DTQL</span>
+          <span class="sl-v">app + TugQL</span>
         </div>
         <div class="sl-arrow">GitHub API ↓</div>
         <div class="sl-node accent">
@@ -314,7 +314,7 @@ https://openvaultdb.com/agent-instructions/install</code></pre>
         <span class="eyebrow">How it fits together</span>
         <h2 style="font-family:var(--font-display);font-weight:360;font-size:clamp(30px,4.4vw,50px);letter-spacing:-.02em;line-height:1.05;margin:16px 0 18px;">One protocol, many backends.</h2>
         <p style="color:var(--text-dim);margin:0 0 22px;">
-          OpenVaultDB defines the protocol and APIs. Queries flow through DTQL into
+          OpenVaultDB defines the protocol and APIs. Queries flow through TugQL into
           DALgo, the data abstraction layer, which maps them onto whichever storage
           adapter you've chosen. The reference path writes Git-friendly INGR.io files
           into a Git repository.
@@ -330,7 +330,7 @@ https://openvaultdb.com/agent-instructions/install</code></pre>
         <div class="connector"></div>
         <div class="layer accent"><span class="name">OpenVaultDB</span><span class="role">protocol &amp; APIs</span></div>
         <div class="connector"></div>
-        <div class="layer"><span class="name">DTQL</span><span class="role">portable query language</span></div>
+        <div class="layer"><span class="name">TugQL</span><span class="role">portable query language</span></div>
         <div class="connector"></div>
         <div class="layer"><span class="name">DALgo</span><span class="role">data abstraction layer</span></div>
         <div class="connector"></div>
@@ -351,12 +351,12 @@ https://openvaultdb.com/agent-instructions/install</code></pre>
 
       <div class="eco-list">
         <div class="eco"><span class="tag">DataTug</span><div><h4><a href="https://datatug.app" target="_blank" rel="noopener">DataTug <span class="arr">↗</span></a></h4><p>DataTug helps developers explore database schemas, write and run queries, and understand their results. Its OpenVaultDB session-storage architecture is under development. <a href="https://datatug.app/en/under-the-hood/tools-we-built/" target="_blank" rel="noopener">Read how DataTug’s development tools were built.</a></p></div></div>
-        <div class="eco"><span class="tag">DTQL</span><div><h4><a href="https://dtql.org/" target="_blank" rel="noopener">Query language <span class="arr">↗</span></a></h4><p>The primary API. A portable query and mutation language built on DALgo capabilities — intentionally not full SQL.</p></div></div>
+        <div class="eco"><span class="tag">TugQL</span><div><h4><a href="https://tugql.org/" target="_blank" rel="noopener">Query language <span class="arr">↗</span></a></h4><p>The primary API. A portable query and mutation language built on DALgo capabilities — intentionally not full SQL.</p></div></div>
         <div class="eco"><span class="tag">DALgo</span><div><h4><a href="https://dalgo.io" target="_blank" rel="noopener">Data abstraction layer <span class="arr">↗</span></a></h4><p>Maps portable queries onto backend providers, so one query model spans many databases.</p></div></div>
         <div class="eco"><span class="tag">inGitDB</span><div><h4><a href="https://ingitdb.com/" target="_blank" rel="noopener">Git-backed engine <span class="arr">↗</span></a></h4><p>The reference storage engine. Auditable history, easy rollback, and versioned data on top of Git.</p></div></div>
         <div class="eco"><span class="tag">INGR.io</span><div><h4><a href="https://ingr.io/" target="_blank" rel="noopener">Storage format <span class="arr">↗</span></a></h4><p>A Git-friendly structured format designed for clean diffs, merges, and conflict resolution.</p></div></div>
 
-        <div class="eco"><span class="tag">Vault</span><div><h4><a href="https://github.com/openvaultdb/openvaultdb-go" target="_blank" rel="noopener">Reference implementation <span class="arr">↗</span></a></h4><p>Go libraries and the reference OpenVaultDB server — portable storage backends and DTQL query support. Run your own vault.</p></div></div>
+        <div class="eco"><span class="tag">Vault</span><div><h4><a href="https://github.com/openvaultdb/openvaultdb-go" target="_blank" rel="noopener">Reference implementation <span class="arr">↗</span></a></h4><p>Go libraries and the reference OpenVaultDB server — portable storage backends and TugQL query support. Run your own vault.</p></div></div>
       </div>
     </div>
   </section>
@@ -377,7 +377,7 @@ https://openvaultdb.com/agent-instructions/install</code></pre>
             <li>Authentication &amp; token exchange</li>
             <li>App namespaces</li>
             <li>Schema management</li>
-            <li>DTQL &amp; CRUD operations</li>
+            <li>TugQL &amp; CRUD operations</li>
             <li>DALgo integration</li>
             <li>inGitDB backend</li>
             <li>Version history</li>
@@ -474,7 +474,7 @@ https://openvaultdb.com/agent-instructions/install</code></pre>
         </div>
         <div class="foot-col">
           <h5>Ecosystem</h5>
-          <a href="https://dtql.org/" target="_blank" rel="noopener">DTQL ↗</a>
+          <a href="https://tugql.org/" target="_blank" rel="noopener">TugQL ↗</a>
           <a href="https://dalgo.io" target="_blank" rel="noopener">DALgo ↗</a>
           <a href="https://ingr.io/" target="_blank" rel="noopener">INGR.io ↗</a>
           <a href="https://ingitdb.com/" target="_blank" rel="noopener">inGitDB ↗</a>
