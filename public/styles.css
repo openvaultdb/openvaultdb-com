@@ -410,10 +410,10 @@ section { position: relative; padding: 90px 0; }
   color: #fff; background: var(--navy); border-radius: 7px;
   padding: 7px 9px; letter-spacing: .04em;
 }
-.eco h4 { margin: 0 0 5px; font-family: var(--font-display); font-weight: 700; font-size: 18px; color: var(--navy); }
-.eco h4 a { color: inherit; transition: color .2s var(--ease); }
-.eco h4 a:hover { color: var(--brass); }
-.eco h4 a .arr { color: var(--brass); font-weight: 600; }
+.eco h3 { margin: 0 0 5px; font-family: var(--font-display); font-weight: 700; font-size: 18px; line-height: 1.3; color: var(--navy); }
+.eco h3 a { color: inherit; transition: color .2s var(--ease); }
+.eco h3 a:hover { color: var(--brass); }
+.eco h3 a .arr { color: var(--brass); font-weight: 600; }
 .eco p { margin: 0; color: var(--text-soft); font-size: 15px; }
 
 /* ---------- Scope ---------- */
@@ -423,11 +423,11 @@ section { position: relative; padding: 90px 0; }
   border: 1px solid var(--line); border-radius: var(--r);
   background: var(--surface); box-shadow: var(--shadow); padding: 26px 24px;
 }
-.scope-col h4 {
-  font-family: var(--font-mono); font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
-  margin: 0 0 18px; display: flex; align-items: center; gap: 9px; color: var(--navy);
+.scope-col h3 {
+  font-family: var(--font-mono); font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  line-height: 1.3; margin: 0 0 18px; display: flex; align-items: center; gap: 9px; color: var(--navy);
 }
-.scope-col h4 i { width: 8px; height: 8px; border-radius: 50%; }
+.scope-col h3 i { width: 8px; height: 8px; border-radius: 50%; }
 .scope-col.now i  { background: var(--signal); }
 .scope-col.maybe i{ background: var(--brass-bright); }
 .scope-col.later i{ background: var(--muted); }
@@ -492,9 +492,9 @@ section { position: relative; padding: 90px 0; }
 .site-footer .brand b span { color: var(--brass-bright); }
 .site-footer p { color: #93a0ac; font-size: 14px; margin: 14px 0 0; max-width: 38ch; }
 .foot-links { display: flex; gap: 46px; flex-wrap: wrap; }
-.foot-col h5 {
-  font-family: var(--font-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase;
-  color: #7e8b97; margin: 0 0 14px;
+.foot-col .foot-label {
+  font-family: var(--font-mono); font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  line-height: 1.3; color: #7e8b97; margin: 0 0 14px; max-width: none;
 }
 .foot-col a { display: block; color: #c4cdd6; font-size: 14.5px; padding: 4px 0; transition: color .2s var(--ease); }
 .foot-col a:hover { color: var(--brass-bright); }

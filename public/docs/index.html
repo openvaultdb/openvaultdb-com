@@ -3,15 +3,36 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Docs — OpenVaultDB</title>
-  <meta name="description" content="OpenVaultDB documentation — protocol design notes, generated from open SpecScore specifications." />
+  <title>OVDB Docs — OpenVaultDB</title>
+  <meta name="description" content="Documentation for OVDB (OpenVaultDB): protocol design notes generated from open SpecScore specifications, so a developer or agent can implement the protocol." />
+  <link rel="canonical" href="https://openvaultdb.com/docs" />
   <meta name="theme-color" content="#0c0e0d" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
-  <meta property="og:title" content="OpenVaultDB — Docs" />
-  <meta property="og:description" content="Protocol design notes, generated from open specifications." />
+  <meta property="og:title" content="OVDB Docs — OpenVaultDB" />
+  <meta property="og:description" content="Documentation for OVDB (OpenVaultDB): protocol design notes generated from open SpecScore specifications, so a developer or agent can implement the protocol." />
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://openvaultdb.com/docs" />
+  <meta property="og:site_name" content="OpenVaultDB" />
+  <meta property="og:image" content="https://openvaultdb.com/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="OVDB — OpenVaultDB, user-owned application databases" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="OVDB Docs — OpenVaultDB" />
+  <meta name="twitter:description" content="Documentation for OVDB (OpenVaultDB): protocol design notes generated from open SpecScore specifications, so a developer or agent can implement the protocol." />
+  <meta name="twitter:image" content="https://openvaultdb.com/og.png" />
+  <meta name="twitter:image:alt" content="OVDB — OpenVaultDB, user-owned application databases" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "OVDB Docs — OpenVaultDB",
+    "url": "https://openvaultdb.com/docs",
+    "description": "Documentation for OVDB (OpenVaultDB): protocol design notes generated from open SpecScore specifications, so a developer or agent can implement the protocol.",
+    "isPartOf": { "@type": "WebSite", "name": "OpenVaultDB", "alternateName": "OVDB", "url": "https://openvaultdb.com/" }
+  }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -36,7 +57,7 @@
     }
     .doc-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); border-color: var(--line-2); }
     .doc-card .num { font-family: var(--font-mono); font-size: 13px; color: var(--brass); border: 1px solid var(--brass-bright); border-radius: 8px; padding: 9px 12px; }
-    .doc-card h3 { font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--navy); margin: 0 0 5px; }
+    .doc-card h2 { font-family: var(--font-display); font-weight: 700; font-size: 20px; line-height: 1.3; color: var(--navy); margin: 0 0 5px; }
     .doc-card p { margin: 0; color: var(--text-soft); font-size: 15.5px; max-width: 60ch; }
     .doc-card .arr { color: var(--brass); font-size: 22px; }
     .doc-card .status { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin-top: 8px; display: inline-block; }
@@ -57,9 +78,10 @@
         <b>Open<span>Vault</span>DB</b>
       </a>
       <nav class="nav" id="nav">
+        <a href="/install">Install</a>
         <a href="/#principle">Principle</a>
         <a href="/#architecture">Architecture</a>
-        <a href="/docs/">Docs</a>
+        <a href="/docs">Docs</a>
         <a class="ghost" href="https://github.com/openvaultdb" target="_blank" rel="noopener">GitHub ↗</a>
       </nav>
       <div class="auth-slot" data-auth-slot></div>
@@ -75,7 +97,7 @@
       <span class="eyebrow">Documentation</span>
       <h1>Design notes, in the open.</h1>
       <p class="lead">
-        Each page here is generated from an open
+        OpenVaultDB (OVDB) design notes. Each page is generated from an open
         <a href="https://specscore.md/" target="_blank" rel="noopener" class="spec-link">SpecScore</a>
         specification in the repository — the source of truth a developer, a
         tool, or an AI agent can read and build a conformant implementation from.
@@ -88,7 +110,7 @@
       <a class="doc-card" href="/docs/auth-model">
         <span class="num">01</span>
         <div>
-          <h3>Authentication Model</h3>
+          <h2>Authentication Model</h2>
           <p>How users connect apps to vaults they own, and how apps prove their identity. The vault is the authority; OpenVaultDB only routes.</p>
           <span class="status">Draft</span>
         </div>
@@ -113,19 +135,21 @@
       </div>
       <div class="foot-links">
         <div class="foot-col">
-          <h5>Docs</h5>
-          <a href="/docs/">Overview</a>
+          <p class="foot-label">Docs</p>
+          <a href="/install">Install OVDB</a>
+          <a href="/docs">Overview</a>
           <a href="/docs/auth-model">Authentication model</a>
         </div>
         <div class="foot-col">
-          <h5>Protocol</h5>
+          <p class="foot-label">Protocol</p>
           <a href="/#principle">Principle</a>
           <a href="/#features">Capabilities</a>
           <a href="/#architecture">Architecture</a>
         </div>
         <div class="foot-col">
-          <h5>Project</h5>
+          <p class="foot-label">Project</p>
           <a href="https://github.com/openvaultdb" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="https://github.com/openvaultdb/ovdb" target="_blank" rel="noopener">ovdb CLI ↗</a>
         </div>
       </div>
     </div>
@@ -133,7 +157,7 @@
       <div class="legal">
         <span>© 2026 OpenVaultDB · Apache-2.0</span>
         <span>Early proposal — subject to change</span>
-        <span><a href="/privacy/">Privacy</a> · <button type="button" class="linklike" data-analytics-choices hidden>Analytics choices</button></span>
+        <span><a href="/privacy">Privacy</a> · <button type="button" class="linklike" data-analytics-choices hidden>Analytics choices</button></span>
       </div>
     </div>
   </footer>

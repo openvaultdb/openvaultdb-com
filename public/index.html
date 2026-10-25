@@ -3,16 +3,68 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>OpenVaultDB — User-owned application databases</title>
-  <meta name="description" content="OpenVaultDB is an open protocol and platform for user-owned application databases. Applications don't own your data — you do, and you grant them access." />
+  <title>OVDB (OpenVaultDB) — User-owned application databases</title>
+  <meta name="description" content="OpenVaultDB (OVDB) is an open protocol for user-owned application databases. Applications don't own your data — you do, and you grant them access." />
+  <link rel="canonical" href="https://openvaultdb.com/" />
   <meta name="theme-color" content="#0c0e0d" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="OpenVaultDB — User-owned application databases" />
-  <meta property="og:description" content="An open protocol for user-owned databases. Apps store data in your vault, in namespaces they own — but the vault is yours." />
+  <meta property="og:title" content="OVDB (OpenVaultDB) — User-owned application databases" />
+  <meta property="og:description" content="OpenVaultDB (OVDB) is an open protocol for user-owned application databases. Applications don't own your data — you do, and you grant them access." />
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="https://openvaultdb.com" />
+  <meta property="og:url" content="https://openvaultdb.com/" />
+  <meta property="og:site_name" content="OpenVaultDB" />
+  <meta property="og:image" content="https://openvaultdb.com/og.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="OVDB — OpenVaultDB, user-owned application databases" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="OVDB (OpenVaultDB) — User-owned application databases" />
+  <meta name="twitter:description" content="OpenVaultDB (OVDB) is an open protocol for user-owned application databases. Applications don't own your data — you do, and you grant them access." />
+  <meta name="twitter:image" content="https://openvaultdb.com/og.png" />
+  <meta name="twitter:image:alt" content="OVDB — OpenVaultDB, user-owned application databases" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://openvaultdb.com/#organization",
+        "name": "OpenVaultDB",
+        "alternateName": ["OVDB", "ovdb"],
+        "url": "https://openvaultdb.com/",
+        "logo": "https://openvaultdb.com/favicon.svg",
+        "sameAs": [
+          "https://github.com/openvaultdb",
+          "https://github.com/openvaultdb/ovdb"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://openvaultdb.com/#website",
+        "name": "OpenVaultDB",
+        "alternateName": "OVDB",
+        "url": "https://openvaultdb.com/",
+        "publisher": { "@id": "https://openvaultdb.com/#organization" }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://openvaultdb.com/#ovdb",
+        "name": "OVDB",
+        "alternateName": "OpenVaultDB",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "macOS, Linux, Windows",
+        "url": "https://openvaultdb.com/install",
+        "downloadUrl": "https://github.com/openvaultdb/ovdb",
+        "softwareHelp": "https://openvaultdb.com/docs",
+        "license": "https://www.apache.org/licenses/LICENSE-2.0",
+        "description": "OVDB is the OpenVaultDB command-line tool and open protocol for user-owned application databases.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "publisher": { "@id": "https://openvaultdb.com/#organization" }
+      }
+    ]
+  }
+  </script>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -44,7 +96,7 @@
         <a href="#architecture">Architecture</a>
         <a href="#ecosystem">Ecosystem</a>
         <a href="#scope">Roadmap</a>
-        <a href="/docs/">Docs</a>
+        <a href="/docs">Docs</a>
         <a class="ghost" href="https://github.com/openvaultdb" target="_blank" rel="noopener">GitHub ↗</a>
       </nav>
 
@@ -64,7 +116,7 @@
         <span class="status-pill reveal d1"><span class="dot"></span> Open protocol · early proposal</span>
         <h1 class="reveal d2">Applications don't own<br>your data. <em>You do.</em></h1>
         <p class="lead reveal d3">
-          OpenVaultDB is an open protocol and platform for user-owned application
+          OpenVaultDB (OVDB) is an open protocol and platform for user-owned application
           databases. Apps connect to <em>your</em> vault and store data in namespaces
           they manage — but the vault, and everything in it, belongs to you.
         </p>
@@ -350,13 +402,13 @@ https://openvaultdb.com/agent-instructions/install</code></pre>
       </div>
 
       <div class="eco-list">
-        <div class="eco"><span class="tag">DataTug</span><div><h4><a href="https://datatug.app" target="_blank" rel="noopener">DataTug <span class="arr">↗</span></a></h4><p>DataTug helps developers explore database schemas, write and run queries, and understand their results. Its OpenVaultDB session-storage architecture is under development. <a href="https://datatug.app/en/under-the-hood/tools-we-built/" target="_blank" rel="noopener">Read how DataTug’s development tools were built.</a></p></div></div>
-        <div class="eco"><span class="tag">TugQL</span><div><h4><a href="https://tugql.org/" target="_blank" rel="noopener">Query language <span class="arr">↗</span></a></h4><p>The primary API. A portable query and mutation language built on DALgo capabilities — intentionally not full SQL.</p></div></div>
-        <div class="eco"><span class="tag">DALgo</span><div><h4><a href="https://dalgo.io" target="_blank" rel="noopener">Data abstraction layer <span class="arr">↗</span></a></h4><p>Maps portable queries onto backend providers, so one query model spans many databases.</p></div></div>
-        <div class="eco"><span class="tag">inGitDB</span><div><h4><a href="https://ingitdb.com/" target="_blank" rel="noopener">Git-backed engine <span class="arr">↗</span></a></h4><p>The reference storage engine. Auditable history, easy rollback, and versioned data on top of Git.</p></div></div>
-        <div class="eco"><span class="tag">INGR.io</span><div><h4><a href="https://ingr.io/" target="_blank" rel="noopener">Storage format <span class="arr">↗</span></a></h4><p>A Git-friendly structured format designed for clean diffs, merges, and conflict resolution.</p></div></div>
+        <div class="eco"><span class="tag">DataTug</span><div><h3><a href="https://datatug.app" target="_blank" rel="noopener">DataTug <span class="arr">↗</span></a></h3><p>DataTug helps developers explore database schemas, write and run queries, and understand their results. Its OpenVaultDB session-storage architecture is under development. <a href="https://datatug.app/en/under-the-hood/tools-we-built/" target="_blank" rel="noopener">Read how DataTug’s development tools were built.</a></p></div></div>
+        <div class="eco"><span class="tag">TugQL</span><div><h3><a href="https://tugql.org/" target="_blank" rel="noopener">Query language <span class="arr">↗</span></a></h3><p>The primary API. A portable query and mutation language built on DALgo capabilities — intentionally not full SQL.</p></div></div>
+        <div class="eco"><span class="tag">DALgo</span><div><h3><a href="https://dalgo.io" target="_blank" rel="noopener">Data abstraction layer <span class="arr">↗</span></a></h3><p>Maps portable queries onto backend providers, so one query model spans many databases.</p></div></div>
+        <div class="eco"><span class="tag">inGitDB</span><div><h3><a href="https://ingitdb.com/" target="_blank" rel="noopener">Git-backed engine <span class="arr">↗</span></a></h3><p>The reference storage engine. Auditable history, easy rollback, and versioned data on top of Git.</p></div></div>
+        <div class="eco"><span class="tag">INGR.io</span><div><h3><a href="https://ingr.io/" target="_blank" rel="noopener">Storage format <span class="arr">↗</span></a></h3><p>A Git-friendly structured format designed for clean diffs, merges, and conflict resolution.</p></div></div>
 
-        <div class="eco"><span class="tag">Vault</span><div><h4><a href="https://github.com/openvaultdb/openvaultdb-go" target="_blank" rel="noopener">Reference implementation <span class="arr">↗</span></a></h4><p>Go libraries and the reference OpenVaultDB server — portable storage backends and TugQL query support. Run your own vault.</p></div></div>
+        <div class="eco"><span class="tag">Vault</span><div><h3><a href="https://github.com/openvaultdb/openvaultdb-go" target="_blank" rel="noopener">Reference implementation <span class="arr">↗</span></a></h3><p>Go libraries and the reference OpenVaultDB server — portable storage backends and TugQL query support. Run your own vault.</p></div></div>
       </div>
     </div>
   </section>
@@ -372,7 +424,7 @@ https://openvaultdb.com/agent-instructions/install</code></pre>
 
       <div class="scope-cols">
         <div class="scope-col now">
-          <h4><i></i> In the MVP</h4>
+          <h3><i></i> In the MVP</h3>
           <ul>
             <li>Authentication &amp; token exchange</li>
             <li>App namespaces</li>
@@ -387,7 +439,7 @@ https://openvaultdb.com/agent-instructions/install</code></pre>
           </ul>
         </div>
         <div class="scope-col maybe">
-          <h4><i></i> Possibly included</h4>
+          <h3><i></i> Possibly included</h3>
           <ul>
             <li>SQLite backend</li>
             <li>PostgreSQL backend</li>
@@ -395,7 +447,7 @@ https://openvaultdb.com/agent-instructions/install</code></pre>
           </ul>
         </div>
         <div class="scope-col later">
-          <h4><i></i> Deferred</h4>
+          <h3><i></i> Deferred</h3>
           <ul>
             <li>Advanced GraphQL</li>
             <li>Complex joins</li>
@@ -466,14 +518,14 @@ https://openvaultdb.com/agent-instructions/install</code></pre>
 
       <div class="foot-links">
         <div class="foot-col">
-          <h5>Protocol</h5>
+          <p class="foot-label">Protocol</p>
           <a href="#principle">Principle</a>
           <a href="#features">Capabilities</a>
           <a href="#architecture">Architecture</a>
           <a href="#scope">Roadmap</a>
         </div>
         <div class="foot-col">
-          <h5>Ecosystem</h5>
+          <p class="foot-label">Ecosystem</p>
           <a href="https://tugql.org/" target="_blank" rel="noopener">TugQL ↗</a>
           <a href="https://dalgo.io" target="_blank" rel="noopener">DALgo ↗</a>
           <a href="https://ingr.io/" target="_blank" rel="noopener">INGR.io ↗</a>
@@ -482,14 +534,15 @@ https://openvaultdb.com/agent-instructions/install</code></pre>
           <a href="https://github.com/openvaultdb/openvaultdb-go" target="_blank" rel="noopener">openvaultdb-go ↗</a>
         </div>
         <div class="foot-col">
-          <h5>Docs</h5>
+          <p class="foot-label">Docs</p>
           <a href="/install">Install with AI</a>
-          <a href="/docs/">Overview</a>
+          <a href="/docs">Overview</a>
           <a href="/docs/auth-model">Authentication model</a>
         </div>
         <div class="foot-col">
-          <h5>Project</h5>
+          <p class="foot-label">Project</p>
           <a href="https://github.com/openvaultdb" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="https://github.com/openvaultdb/ovdb" target="_blank" rel="noopener">ovdb CLI ↗</a>
           <a href="https://github.com/openvaultdb" target="_blank" rel="noopener">Open questions ↗</a>
         </div>
       </div>
@@ -499,7 +552,7 @@ https://openvaultdb.com/agent-instructions/install</code></pre>
       <div class="legal">
         <span>© 2026 OpenVaultDB · Apache-2.0</span>
         <span>Early proposal — subject to change</span>
-        <span><a href="/privacy/">Privacy</a> · <button type="button" class="linklike" data-analytics-choices hidden>Analytics choices</button></span>
+        <span><a href="/privacy">Privacy</a> · <button type="button" class="linklike" data-analytics-choices hidden>Analytics choices</button></span>
       </div>
     </div>
   </footer>
