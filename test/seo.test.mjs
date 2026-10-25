@@ -29,6 +29,7 @@ test("homepage introduces OVDB in the title, description, hero, and structured d
   const data = jsonLd(html);
   const byType = Object.fromEntries(data["@graph"].map((node) => [node["@type"], node]));
   assert.ok(byType.Organization.alternateName.includes("OVDB"));
+  assert.equal(byType.Organization.logo, "https://openvaultdb.com/logo.png");
   assert.equal(byType.WebSite.alternateName, "OVDB");
   assert.equal(byType.SoftwareApplication.name, "OVDB");
   assert.equal(byType.SoftwareApplication.alternateName, "OpenVaultDB");
@@ -88,4 +89,39 @@ test("sitemap lists indexable URLs and skips signed-in routes", () => {
   const image = join(root, "public/og.png");
   assert.equal(existsSync(image), true);
   assert.ok(statSync(image).size > 1000);
+});
+
+test("organization logo is a square PNG of at least 112px", () => {
+  const png = readFileSync(join(root, "public/logo.png"));
+  assert.equal(png.subarray(0, 8).toString("hex"), "89504e470d0a1a0a");
+  const width = png.readUInt32BE(16);
+  const height = png.readUInt32BE(20);
+  assert.equal(width, 512);
+  assert.equal(height, 512);
+  assert.ok(width >= 112 && height >= 112);
+  assert.ok(png.length > 1000);
+
+  const homepage = read("public/index.html");
+  assert.match(homepage, /rel="icon" href="\/logo\.png" type="image\/png" sizes="512x512"/);
+  assert.match(homepage, /rel="apple-touch-icon" href="\/logo\.png"/);
+  assert.equal(homepage.includes("https://openvaultdb.com/favicon.svg"), false);
+
+  for (const path of [
+    "public/index.html",
+    "public/install/index.html",
+    "public/docs/index.html",
+    "public/docs/auth-model/index.html",
+    "public/privacy/index.html",
+    "public/connect/index.html",
+    "public/my/apps/index.html",
+    "public/my/vaults/index.html",
+    "public/agent-instructions/install/index.html",
+    "public/agent-instructions/onboarding/index.html",
+    "public/agent-instructions/configure/index.html",
+  ]) {
+    const html = read(path);
+    assert.match(html, /rel="icon" href="\/favicon\.svg"/, path);
+    assert.match(html, /rel="icon" href="\/logo\.png" type="image\/png" sizes="512x512"/, path);
+    assert.match(html, /rel="apple-touch-icon" href="\/logo\.png"/, path);
+  }
 });
