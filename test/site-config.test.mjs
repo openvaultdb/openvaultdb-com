@@ -44,6 +44,7 @@ test("Wrangler config is assets-only (no Worker script) and keeps clean static r
     "robots.txt",
     "sitemap.xml",
     "llms.txt",
+    "og.png",
     "agent-instructions/install/index.html",
     "agent-instructions/onboarding/index.html",
     "agent-instructions/configure/index.html",

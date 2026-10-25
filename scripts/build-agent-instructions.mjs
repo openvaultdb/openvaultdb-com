@@ -133,21 +133,60 @@ export function renderMarkdown(markdown) {
   return html.join("\n");
 }
 
+const siteOrigin = "https://openvaultdb.com";
+const ogImage = `${siteOrigin}/og.png`;
+const ogImageAlt = "OVDB — OpenVaultDB, user-owned application databases";
+
 function header() {
   return `<header class="site-header"><div class="wrap doc-nav">
     <a class="brand" href="/" aria-label="OpenVaultDB home"><b>Open<span>Vault</span>DB</b></a>
-    <nav aria-label="Main navigation"><a href="/install">Install</a><a href="/docs/">Docs</a><a href="https://github.com/openvaultdb">GitHub ↗</a></nav>
+    <nav aria-label="Main navigation"><a href="/install">Install</a><a href="/docs">Docs</a><a href="https://github.com/openvaultdb/ovdb">ovdb CLI ↗</a><a href="https://github.com/openvaultdb">GitHub ↗</a></nav>
   </div></header>`;
 }
 
-function page({ title, description, body, extraClass = "" }) {
+function socialHead({ title, description, path }) {
+  const canonical = `${siteOrigin}${path}`;
+  const structured = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: title,
+    url: canonical,
+    description,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "OpenVaultDB",
+      alternateName: "OVDB",
+      url: `${siteOrigin}/`,
+    },
+  }).replaceAll("<", "\\u003c");
+  return `  <link rel="canonical" href="${canonical}">
+  <meta property="og:title" content="${escapeHTML(title)}">
+  <meta property="og:description" content="${escapeHTML(description)}">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="${canonical}">
+  <meta property="og:site_name" content="OpenVaultDB">
+  <meta property="og:image" content="${ogImage}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="${escapeHTML(ogImageAlt)}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="${escapeHTML(title)}">
+  <meta name="twitter:description" content="${escapeHTML(description)}">
+  <meta name="twitter:image" content="${ogImage}">
+  <meta name="twitter:image:alt" content="${escapeHTML(ogImageAlt)}">
+  <script type="application/ld+json">${structured}</script>`;
+}
+
+function page({ title, description, path, body, extraClass = "" }) {
+  const fullTitle = `${title} · OpenVaultDB`;
   return `<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>${escapeHTML(title)} · OpenVaultDB</title>
+  <title>${escapeHTML(fullTitle)}</title>
   <meta name="description" content="${escapeHTML(description)}">
+${socialHead({ title: fullTitle, description, path })}
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/agent-instructions.css">
@@ -167,9 +206,20 @@ function instructionPage(name, source) {
     onboarding: '<a class="btn btn-ghost" href="/agent-instructions/configure">Configure the server port</a>',
     configure: '<a class="btn btn-ghost" href="/agent-instructions/onboarding">Back to onboarding</a>',
   }[name];
+  const titles = {
+    install: "Install the OVDB CLI",
+    onboarding: "Set up OVDB",
+    configure: "Configure OVDB",
+  };
+  const descriptions = {
+    install: "Official instructions for AI agents installing the OVDB CLI (OpenVaultDB).",
+    onboarding: "Official OVDB onboarding instructions for AI agents: start the local server and create a first database.",
+    configure: "Official OVDB instructions for AI agents changing and verifying local server settings.",
+  };
   return page({
-    title: `${name[0].toUpperCase()}${name.slice(1)} instructions`,
-    description: `Official OpenVaultDB ${name} instructions for AI agents.`,
+    title: titles[name],
+    description: descriptions[name],
+    path: `/agent-instructions/${name}`,
     body: `<main class="doc-shell wrap">
       <div class="doc-kicker">Official AI agent instructions</div>
       <div class="doc-actions"><button class="btn btn-primary" type="button" data-copy-target="instruction-source" aria-live="polite">Copy these instructions</button><a class="btn btn-ghost" href="/install">All install options</a></div>
@@ -183,13 +233,14 @@ function instructionPage(name, source) {
 function installPage(instructions) {
   const full = instructionOrder.map((name) => instructions[name]).join("\n\n---\n\n");
   return page({
-    title: "Install",
-    description: "Install and set up OpenVaultDB with an AI agent.",
+    title: "Install OVDB",
+    description: "Install the OVDB CLI and set up OpenVaultDB with an AI agent or a checksum-verified script.",
+    path: "/install",
     extraClass: "install-page",
     body: `<main class="doc-shell wrap">
       <div class="doc-kicker">AI-assisted setup</div>
-      <h1>Install OpenVaultDB</h1>
-      <p class="doc-lead">Copy one prompt into your coding or terminal agent. It will use deterministic <code>ovdb</code> commands and stop on errors.</p>
+      <h1>Install OVDB</h1>
+      <p class="doc-lead">Copy one prompt into your coding or terminal agent to set up OpenVaultDB. It will use deterministic <code>ovdb</code> commands and stop on errors.</p>
       <section class="copy-panel" aria-labelledby="short-title">
         <div class="copy-panel-head"><div><div class="option-label">Recommended</div><h2 id="short-title">Short prompt</h2></div><button class="btn btn-primary" type="button" data-copy-target="short-prompt" aria-live="polite">Copy short prompt</button></div>
         <pre><code id="short-prompt">${escapeHTML(shortPrompt)}</code></pre>

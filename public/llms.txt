@@ -1,6 +1,11 @@
-# OpenVaultDB
+# OpenVaultDB (OVDB)
 
-> User-owned, portable databases with pluggable storage engines.
+> User-owned, portable databases with pluggable storage engines. OVDB is the short name; the command-line tool is `ovdb`.
+
+## Documentation
+
+- [Docs](https://openvaultdb.com/docs): Protocol design notes for OVDB.
+- [Authentication model](https://openvaultdb.com/docs/auth-model): How apps connect to a vault the user owns.
 
 ## Installation
 
@@ -15,3 +20,7 @@
 - [Windows installer](https://openvaultdb.com/install.ps1): Checksum-verifying PowerShell installer.
 - [AI skill installer](https://openvaultdb.com/install-skill.sh): Installer for the official OpenVaultDB agent skill.
 - [Windows AI skill installer](https://openvaultdb.com/install-skill.ps1): PowerShell installer for the official OpenVaultDB agent skill.
+
+## CLI
+
+- [ovdb](https://github.com/openvaultdb/ovdb): The OpenVaultDB command-line tool.
