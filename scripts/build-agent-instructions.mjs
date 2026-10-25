@@ -188,6 +188,8 @@ function page({ title, description, path, body, extraClass = "" }) {
   <meta name="description" content="${escapeHTML(description)}">
 ${socialHead({ title: fullTitle, description, path })}
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="/logo.png" type="image/png" sizes="512x512">
+  <link rel="apple-touch-icon" href="/logo.png">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/agent-instructions.css">
 </head>
