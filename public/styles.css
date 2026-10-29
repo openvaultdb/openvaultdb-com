@@ -856,8 +856,42 @@ html.has-consent-banner body { padding-bottom: var(--consent-banner-h, 0px); }
 .legal a, .legal .linklike { color: inherit; }
 .legal a:hover, .legal .linklike:hover { color: var(--brass-bright); }
 
-.site-feedback { padding: 20px 24px; text-align: center; }
-.site-feedback button { min-height: 44px; max-width: 100%; padding: 10px 18px; border: 1px solid #084dbd; border-radius: 6px; background: #0d63e9; color: #fff; font: 600 14px/1.4 system-ui, sans-serif; cursor: pointer; }
+/* Reserve room below the final footer links for the floating trigger. */
+.site-feedback { min-height: calc(96px + env(safe-area-inset-bottom)); }
+/* ImproveIt launcher: a quiet branded surface with a clearly visible mark. */
+.site-feedback button {
+  position: fixed;
+  right: max(18px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 110;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  max-width: calc(100vw - 36px);
+  min-height: 48px;
+  height: auto;
+  padding: 8px 16px 8px 9px;
+  border: 1px solid #b4ca9e;
+  border-radius: 999px;
+  background: #f1f8e7;
+  color: #254332;
+  font: 600 14px/1.4 system-ui, sans-serif;
+  white-space: normal;
+  box-shadow: 0 2px 8px rgba(25, 48, 34, .12);
+  cursor: pointer;
+  transition: none;
+}
 .site-feedback button[hidden] { display: none; }
-.site-feedback button:hover { background: #084dbd; }
-.site-feedback button:focus-visible { outline: 3px solid #084dbd; outline-offset: 3px; }
+.site-feedback button:hover { background: #e7f2d8; color: #254332; border-color: #86a477; }
+.site-feedback button:focus-visible { outline: 3px solid #416b48; outline-offset: 3px; }
+.site-feedback button .feedback-mark { flex: 0 0 30px; width: 30px; height: 30px; }
+@media (prefers-color-scheme: dark) {
+  .site-feedback button { background: #293d32; color: #e2efd4; border-color: #6d8a65; box-shadow: 0 2px 8px rgba(0, 0, 0, .2); }
+  .site-feedback button:hover { background: #344c3c; color: #e2efd4; border-color: #8aa47b; }
+  .site-feedback button:focus-visible { outline-color: #b3d795; }
+  .site-feedback button .feedback-mark rect { fill: #9bb67b; }
+}
+
+/* Reuse the host consent controller's measured bottom footprint. */
+html.has-consent-banner .site-feedback button { bottom: calc(var(--consent-banner-h, 0px) + max(18px, env(safe-area-inset-bottom))); }
