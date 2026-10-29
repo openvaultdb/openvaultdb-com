@@ -84,22 +84,28 @@ test("no page claims encryption: the MVP controls access with scoped, revocable 
   assert.match(read("public/ru/index.html"), /в MVP данные хранилища не шифруются/);
 });
 
-test("film slot ships disabled, with a per-locale id and local poster for en and ru", async () => {
+test("film slot is enabled with the published English and Russian film and a local poster each", async () => {
   const src = read("public/js/video-config.js");
   const window = {};
   new Function("window", src)(window);
   const cfg = window.OVDB_VIDEO;
-  assert.equal(cfg.enabled, false);
+  assert.equal(cfg.enabled, true);
+  const expected = { en: ["LMTcLntUWJM", "1:35"], ru: ["G6qINgqifaQ", "1:45"] };
   for (const locale of ["en", "ru"]) {
-    assert.equal(cfg.locales[locale].id, "", `${locale} id is filled in only when the film is published`);
-    assert.match(cfg.locales[locale].poster, /^\/video\/[^/]+$/);
+    assert.equal(cfg.locales[locale].id, expected[locale][0], `${locale} film id`);
+    assert.equal(cfg.locales[locale].duration, expected[locale][1], `${locale} duration`);
+    assert.match(cfg.locales[locale].poster, /^\/video\/poster-(en|ru)\.webp$/);
+    assert.ok(cfg.locales[locale].poster.includes(`poster-${locale}`), `${locale} uses its own poster`);
     assert.ok(cfg.locales[locale].width > 0 && cfg.locales[locale].height > 0);
     assert.ok(read(`public${cfg.locales[locale].poster}`).length > 0);
   }
+  assert.notEqual(cfg.locales.en.id, cfg.locales.ru.id);
   for (const file of ["public/index.html", "public/ru/index.html"]) {
     const html = read(file);
     assert.match(html, /<section class="film" data-video-slot hidden/, file);
+    assert.match(html, /data-aria-label="[^"]*\{duration\}/, file);
     assert.doesNotMatch(html, /youtube|ytimg/i, `${file} must not reference YouTube before a click`);
+    assert.doesNotMatch(html, new RegExp(cfg.locales.en.id + "|" + cfg.locales.ru.id), `${file} carries no id: the script picks it`);
   }
   assert.match(read("public/js/video-embed.js"), /www\.youtube-nocookie\.com\/embed\//);
   assert.doesNotMatch(read("public/js/video-embed.js"), /https:\/\/www\.youtube\.com/);

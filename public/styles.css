@@ -949,6 +949,10 @@ html.has-consent-banner .site-feedback button { bottom: calc(var(--consent-banne
   position: absolute; left: 20px; bottom: 16px; padding: 4px 12px; border-radius: 999px;
   background: rgba(22,41,59,.82); font-family: var(--font-body); font-weight: 600; font-size: 14px;
 }
+.film-duration {
+  position: absolute; right: 16px; bottom: 16px; padding: 4px 10px; border-radius: 8px;
+  background: rgba(22,41,59,.82); color: #fff; font-family: var(--font-body); font-weight: 600; font-size: 14px;
+}
 .film-iframe { display: block; width: 100%; height: 100%; border: 0; }
 @media (max-width: 680px) {
   .film { padding: 8px 0 40px; }

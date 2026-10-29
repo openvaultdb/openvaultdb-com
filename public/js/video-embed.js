@@ -20,11 +20,14 @@
 
   var label = slot.getAttribute("data-play-label") || "Play";
   var title = slot.getAttribute("data-iframe-title") || "Video";
+  var duration = v.duration || "";
+  var aria = (slot.getAttribute("data-aria-label") || label).replace("{duration}", duration);
 
   var button = document.createElement("button");
   button.type = "button";
   button.className = "film-play";
-  button.setAttribute("aria-label", label + ": " + title);
+  button.lang = lang;
+  button.setAttribute("aria-label", aria + ": " + title);
 
   var img = document.createElement("img");
   img.className = "film-poster";
@@ -43,6 +46,13 @@
   text.textContent = label;
 
   button.append(img, icon, text);
+  if (duration) {
+    var badge = document.createElement("span");
+    badge.className = "film-duration";
+    badge.setAttribute("aria-hidden", "true");
+    badge.textContent = duration;
+    button.append(badge);
+  }
   frame.append(button);
   slot.hidden = false;
 

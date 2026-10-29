@@ -101,31 +101,31 @@ copy to the build script and extend `test/locale.test.mjs`.
 
 ## Film slot
 
-The homepage has a hidden film section. It is switched on in one place,
+The homepage has a click-to-load film section: `/` shows the English film
+(1:35), `/ru/` the Russian one (1:45). It is configured in one place,
 [`public/js/video-config.js`](public/js/video-config.js):
 
 ```js
 window.OVDB_VIDEO = {
-  enabled: false,                       // 1. set to true last
+  enabled: true,
   locales: {
-    en: { id: "", poster: "/video/poster-en.svg", width: 1280, height: 720 },
-    ru: { id: "", poster: "/video/poster-ru.svg", width: 1280, height: 720 },
+    en: { id: "<11-char id>", poster: "/video/poster-en.webp", width: 1280, height: 720, duration: "1:35" },
+    ru: { id: "<11-char id>", poster: "/video/poster-ru.webp", width: 1280, height: 720, duration: "1:45" },
   },
 };
 ```
 
-1. Put the 11-character YouTube video id of the English and Russian film in
-   `locales.en.id` and `locales.ru.id`. A locale without an id keeps the slot
-   hidden on that page.
-2. Replace `public/video/poster-en.svg` and `poster-ru.svg` (placeholders) with
-   the real posters, or point `poster` at another local image and set its real
-   `width` and `height` so the page does not shift when it appears.
-3. Set `enabled` to `true`.
+- `id` is the YouTube video id for that language. A locale without a valid id
+  keeps the slot hidden on that page, so a language never shows the other
+  language's film. `enabled: false` hides the slot everywhere.
+- `poster` is a local 16:9 image in `public/video/`; `width`/`height` must match
+  the file so the page does not shift. `duration` is the visible badge and part of
+  the button's accessible label (`data-aria-label` in each HTML file).
 
 Nothing is requested from YouTube until a visitor clicks the poster; the player
 then loads from `youtube-nocookie.com`. `e2e-analytics/locale.spec.ts` covers
 this. Localized slot headings live next to the slot in each HTML file
-(`data-play-label`, `data-iframe-title`, heading).
+(`data-play-label`, `data-aria-label`, `data-iframe-title`, heading).
 
 ## Tests
 
