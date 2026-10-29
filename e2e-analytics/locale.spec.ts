@@ -9,7 +9,7 @@ const ORIGIN = "https://openvaultdb.test";
 const PUBLIC = path.resolve(__dirname, "..", "public");
 const YOUTUBE = /youtube\.com|youtube-nocookie\.com|ytimg\.com|googlevideo\.com/;
 const TYPES: Record<string, string> = {
-  ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml",
+  ".html": "text/html", ".css": "text/css", ".js": "text/javascript", ".svg": "image/svg+xml", ".webp": "image/webp",
 };
 
 async function boot(page: Page, overrides: Record<string, string> = {}): Promise<string[]> {
@@ -87,8 +87,10 @@ test("the consent banner and install block are Russian on /ru", async ({ page })
   await expect(page.getByRole("button", { name: "Отклонить" })).toBeVisible();
 });
 
+const disabled = `window.OVDB_VIDEO={enabled:false,locales:{}};`;
+
 test("film slot is hidden and makes no YouTube request while disabled", async ({ page }) => {
-  const seen = await boot(page);
+  const seen = await boot(page, { "/js/video-config.js": disabled });
   for (const p of ["/", "/ru"]) {
     await page.goto(`${ORIGIN}${p}`);
     await page.waitForTimeout(300);
@@ -97,12 +99,41 @@ test("film slot is hidden and makes no YouTube request while disabled", async ({
   expect(seen.filter((u) => YOUTUBE.test(u))).toEqual([]);
 });
 
+test("published film: own poster, duration badge and label, no request before click, own id after", async ({ page }) => {
+  const seen = await boot(page);
+  const films: [string, string, string, string, RegExp][] = [
+    ["/", "en", "LMTcLntUWJM", "1:35", /^Play the 1:35 film: OpenVaultDB film: Your data, your vault$/],
+    ["/ru", "ru", "G6qINgqifaQ", "1:45", /^Смотреть фильм \(1:45\): Фильм об OpenVaultDB/],
+  ];
+  for (const [p, lang, id, duration, label] of films) {
+    seen.length = 0;
+    await page.goto(`${ORIGIN}${p}`);
+    const slot = page.locator("[data-video-slot]");
+    await expect(slot).toBeVisible();
+    const img = slot.locator("img.film-poster");
+    await expect(img).toHaveAttribute("src", `/video/poster-${lang}.webp`);
+    await expect(img).toHaveAttribute("width", "1280");
+    await expect(img).toHaveAttribute("height", "720");
+    await expect(slot.locator(".film-duration")).toHaveText(duration);
+    const button = slot.getByRole("button");
+    await expect(button).toHaveAttribute("lang", lang);
+    expect(await button.getAttribute("aria-label")).toMatch(label);
+    await page.waitForTimeout(300);
+    expect(seen.filter((u) => YOUTUBE.test(u)), `${p} before click`).toEqual([]);
+    expect(await page.locator("iframe").count()).toBe(0);
+
+    await button.click();
+    await expect(slot.locator("iframe")).toHaveAttribute("src", new RegExp(`^https://www\\.youtube-nocookie\\.com/embed/${id}\\?autoplay=1`));
+    expect(seen.filter((u) => YOUTUBE.test(u) && !/youtube-nocookie\.com\/embed\//.test(u))).toEqual([]);
+  }
+});
+
 const enabled = (en: string, ru: string) =>
-  `window.OVDB_VIDEO={enabled:true,locales:{en:{id:"${en}",poster:"/video/poster-en.svg",width:1280,height:720},ru:{id:"${ru}",poster:"/video/poster-ru.svg",width:1280,height:720}}};`;
+  `window.OVDB_VIDEO={enabled:true,locales:{en:{id:"${en}",poster:"/video/poster-en.webp",width:1280,height:720},ru:{id:"${ru}",poster:"/video/poster-ru.webp",width:1280,height:720}}};`;
 
 test("enabled film: poster only until click, then youtube-nocookie, per-locale id", async ({ page }) => {
   const seen = await boot(page, { "/js/video-config.js": enabled("AAAAAAAAAAA", "BBBBBBBBBBB") });
-  for (const [p, id, poster] of [["/", "AAAAAAAAAAA", "poster-en.svg"], ["/ru", "BBBBBBBBBBB", "poster-ru.svg"]]) {
+  for (const [p, id, poster] of [["/", "AAAAAAAAAAA", "poster-en.webp"], ["/ru", "BBBBBBBBBBB", "poster-ru.webp"]]) {
     seen.length = 0;
     await page.goto(`${ORIGIN}${p}`);
     const slot = page.locator("[data-video-slot]");
