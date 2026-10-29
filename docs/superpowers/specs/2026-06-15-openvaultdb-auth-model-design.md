@@ -212,5 +212,6 @@ and never exposes them to consuming apps.
   quickly.
 - **Token format and lifetime** — JWT vs. opaque; refresh model. Likely defers
   to each vault implementation, but a minimum conformance profile may be needed.
-- **Multi-device key management** for encrypted modes (tracked in the
-  encryption design, not here).
+- **Multi-device key management** — deferred. The MVP does not encrypt vault
+  data; access is controlled by scoped, revocable tokens and grants. This
+  returns only if an encryption model is specified.

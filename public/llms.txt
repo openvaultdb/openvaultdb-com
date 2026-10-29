@@ -6,6 +6,7 @@
 
 - [Docs](https://openvaultdb.com/docs): Protocol design notes for OVDB.
 - [Authentication model](https://openvaultdb.com/docs/auth-model): How apps connect to a vault the user owns.
+- [Русская версия](https://openvaultdb.com/ru): Russian-language overview of OVDB (OpenVaultDB).
 
 ## Installation
 

@@ -209,7 +209,7 @@ test("pages that load analytics.js offer Analytics choices and link the privacy 
   for (const p of pages) {
     const html = readFileSync(p, "utf8");
     assert.match(html, /data-analytics-choices/, p);
-    assert.match(html, /href="\/privacy"/, p);
+    assert.match(html, p.includes("/ru/") ? /href="\/ru\/privacy"/ : /href="\/privacy"/, p);
   }
 });
 

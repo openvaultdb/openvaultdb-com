@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720" role="img" aria-label="Ваши данные, ваше хранилище.">
+  <rect width="1280" height="720" fill="#16293b"/>
+  <circle cx="1010" cy="360" r="290" fill="none" stroke="#c89a45" stroke-width="3" stroke-dasharray="4 18" opacity=".7"/>
+  <circle cx="1010" cy="360" r="215" fill="none" stroke="#e7c684" stroke-width="2" opacity=".5"/>
+  <circle cx="1010" cy="360" r="120" fill="#20405a"/>
+  <path d="M1010 255v210M905 360h210" stroke="#c89a45" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="1010" cy="360" r="30" fill="#c89a45"/>
+  <g font-family="Helvetica, Arial, sans-serif" font-weight="800" font-size="68" fill="#f8f4ea">
+    <text x="80" y="170">Ваши данные,</text>
+    <text x="80" y="252">ваше хранилище.</text>
+  </g>
+  <text x="80" y="312" font-family="Helvetica, Arial, sans-serif" font-weight="600" font-size="34" fill="#e7c684">Фильм об OpenVaultDB</text>
+  <text x="80" y="640" font-family="Menlo, Consolas, monospace" font-size="26" fill="#9fb0bf">openvaultdb.com</text>
+</svg>
