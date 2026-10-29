@@ -884,7 +884,8 @@ html.has-consent-banner body { padding-bottom: var(--consent-banner-h, 0px); }
 }
 .site-feedback button[hidden] { display: none; }
 .site-feedback button:hover { background: #e7f2d8; color: #254332; border-color: #86a477; }
-.site-feedback button:focus-visible { outline: 3px solid #416b48; outline-offset: 3px; }
+/* Keep the entire focus ring inside the pill, against its own surface. */
+.site-feedback button:focus-visible { outline: 3px solid #416b48; outline-offset: -4px; }
 .site-feedback button .feedback-mark { flex: 0 0 30px; width: 30px; height: 30px; }
 @media (prefers-color-scheme: dark) {
   .site-feedback button { background: #293d32; color: #e2efd4; border-color: #6d8a65; box-shadow: 0 2px 8px rgba(0, 0, 0, .2); }
