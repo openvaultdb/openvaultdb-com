@@ -317,6 +317,15 @@ function generatedWindowsSkillInstaller() {
   );
 }
 
+// Shared by every generated public page; account and connect pages stay isolated.
+export function addFeedback(html) {
+  if (html.includes('id="site-feedback-widget"')) return html;
+  return html.replace('</body>', `<div class="site-feedback"><button type="button" data-feedback-launcher aria-haspopup="dialog" hidden>Suggest an improvement</button></div>
+  <script id="site-feedback-widget" src="https://improveit.now/widget.js" data-space="ao58m" data-app="0e96104c8a9188fbdae1ea49369ece23" data-lang="en" data-color="#0d63e9" data-launcher="hidden" defer></script>
+  <script src="/js/feedback.js" defer></script>
+</body>`);
+}
+
 export function buildOutputs() {
   const instructions = readInstructions();
   const outputs = new Map();
@@ -331,6 +340,9 @@ export function buildOutputs() {
   outputs.set("install-skill.ps1", generatedWindowsSkillInstaller());
   for (const name of ["robots.txt", "sitemap.xml", "llms.txt"]) {
     outputs.set(name, readFileSync(join(discoveryDir, name), "utf8"));
+  }
+  for (const [path, html] of outputs) {
+    if (path.endsWith(".html")) outputs.set(path, addFeedback(html));
   }
   return outputs;
 }
