@@ -17,7 +17,7 @@ We build with our own tooling:
 
 ## DataTug session-storage architecture
 
-The OpenVaultDB session-storage architecture for [DataTug](https://datatug.app) is under development. Read [how DataTug’s development tools were built](https://datatug.app/en/under-the-hood/tools-we-built/).
+[DataTug](https://datatug.app) works with OpenVaultDB. Read [how DataTug’s development tools were built](https://datatug.app/en/under-the-hood/tools-we-built/).
 
 ## About OpenVaultDB
 

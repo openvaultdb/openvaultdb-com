@@ -104,3 +104,11 @@ test("film slot ships disabled, with a per-locale id and local poster for en and
   assert.match(read("public/js/video-embed.js"), /www\.youtube-nocookie\.com\/embed\//);
   assert.doesNotMatch(read("public/js/video-embed.js"), /https:\/\/www\.youtube\.com/);
 });
+
+test("DataTug is stated as working with OpenVaultDB, in both languages", () => {
+  assert.match(read("public/index.html"), /DataTug works with OpenVaultDB\./);
+  assert.match(read("public/ru/index.html"), /DataTug работает с OpenVaultDB\./);
+  for (const file of ["public/index.html", "public/ru/index.html"]) {
+    assert.doesNotMatch(read(file), /under development|находится в разработке/, file);
+  }
+});
