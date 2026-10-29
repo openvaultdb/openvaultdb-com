@@ -1,0 +1,605 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OVDB (OpenVaultDB) — базы данных приложений, принадлежащие пользователю</title>
+  <meta name="description" content="OpenVaultDB (OVDB) — открытый протокол для баз данных приложений, принадлежащих пользователям. Приложения не владеют вашими данными — владеете вы, и вы выдаёте им доступ." />
+  <link rel="canonical" href="https://openvaultdb.com/ru" />
+  <link rel="alternate" hreflang="en" href="https://openvaultdb.com/" />
+  <link rel="alternate" hreflang="ru" href="https://openvaultdb.com/ru" />
+  <link rel="alternate" hreflang="x-default" href="https://openvaultdb.com/" />
+  <meta name="theme-color" content="#0c0e0d" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="icon" href="/logo.png" type="image/png" sizes="512x512" />
+  <link rel="apple-touch-icon" href="/logo.png" />
+
+  <meta property="og:title" content="OVDB (OpenVaultDB) — базы данных приложений, принадлежащие пользователю" />
+  <meta property="og:description" content="OpenVaultDB (OVDB) — открытый протокол для баз данных приложений, принадлежащих пользователям. Приложения не владеют вашими данными — владеете вы, и вы выдаёте им доступ." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://openvaultdb.com/ru" />
+  <meta property="og:site_name" content="OpenVaultDB" />
+  <meta property="og:locale" content="ru_RU" />
+  <meta property="og:locale:alternate" content="en_US" />
+  <meta property="og:image" content="https://openvaultdb.com/og-ru.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="OVDB — OpenVaultDB, базы данных приложений, принадлежащие пользователю" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="OVDB (OpenVaultDB) — базы данных приложений, принадлежащие пользователю" />
+  <meta name="twitter:description" content="OpenVaultDB (OVDB) — открытый протокол для баз данных приложений, принадлежащих пользователям. Приложения не владеют вашими данными — владеете вы, и вы выдаёте им доступ." />
+  <meta name="twitter:image" content="https://openvaultdb.com/og-ru.png" />
+  <meta name="twitter:image:alt" content="OVDB — OpenVaultDB, базы данных приложений, принадлежащие пользователю" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://openvaultdb.com/#organization",
+        "name": "OpenVaultDB",
+        "alternateName": ["OVDB", "ovdb"],
+        "url": "https://openvaultdb.com/ru",
+        "logo": "https://openvaultdb.com/logo.png",
+        "sameAs": [
+          "https://github.com/openvaultdb",
+          "https://github.com/openvaultdb/ovdb"
+        ]
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://openvaultdb.com/#website",
+        "name": "OpenVaultDB",
+        "alternateName": "OVDB",
+        "url": "https://openvaultdb.com/ru",
+        "inLanguage": "ru",
+        "publisher": { "@id": "https://openvaultdb.com/#organization" }
+      },
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://openvaultdb.com/#ovdb",
+        "name": "OVDB",
+        "alternateName": "OpenVaultDB",
+        "applicationCategory": "DeveloperApplication",
+        "operatingSystem": "macOS, Linux, Windows",
+        "url": "https://openvaultdb.com/install",
+        "downloadUrl": "https://github.com/openvaultdb/ovdb",
+        "softwareHelp": "https://openvaultdb.com/docs",
+        "license": "https://www.apache.org/licenses/LICENSE-2.0",
+        "description": "OVDB — инструмент командной строки OpenVaultDB и открытый протокол для баз данных приложений, принадлежащих пользователям.",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+        "publisher": { "@id": "https://openvaultdb.com/#organization" }
+      }
+    ]
+  }
+  </script>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="/styles.css" />
+  <script src="/js/analytics.js"></script>
+</head>
+<body>
+
+  <!-- ============ HEADER ============ -->
+  <header class="site-header">
+    <div class="wrap">
+      <a class="brand" href="#top" aria-label="OpenVaultDB — главная">
+        <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+          <rect x="2.5" y="2.5" width="27" height="27" rx="6" stroke="#16293b" stroke-width="1.7"/>
+          <circle cx="16" cy="16" r="8.5" stroke="#16293b" stroke-width="1.7"/>
+          <circle cx="16" cy="16" r="3" fill="#a9741f"/>
+          <path d="M16 16l4.6 4.6M16 7.5v-2M16 24.5v2M7.5 16h-2M24.5 16h2" stroke="#a9741f" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+        <b>Open<span>Vault</span>DB</b>
+      </a>
+
+      <nav class="nav" id="nav">
+        <a href="/install" lang="en" title="Страница на английском">Установка</a>
+        <a href="#principle">Принцип</a>
+        <a href="#features">Возможности</a>
+        <a href="#architecture">Архитектура</a>
+        <a href="#ecosystem">Экосистема</a>
+        <a href="#scope">План</a>
+        <a href="/docs" lang="en" title="Страница на английском">Документация</a>
+        <a class="ghost" href="https://github.com/openvaultdb" target="_blank" rel="noopener">GitHub ↗</a>
+      </nav>
+
+      <div class="auth-slot" data-auth-slot></div>
+
+      <a class="lang-switch" href="/" hreflang="en" lang="en" title="English" aria-label="English version">EN</a>
+
+      <button class="nav-toggle" id="navToggle" aria-label="Открыть меню" aria-expanded="false">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ============ HERO ============ -->
+  <main id="top">
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <span class="status-pill reveal d1"><span class="dot"></span> Открытый протокол · ранний проект</span>
+        <h1 class="reveal d2">Приложения не владеют вашими данными. <em>Владеете вы.</em></h1>
+        <p class="lead reveal d3">
+          OpenVaultDB (OVDB) — открытый протокол и платформа для баз данных приложений,
+          принадлежащих пользователю. Приложения подключаются к <em>вашему</em> хранилищу и
+          хранят данные в пространствах имён, которыми сами управляют, — но само хранилище
+          и всё, что в нём лежит, принадлежит вам.
+        </p>
+        <div class="actions reveal d4">
+          <a class="btn btn-primary" href="/install">
+            Установить с помощью ИИ
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="#principle">Читать концепцию</a>
+        </div>
+      </div>
+
+      <div class="vault reveal d3" aria-hidden="true">
+        <svg viewBox="0 0 500 500" fill="none">
+          <defs>
+            <radialGradient id="vg" cx="50%" cy="40%" r="62%">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="100%" stop-color="#eef0f2"/>
+            </radialGradient>
+          </defs>
+          <circle cx="250" cy="250" r="240" fill="url(#vg)" stroke="#cdd4da" stroke-width="2"/>
+          <circle cx="250" cy="250" r="206" stroke="#dde1e5" stroke-width="1.5"/>
+          <!-- spinning outer dial -->
+          <g class="ring-spin">
+            <circle cx="250" cy="250" r="184" stroke="#c89a45" stroke-width="2.5" stroke-dasharray="3 14"/>
+            <circle cx="250" cy="66" r="5" fill="#a9741f"/>
+          </g>
+          <!-- bolts ring -->
+          <g class="ring-spin-rev">
+            <circle cx="250" cy="250" r="150" stroke="#16293b" stroke-width="1.5"/>
+            <g fill="#a9741f">
+              <circle cx="250" cy="100" r="4"/><circle cx="400" cy="250" r="4"/>
+              <circle cx="250" cy="400" r="4"/><circle cx="100" cy="250" r="4"/>
+              <circle cx="356" cy="144" r="3"/><circle cx="356" cy="356" r="3"/>
+              <circle cx="144" cy="356" r="3"/><circle cx="144" cy="144" r="3"/>
+            </g>
+          </g>
+          <!-- handle / keyhole -->
+          <circle cx="250" cy="250" r="92" fill="#ffffff" stroke="#16293b" stroke-width="2"/>
+          <g stroke="#a9741f" stroke-width="6" stroke-linecap="round">
+            <path d="M250 196v108M196 250h108"/>
+            <path d="M213 213l74 74M287 213l-74 74" stroke-width="4" opacity=".5"/>
+          </g>
+          <circle cx="250" cy="250" r="20" fill="#16293b"/>
+          <circle cx="250" cy="250" r="9" fill="#c89a45"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ФИЛЬМ (скрыт, пока /js/video-config.js не включит его) ============ -->
+  <section class="film" data-video-slot hidden data-play-label="Смотреть фильм" data-iframe-title="Фильм об OpenVaultDB: ваши данные, ваше хранилище">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Фильм</span>
+        <h2>Ваши данные, ваше хранилище.</h2>
+      </div>
+      <div class="film-frame" data-video-frame></div>
+    </div>
+  </section>
+
+  <!-- BEGIN GENERATED AI INSTALL -->
+  <section class="home-install" aria-labelledby="home-install-title">
+    <div class="wrap">
+      <div class="home-install-copy">
+        <span class="eyebrow">Установка OpenVaultDB</span>
+        <h2 id="home-install-title">Попросите агента — или выполните одну команду.</h2>
+        <p>Прямые установщики скачивают подходящий официальный релиз, проверяют его контрольную сумму SHA-256 и не требуют Go.</p>
+        <a class="btn btn-ghost" href="/install" lang="en">Все варианты установки (на английском)</a>
+      </div>
+      <div class="home-install-options">
+        <article class="home-install-option home-prompt">
+          <div class="home-install-option-head"><span>ИИ-агент</span><strong>Рекомендуется</strong></div>
+          <pre><code id="home-short-prompt">Install and set up OpenVaultDB on this machine.
+
+Follow the official instructions:
+https://openvaultdb.com/agent-instructions/install</code></pre>
+          <button class="btn btn-primary" type="button" data-copy-target="home-short-prompt" data-copied="Скопировано" data-copy-failed="Не удалось скопировать — выделите текст ниже" aria-live="polite">Скопировать запрос</button>
+        </article>
+        <article class="home-install-option">
+          <div class="home-install-option-head"><span>macOS или Linux</span><strong>Терминал</strong></div>
+          <pre><code id="home-unix-install">(p=$(mktemp) &amp;&amp; trap 'rm -f "$p"' EXIT &amp;&amp; curl -fsSL https://openvaultdb.com/install.sh -o "$p" &amp;&amp; sh "$p")</code></pre>
+          <button class="btn btn-ghost" type="button" data-copy-target="home-unix-install" data-copied="Скопировано" data-copy-failed="Не удалось скопировать — выделите текст ниже" aria-live="polite">Скопировать команду</button>
+        </article>
+        <article class="home-install-option">
+          <div class="home-install-option-head"><span>Windows</span><strong>PowerShell</strong></div>
+          <pre><code id="home-windows-install">$p=Join-Path $env:TEMP ("ovdb-"+[guid]::NewGuid()+".ps1"); try { irm https://openvaultdb.com/install.ps1 -OutFile $p -EA Stop; &amp; $p } finally { Remove-Item $p -EA SilentlyContinue }</code></pre>
+          <button class="btn btn-ghost" type="button" data-copy-target="home-windows-install" data-copied="Скопировано" data-copy-failed="Не удалось скопировать — выделите текст ниже" aria-live="polite">Скопировать команду</button>
+        </article>
+        <p class="home-install-trust">Эти команды доверяют установщику, который отдаёт <code>openvaultdb.com</code>. <a href="/install.sh">Исходник для shell</a> · <a href="/install.ps1">Исходник для PowerShell</a>. Каждый установщик проверяет контрольную сумму скачанного релиза перед установкой. Если вам важна поставка через менеджер пакетов, выбирайте <a href="/agent-instructions/install" lang="en">Homebrew через пошаговую установку</a> (на английском).</p>
+      </div>
+    </div>
+  </section>
+    <!-- END GENERATED AI INSTALL -->
+
+  <div class="wrap"><div class="divider"></div></div>
+
+  <!-- ============ GET STARTED ============ -->
+  <section class="getstarted" id="get-started">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">С чего начать</span>
+        <h2>Два пути: для людей и для приложений, которыми они пользуются.</h2>
+      </div>
+
+      <div class="start-cards">
+        <a class="start-card" href="/my/vaults" data-auth-cta>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="2.5" y="2.5" width="19" height="19" rx="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg></span>
+          <div class="label">Для вас</div>
+          <h3>Кошелёк хранилищ</h3>
+          <p>Ведите список принадлежащих вам хранилищ и выдавайте приложениям доступ к ним. Ваши данные остаются вашими — OpenVaultDB хранит только ссылки.</p>
+          <span class="cta">Открыть кошелёк <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+
+        <a class="start-card" href="/my/apps" data-auth-cta>
+          <span class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M3 9h18M8 4v16" stroke="currentColor" stroke-width="1.6"/></svg></span>
+          <div class="label">Для разработчиков</div>
+          <h3>Зарегистрируйте приложение</h3>
+          <p>Создавайте приложения, которые хранят данные в хранилищах пользователей. Приложение определяется доменом, которым вы управляете, — центральный реестр не нужен.</p>
+          <span class="cta">Настроить приложение <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRINCIPLE ============ -->
+  <section class="principle" id="principle">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">Главный принцип</span>
+        <blockquote>
+          Приложения не владеют данными пользователей. Пользователи владеют своими данными и
+          <span>разрешают приложениям доступ</span> к ним.
+        </blockquote>
+        <p>
+          Вы решаете, где живёт хранилище: на ноутбуке, домашнем сервере, VPS, в
+          инфраструктуре OpenVaultDB или в вашем собственном облачном аккаунте.
+          Каждое приложение получает изолированное пространство имён, которым
+          полностью управляет: создаёт собственную схему, отвечает за свои миграции и
+          распоряжается жизненным циклом своих данных. Никакой глобальной модели
+          данных. Никакой привязки к поставщику.
+        </p>
+      </div>
+
+      <div class="vaulttree" role="img" aria-label="Пример хранилища пользователя с пространствами имён приложений">
+        <div class="top"><i></i> хранилище пользователя</div>
+<pre><b>your-vault</b>
+├── <a class="ns" href="https://sneat.app" target="_blank" rel="noopener">sneat.app</a>
+│     ├── schema  v3
+│     └── records
+├── <a class="ns" href="https://issuenumber.one/" target="_blank" rel="noopener">app.issuenumber.one</a>
+│     ├── schema  v1
+│     └── records
+└── <span class="ns">app.example.com</span>
+      ├── schema  v7
+      └── records</pre>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CAPABILITIES ============ -->
+  <section class="features" id="features">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Что даёт протокол</span>
+        <h2>Владение, переносимость и полный журнал изменений — по замыслу.</h2>
+      </div>
+
+      <div class="grid">
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.5-3 7.5-7 9-4-1.5-7-4.5-7-9V6l7-3z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <h3>Данные принадлежат пользователю</h3>
+          <p>Экземпляр OpenVaultDB принадлежит вам. Приложения получают токены и права доступа с ограниченной областью действия, которые можно отозвать, — но никогда не владение вашими данными.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M4 9h16M9 9v11" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          <h3>Пространства имён приложений</h3>
+          <p>Каждое приложение получает изолированную область, где создаёт, изменяет и удаляет собственную схему и данные. Миграции и версионирование — на стороне приложения.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7c0-1.7 3.6-3 8-3s8 1.3 8 3-3.6 3-8 3-8-1.3-8-3z" stroke="currentColor" stroke-width="1.6"/><path d="M4 7v10c0 1.7 3.6 3 8 3s8-1.3 8-3V7M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          <h3>Своё хранилище данных</h3>
+          <p>Разверните у себя, возьмите управляемый тариф или подключите собственные Firestore, Postgres, SQLite или облачную БД через адаптеры хранилищ DALgo.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><circle cx="6" cy="6" r="2.6" stroke="currentColor" stroke-width="1.6"/><circle cx="6" cy="18" r="2.6" stroke="currentColor" stroke-width="1.6"/><circle cx="18" cy="12" r="2.6" stroke="currentColor" stroke-width="1.6"/><path d="M6 8.6v6.8M8.4 7.2l7.4 3.6M8.4 16.8l7.4-3.6" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          <h3>История на основе Git</h3>
+          <p>Эталонный движок inGitDB версионирует каждое изменение: история коммитов, журнал аудита и возможность откатить запись, таблицу или всё хранилище целиком.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.6"/><path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="15" r="1.6" fill="currentColor"/></svg></div>
+          <h3>Ограниченный, отзываемый доступ</h3>
+          <p>Доступ строится на токенах и правах доступа с ограниченной областью действия, которые можно отозвать в любой момент. Ваши данные остаются в выбранном вами хранилище; в MVP данные хранилища не шифруются, поэтому выбирайте хост, которому доверяете.</p>
+        </article>
+
+        <article class="card">
+          <div class="ico"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="19" cy="18" r="2.4" stroke="currentColor" stroke-width="1.6"/></svg></div>
+          <h3>Переносимый API запросов</h3>
+          <p>TugQL открывает только те возможности, что переносимы между всеми бэкендами, — поэтому запросы, работающие на Git, работают и на Postgres, SQLite или Firestore.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SERVERLESS ============ -->
+  <section class="serverless">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">Сервер не нужен</span>
+        <h2 class="sl-title">Ваш браузер пишет прямо в ваш Git-репозиторий.</h2>
+        <p class="sl-lead">
+          В базовом бессерверном режиме и в режиме самостоятельного размещения приложение читает и
+          записывает ваши данные прямо из браузера в Git-репозиторий, которым вы владеете, —
+          с аутентификацией через собственный вход приложения через GitHub или через
+          fine-grained токен, который вы выдаёте. OpenVaultDB вообще не участвует в основном
+          пути данных. Для необязательного управляемого резервного копирования и экспорта
+          OpenVaultDB отдельный сервис владеет собственным GitHub App. inGitDB и INGR.io
+          сохраняют каждое изменение как чистый коммит, который можно слить.
+        </p>
+        <ul class="sl-points">
+          <li>Базовые и самостоятельно размещаемые приложения работают с GitHub напрямую; управляемый экспорт — необязательный отдельный сервис</li>
+          <li>Приватные репозитории — для приватных данных, публичные — для публичных</li>
+          <li>Ваши данные живут в репозитории под вашим контролем — клонируйте его куда угодно</li>
+        </ul>
+        <p class="sl-note">
+          Лучше всего подходит для личного использования и редко меняющихся данных.
+          Нужна пропускная способность записи или масштаб? Запустите inGitDB на сервере
+          или используйте облачную базу данных или РСУБД через DALgo — выбирайте
+          инструмент под задачу.
+        </p>
+        <div class="actions" style="margin-top:24px">
+          <a class="btn btn-ghost" href="/docs/auth-model" lang="en">
+            Читать полную модель аутентификации (на английском)
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <div class="sl-flow" aria-label="Бессерверный поток данных: от браузера к вашему репозиторию GitHub">
+        <div class="sl-node">
+          <span class="sl-k">Ваш браузер</span>
+          <span class="sl-v">приложение + TugQL</span>
+        </div>
+        <div class="sl-arrow">GitHub API ↓</div>
+        <div class="sl-node accent">
+          <span class="sl-k">Ваш репозиторий GitHub</span>
+          <span class="sl-v">приватный или публичный · inGitDB / INGR.io</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ARCHITECTURE ============ -->
+  <section class="arch" id="architecture">
+    <div class="wrap">
+      <div>
+        <span class="eyebrow">Как всё складывается</span>
+        <h2 style="font-family:var(--font-display);font-weight:360;font-size:clamp(30px,4.4vw,50px);letter-spacing:-.02em;line-height:1.05;margin:16px 0 18px;">Один протокол — много бэкендов.</h2>
+        <p style="color:var(--text-dim);margin:0 0 22px;">
+          OpenVaultDB определяет протокол и API. Запросы проходят через TugQL в DALgo —
+          слой абстракции данных, — который отображает их на выбранный вами адаптер
+          хранилища. Эталонный путь записывает Git-дружественные файлы INGR.io в
+          Git-репозиторий.
+        </p>
+        <div class="adapters">
+          <span>inGitDB</span><span>SQLite</span><span>PostgreSQL</span><span>Firestore</span>
+          <span class="future">DynamoDB · скоро</span><span class="future">Cosmos DB · скоро</span><span class="future">S3 · скоро</span>
+        </div>
+      </div>
+
+      <div class="stack" aria-label="Архитектурный стек OpenVaultDB, сверху вниз">
+        <div class="layer"><span class="name">Приложение</span><span class="role">запросы и разрешения</span></div>
+        <div class="connector"></div>
+        <div class="layer accent"><span class="name">OpenVaultDB</span><span class="role">протокол и API</span></div>
+        <div class="connector"></div>
+        <div class="layer"><span class="name">TugQL</span><span class="role">переносимый язык запросов</span></div>
+        <div class="connector"></div>
+        <div class="layer"><span class="name">DALgo</span><span class="role">слой абстракции данных</span></div>
+        <div class="connector"></div>
+        <div class="layer"><span class="name">Адаптер хранилища</span><span class="role">inGitDB · SQLite · Postgres · Firestore</span></div>
+        <div class="connector"></div>
+        <div class="layer"><span class="name">INGR.io → Git</span><span class="role">версионируемое хранилище, удобное для diff</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ECOSYSTEM ============ -->
+  <section class="ecosystem" id="ecosystem">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Экосистема</span>
+        <h2>Небольшое семейство сфокусированных, совместимых частей.</h2>
+      </div>
+
+      <div class="eco-list">
+        <div class="eco"><span class="tag">DataTug</span><div><h3><a href="https://datatug.app" target="_blank" rel="noopener">DataTug <span class="arr">↗</span></a></h3><p>DataTug помогает разработчикам изучать схемы баз данных, писать и выполнять запросы и разбираться в их результатах. Его архитектура хранения сессий на основе OpenVaultDB находится в разработке. <a href="https://datatug.app/en/under-the-hood/tools-we-built/" target="_blank" rel="noopener" lang="en">Как создавались инструменты разработки DataTug (на английском).</a></p></div></div>
+        <div class="eco"><span class="tag">TugQL</span><div><h3><a href="https://tugql.org/" target="_blank" rel="noopener">Язык запросов <span class="arr">↗</span></a></h3><p>Основной API. Переносимый язык запросов и изменений, построенный на возможностях DALgo, — намеренно не полноценный SQL.</p></div></div>
+        <div class="eco"><span class="tag">DALgo</span><div><h3><a href="https://dalgo.io" target="_blank" rel="noopener">Слой абстракции данных <span class="arr">↗</span></a></h3><p>Отображает переносимые запросы на провайдеры бэкендов, так что одна модель запросов охватывает множество баз данных.</p></div></div>
+        <div class="eco"><span class="tag">inGitDB</span><div><h3><a href="https://ingitdb.com/" target="_blank" rel="noopener">Движок на основе Git <span class="arr">↗</span></a></h3><p>Эталонный движок хранения. Проверяемая история, простой откат и версионируемые данные поверх Git.</p></div></div>
+        <div class="eco"><span class="tag">INGR.io</span><div><h3><a href="https://ingr.io/" target="_blank" rel="noopener">Формат хранения <span class="arr">↗</span></a></h3><p>Git-дружественный структурированный формат, рассчитанный на чистые диффы, слияния и разрешение конфликтов.</p></div></div>
+
+        <div class="eco"><span class="tag">Хранилище</span><div><h3><a href="https://github.com/openvaultdb/openvaultdb-go" target="_blank" rel="noopener">Эталонная реализация <span class="arr">↗</span></a></h3><p>Библиотеки на Go и эталонный сервер OpenVaultDB — переносимые бэкенды хранения и поддержка запросов TugQL. Запустите собственное хранилище.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ ROADMAP / SCOPE ============ -->
+  <section class="scope" id="scope">
+    <div class="wrap">
+      <div class="section-head">
+        <span class="eyebrow">Объём MVP</span>
+        <h2>Честно о том, что входит, что дальше и что позже.</h2>
+        <p>OpenVaultDB — ранний проект. Вот как очерчен первый этап.</p>
+      </div>
+
+      <div class="scope-cols">
+        <div class="scope-col now">
+          <h3><i></i> В MVP</h3>
+          <ul>
+            <li>Аутентификация и обмен токенами</li>
+            <li>Пространства имён приложений</li>
+            <li>Управление схемами</li>
+            <li>TugQL и CRUD-операции</li>
+            <li>Интеграция с DALgo</li>
+            <li>Бэкенд inGitDB</li>
+            <li>История версий</li>
+            <li>Базовый веб-интерфейс</li>
+            <li>Интеграция с DataTug</li>
+            <li>Самостоятельное размещение</li>
+          </ul>
+        </div>
+        <div class="scope-col maybe">
+          <h3><i></i> Возможно, войдёт</h3>
+          <ul>
+            <li>Бэкенд SQLite</li>
+            <li>Бэкенд PostgreSQL</li>
+            <li>Бэкенд Firestore</li>
+          </ul>
+        </div>
+        <div class="scope-col later">
+          <h3><i></i> Отложено</h3>
+          <ul>
+            <li>Расширенный GraphQL</li>
+            <li>Сложные соединения (joins)</li>
+            <li>Хранимые процедуры</li>
+            <li>Запросы между приложениями</li>
+            <li>Полная федерация</li>
+            <li>Расширенная модель совместного доступа</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DEFINED IN THE OPEN ============ -->
+  <section class="spec">
+    <div class="wrap">
+      <div class="spec-band">
+        <span class="eyebrow">Определено открыто</span>
+        <h2>Спецификация, а не импровизация.</h2>
+        <p>
+          Протокол OpenVaultDB и его эталонная реализация описаны как открытые
+          машиночитаемые спецификации по стандарту
+          <a class="spec-link" href="https://specscore.md/" target="_blank" rel="noopener"><strong>SpecScore.md</strong></a>.
+          Спецификация — источник истины, поэтому любой разработчик, любой инструмент
+          и любой ИИ-агент может прочитать её и построить совместимую реализацию.
+        </p>
+        <div class="actions">
+          <a class="btn btn-primary" href="https://specscore.md/" target="_blank" rel="noopener">Изучить SpecScore.md ↗</a>
+          <a class="btn btn-ghost" href="https://github.com/specscore" target="_blank" rel="noopener">SpecScore на GitHub ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CTA ============ -->
+  <section class="cta">
+    <div class="wrap">
+      <div class="panel">
+        <span class="eyebrow" style="justify-content:center;">Присоединяйтесь</span>
+        <h2>Помогите определить протокол для данных, принадлежащих пользователям.</h2>
+        <p>OpenVaultDB открыт и развивается открыто. Читайте архитектурные заметки, высказывайтесь по открытым вопросам или следите за тем, как формируется спецификация.</p>
+        <div class="actions">
+          <a class="btn btn-primary" href="https://github.com/openvaultdb" target="_blank" rel="noopener">
+            Открыть на GitHub
+            <svg viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </a>
+          <a class="btn btn-ghost" href="https://datatug.io" target="_blank" rel="noopener">Узнать о DataTug ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="site-footer">
+    <div class="wrap">
+      <div>
+        <span class="brand">
+          <svg viewBox="0 0 32 32" fill="none" aria-hidden="true" style="width:26px;height:26px;">
+            <rect x="2.5" y="2.5" width="27" height="27" rx="6" stroke="#c9a45c" stroke-width="1.5"/>
+            <circle cx="16" cy="16" r="8.5" stroke="#e7c684" stroke-width="1.5"/>
+            <circle cx="16" cy="16" r="3" fill="#c9a45c"/>
+          </svg>
+          <b>Open<span style="color:var(--brass)">Vault</span>DB</b>
+        </span>
+        <p>Открытый протокол для баз данных приложений, принадлежащих пользователям. Ваши данные, ваше хранилище, ваши правила.</p>
+      </div>
+
+      <div class="foot-links">
+        <div class="foot-col">
+          <p class="foot-label">Протокол</p>
+          <a href="#principle">Принцип</a>
+          <a href="#features">Возможности</a>
+          <a href="#architecture">Архитектура</a>
+          <a href="#scope">Дорожная карта</a>
+        </div>
+        <div class="foot-col">
+          <p class="foot-label">Экосистема</p>
+          <a href="https://tugql.org/" target="_blank" rel="noopener">TugQL ↗</a>
+          <a href="https://dalgo.io" target="_blank" rel="noopener">DALgo ↗</a>
+          <a href="https://ingr.io/" target="_blank" rel="noopener">INGR.io ↗</a>
+          <a href="https://ingitdb.com/" target="_blank" rel="noopener">inGitDB ↗</a>
+          <a href="https://datatug.io" target="_blank" rel="noopener">DataTug ↗</a>
+          <a href="https://github.com/openvaultdb/openvaultdb-go" target="_blank" rel="noopener">openvaultdb-go ↗</a>
+        </div>
+        <div class="foot-col">
+          <p class="foot-label">Документация (на английском)</p>
+          <a href="/install" lang="en">Install with AI</a>
+          <a href="/docs" lang="en">Overview</a>
+          <a href="/docs/auth-model" lang="en">Authentication model</a>
+        </div>
+        <div class="foot-col">
+          <p class="foot-label">Проект</p>
+          <a href="https://github.com/openvaultdb" target="_blank" rel="noopener">GitHub ↗</a>
+          <a href="https://github.com/openvaultdb/ovdb" target="_blank" rel="noopener">CLI ovdb ↗</a>
+          <a href="https://github.com/openvaultdb" target="_blank" rel="noopener">Открытые вопросы ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap">
+      <div class="legal">
+        <span>© 2026 OpenVaultDB · Apache-2.0</span>
+        <span>Ранний проект — возможны изменения</span>
+        <span><a href="/ru/privacy">Конфиденциальность</a> · <button type="button" class="linklike" data-analytics-choices hidden>Настройки аналитики</button></span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile nav toggle — the only JS this page needs.
+    var t = document.getElementById('navToggle');
+    var n = document.getElementById('nav');
+    t.addEventListener('click', function () {
+      var open = n.classList.toggle('open');
+      t.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+    n.addEventListener('click', function (e) {
+      if (e.target.tagName === 'A') { n.classList.remove('open'); t.setAttribute('aria-expanded', 'false'); }
+    });
+  </script>
+  <script type="module" src="/js/auth-ui.js"></script>
+  <script src="/js/copy-text.js" defer></script>
+  <script src="/js/video-config.js" defer></script>
+  <script src="/js/video-embed.js" defer></script>
+<div class="site-feedback"><button type="button" data-feedback-launcher aria-haspopup="dialog" hidden>Предложить улучшение</button></div>
+  <script id="site-feedback-widget" src="https://improveit.now/widget.js" data-space="ao58m" data-app="0e96104c8a9188fbdae1ea49369ece23" data-lang="ru" data-color="#0d63e9" data-launcher="hidden" defer></script>
+  <script src="/js/feedback.js" defer></script>
+</body>
+</html>

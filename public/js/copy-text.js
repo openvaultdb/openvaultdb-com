@@ -25,9 +25,9 @@
     button.disabled = true;
     try {
       await copyText(target.value ?? target.textContent);
-      button.textContent = "Copied";
+      button.textContent = button.dataset.copied || "Copied";
     } catch {
-      button.textContent = "Copy failed — select the text below";
+      button.textContent = button.dataset.copyFailed || "Copy failed — select the text below";
     }
     button.disabled = false;
     window.setTimeout(() => {

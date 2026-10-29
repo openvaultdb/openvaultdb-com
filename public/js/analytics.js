@@ -10,14 +10,34 @@
 
   var GA_ID = "G-B2RWRSXVZE";
   var KEY = "openvaultdb.analytics-consent.v1";
-  var PRIVACY_URL = "/privacy/#analytics";
-  var TEXT =
-    "We’d like to use Google Analytics to count visits and see which pages help. " +
-    "It sets cookies only if you accept.";
+  var COPY = {
+    en: {
+      privacyUrl: "/privacy/#analytics",
+      text:
+        "We’d like to use Google Analytics to count visits and see which pages help. " +
+        "It sets cookies only if you accept.",
+      region: "Analytics choice",
+      notice: "Privacy notice",
+      accept: "Accept analytics",
+      reject: "Reject",
+    },
+    ru: {
+      privacyUrl: "/ru/privacy/#analytics",
+      text:
+        "Мы хотели бы использовать Google Analytics, чтобы считать посещения и понимать, какие страницы полезны. " +
+        "Cookie устанавливаются, только если вы согласитесь.",
+      region: "Выбор по аналитике",
+      notice: "Уведомление о конфиденциальности",
+      accept: "Принять аналитику",
+      reject: "Отклонить",
+    },
+  };
 
   function create(win) {
     var doc = win.document;
     var loc = win.location;
+    var htmlLang = (doc.documentElement && doc.documentElement.lang) || "";
+    var T = /^ru(-|$)/i.test(htmlLang) ? COPY.ru : COPY.en;
     var memory = null; // accepted choice held when storage is unavailable
     var loaded = false;
     var banner = null;
@@ -256,18 +276,18 @@
       banner.className = "consent-banner";
       banner.id = "analytics-consent";
       banner.setAttribute("role", "region");
-      banner.setAttribute("aria-label", "Analytics choice");
+      banner.setAttribute("aria-label", T.region);
       banner.tabIndex = -1;
       var p = doc.createElement("p");
-      p.appendChild(doc.createTextNode(TEXT + " "));
+      p.appendChild(doc.createTextNode(T.text + " "));
       var a = doc.createElement("a");
-      a.href = PRIVACY_URL;
-      a.textContent = "Privacy notice";
+      a.href = T.privacyUrl;
+      a.textContent = T.notice;
       p.appendChild(a);
       var row = doc.createElement("div");
       row.className = "consent-actions";
-      row.appendChild(button("Accept analytics", "granted"));
-      row.appendChild(button("Reject", "denied"));
+      row.appendChild(button(T.accept, "granted"));
+      row.appendChild(button(T.reject, "denied"));
       banner.appendChild(p);
       banner.appendChild(row);
       // First child of <body>, so keyboard users reach it early; CSS fixes it to the bottom.

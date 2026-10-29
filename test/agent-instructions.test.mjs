@@ -26,6 +26,7 @@ test("generated static routes match the canonical instruction sources", () => {
       "agent-instructions/configure/index.html",
       "install/index.html",
       "index.html",
+      "ru/index.html",
       "agent-skills/openvaultdb/SKILL.md",
       "install.ps1",
       "install-skill.sh",

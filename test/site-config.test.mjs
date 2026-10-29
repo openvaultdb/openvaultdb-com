@@ -36,6 +36,13 @@ test("Wrangler config is assets-only (no Worker script) and keeps clean static r
 
   for (const path of [
     "index.html",
+    "ru/index.html",
+    "ru/privacy/index.html",
+    "og-ru.png",
+    "video/poster-en.svg",
+    "video/poster-ru.svg",
+    "js/video-config.js",
+    "js/video-embed.js",
     "install/index.html",
     "install.sh",
     "install.ps1",

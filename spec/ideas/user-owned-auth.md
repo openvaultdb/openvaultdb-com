@@ -70,7 +70,7 @@ to one self-hosted vault and read/write its own namespace.
 
 - **New Features this would create:** Authentication Model
 - **Existing Features affected:** none
-- **Dependencies:** Decision 0001 (Auth Architecture); Encryption model (separate) for multi-device keys
+- **Dependencies:** Decision 0001 (Auth Architecture). The MVP does not encrypt vault data, so access control rests on scoped, revocable tokens and grants; multi-device key management is deferred until an encryption model is specified.
 
 ## Open Questions
 

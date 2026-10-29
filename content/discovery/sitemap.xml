@@ -1,11 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>https://openvaultdb.com/</loc></url>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://openvaultdb.com/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://openvaultdb.com/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://openvaultdb.com/ru" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://openvaultdb.com/" />
+  </url>
+  <url>
+    <loc>https://openvaultdb.com/ru</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://openvaultdb.com/" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://openvaultdb.com/ru" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://openvaultdb.com/" />
+  </url>
   <url><loc>https://openvaultdb.com/install</loc></url>
   <url><loc>https://openvaultdb.com/docs</loc></url>
   <url><loc>https://openvaultdb.com/docs/auth-model</loc></url>
   <url><loc>https://openvaultdb.com/agent-instructions/install</loc></url>
   <url><loc>https://openvaultdb.com/agent-instructions/onboarding</loc></url>
   <url><loc>https://openvaultdb.com/agent-instructions/configure</loc></url>
-  <url><loc>https://openvaultdb.com/privacy</loc></url>
+  <url>
+    <loc>https://openvaultdb.com/privacy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://openvaultdb.com/privacy" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://openvaultdb.com/ru/privacy" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://openvaultdb.com/privacy" />
+  </url>
+  <url>
+    <loc>https://openvaultdb.com/ru/privacy</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://openvaultdb.com/privacy" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://openvaultdb.com/ru/privacy" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://openvaultdb.com/privacy" />
+  </url>
 </urlset>

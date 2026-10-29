@@ -260,47 +260,95 @@ function installPage(instructions) {
   });
 }
 
-function homeInstallSection() {
+// Per-locale copy for the generated homepage install block. Commands and the
+// agent prompt are identical in every locale (code stays as is); only the
+// surrounding words are translated. The rest of each homepage is hand-written
+// in public/index.html (en) and public/ru/index.html (ru).
+const homeInstallCopy = {
+  en: {
+    eyebrow: "Install OpenVaultDB",
+    title: "Ask your agent—or run one command.",
+    lead: "The direct installers download the matching official release, verify its SHA-256 checksum, and need no Go toolchain.",
+    more: "See full install options",
+    agent: "AI agent",
+    recommended: "Recommended",
+    unix: "macOS or Linux",
+    terminal: "Terminal",
+    windows: "Windows",
+    powershell: "PowerShell",
+    copyPrompt: "Copy prompt",
+    copyCommand: "Copy command",
+    copied: "Copied",
+    copyFailed: "Copy failed — select the text below",
+    trust: `These shortcuts trust the installer served by <code>openvaultdb.com</code>. <a href="/install.sh">Review shell source</a> · <a href="/install.ps1">Review PowerShell source</a>. Each installer verifies the downloaded release checksum before installing it. Prefer <a href="/agent-instructions/install">Homebrew through the guided install</a> when you want package-manager provenance.`,
+  },
+  ru: {
+    eyebrow: "Установка OpenVaultDB",
+    title: "Попросите агента — или выполните одну команду.",
+    lead: "Прямые установщики скачивают подходящий официальный релиз, проверяют его контрольную сумму SHA-256 и не требуют Go.",
+    more: "Все варианты установки (на английском)",
+    agent: "ИИ-агент",
+    recommended: "Рекомендуется",
+    unix: "macOS или Linux",
+    terminal: "Терминал",
+    windows: "Windows",
+    powershell: "PowerShell",
+    copyPrompt: "Скопировать запрос",
+    copyCommand: "Скопировать команду",
+    copied: "Скопировано",
+    copyFailed: "Не удалось скопировать — выделите текст ниже",
+    trust: `Эти команды доверяют установщику, который отдаёт <code>openvaultdb.com</code>. <a href="/install.sh">Исходник для shell</a> · <a href="/install.ps1">Исходник для PowerShell</a>. Каждый установщик проверяет контрольную сумму скачанного релиза перед установкой. Если вам важна поставка через менеджер пакетов, выбирайте <a href="/agent-instructions/install" lang="en">Homebrew через пошаговую установку</a> (на английском).`,
+  },
+};
+
+export const homePages = { en: "index.html", ru: "ru/index.html" };
+
+function homeInstallSection(locale = "en") {
+  const c = homeInstallCopy[locale];
+  // English is the built-in default in public/js/copy-text.js, so only other locales carry labels.
+  const copied = locale === "en" ? "" : `data-copied="${escapeHTML(c.copied)}" data-copy-failed="${escapeHTML(c.copyFailed)}" `;
+  const more = locale === "en" ? "" : ' lang="en"';
   return `${homeStart}
   <section class="home-install" aria-labelledby="home-install-title">
     <div class="wrap">
       <div class="home-install-copy">
-        <span class="eyebrow">Install OpenVaultDB</span>
-        <h2 id="home-install-title">Ask your agent—or run one command.</h2>
-        <p>The direct installers download the matching official release, verify its SHA-256 checksum, and need no Go toolchain.</p>
-        <a class="btn btn-ghost" href="/install">See full install options</a>
+        <span class="eyebrow">${c.eyebrow}</span>
+        <h2 id="home-install-title">${c.title}</h2>
+        <p>${c.lead}</p>
+        <a class="btn btn-ghost" href="/install"${more}>${c.more}</a>
       </div>
       <div class="home-install-options">
         <article class="home-install-option home-prompt">
-          <div class="home-install-option-head"><span>AI agent</span><strong>Recommended</strong></div>
+          <div class="home-install-option-head"><span>${c.agent}</span><strong>${c.recommended}</strong></div>
           <pre><code id="home-short-prompt">${escapeHTML(shortPrompt)}</code></pre>
-          <button class="btn btn-primary" type="button" data-copy-target="home-short-prompt" aria-live="polite">Copy prompt</button>
+          <button class="btn btn-primary" type="button" data-copy-target="home-short-prompt" ${copied}aria-live="polite">${c.copyPrompt}</button>
         </article>
         <article class="home-install-option">
-          <div class="home-install-option-head"><span>macOS or Linux</span><strong>Terminal</strong></div>
+          <div class="home-install-option-head"><span>${c.unix}</span><strong>${c.terminal}</strong></div>
           <pre><code id="home-unix-install">(p=$(mktemp) &amp;&amp; trap 'rm -f "$p"' EXIT &amp;&amp; curl -fsSL https://openvaultdb.com/install.sh -o "$p" &amp;&amp; sh "$p")</code></pre>
-          <button class="btn btn-ghost" type="button" data-copy-target="home-unix-install" aria-live="polite">Copy command</button>
+          <button class="btn btn-ghost" type="button" data-copy-target="home-unix-install" ${copied}aria-live="polite">${c.copyCommand}</button>
         </article>
         <article class="home-install-option">
-          <div class="home-install-option-head"><span>Windows</span><strong>PowerShell</strong></div>
+          <div class="home-install-option-head"><span>${c.windows}</span><strong>${c.powershell}</strong></div>
           <pre><code id="home-windows-install">$p=Join-Path $env:TEMP ("ovdb-"+[guid]::NewGuid()+".ps1"); try { irm https://openvaultdb.com/install.ps1 -OutFile $p -EA Stop; &amp; $p } finally { Remove-Item $p -EA SilentlyContinue }</code></pre>
-          <button class="btn btn-ghost" type="button" data-copy-target="home-windows-install" aria-live="polite">Copy command</button>
+          <button class="btn btn-ghost" type="button" data-copy-target="home-windows-install" ${copied}aria-live="polite">${c.copyCommand}</button>
         </article>
-        <p class="home-install-trust">These shortcuts trust the installer served by <code>openvaultdb.com</code>. <a href="/install.sh">Review shell source</a> · <a href="/install.ps1">Review PowerShell source</a>. Each installer verifies the downloaded release checksum before installing it. Prefer <a href="/agent-instructions/install">Homebrew through the guided install</a> when you want package-manager provenance.</p>
+        <p class="home-install-trust">${c.trust}</p>
       </div>
     </div>
   </section>
   ${homeEnd}`;
 }
 
-function generatedHomepage() {
-  const source = readFileSync(join(publicDir, "index.html"), "utf8");
+function generatedHomepage(locale = "en") {
+  const file = homePages[locale];
+  const source = readFileSync(join(publicDir, file), "utf8");
   const start = source.indexOf(homeStart);
   const end = source.indexOf(homeEnd);
   if (start < 0 || end < start) {
-    throw new Error("public/index.html is missing the generated AI install markers");
+    throw new Error(`public/${file} is missing the generated AI install markers`);
   }
-  return source.slice(0, start) + homeInstallSection() + source.slice(end + homeEnd.length);
+  return source.slice(0, start) + homeInstallSection(locale) + source.slice(end + homeEnd.length);
 }
 
 function generatedSkillInstaller() {
@@ -318,10 +366,12 @@ function generatedWindowsSkillInstaller() {
 }
 
 // Shared by every generated public page; account and connect pages stay isolated.
-export function addFeedback(html) {
+const feedbackLabel = { en: "Suggest an improvement", ru: "Предложить улучшение" };
+
+export function addFeedback(html, locale = "en") {
   if (html.includes('id="site-feedback-widget"')) return html;
-  return html.replace('</body>', `<div class="site-feedback"><button type="button" data-feedback-launcher aria-haspopup="dialog" hidden>Suggest an improvement</button></div>
-  <script id="site-feedback-widget" src="https://improveit.now/widget.js" data-space="ao58m" data-app="0e96104c8a9188fbdae1ea49369ece23" data-lang="en" data-color="#0d63e9" data-launcher="hidden" defer></script>
+  return html.replace('</body>', `<div class="site-feedback"><button type="button" data-feedback-launcher aria-haspopup="dialog" hidden>${feedbackLabel[locale]}</button></div>
+  <script id="site-feedback-widget" src="https://improveit.now/widget.js" data-space="ao58m" data-app="0e96104c8a9188fbdae1ea49369ece23" data-lang="${locale}" data-color="#0d63e9" data-launcher="hidden" defer></script>
   <script src="/js/feedback.js" defer></script>
 </body>`);
 }
@@ -333,7 +383,9 @@ export function buildOutputs() {
     outputs.set(`agent-instructions/${name}/index.html`, instructionPage(name, instructions[name]));
   }
   outputs.set("install/index.html", installPage(instructions));
-  outputs.set("index.html", generatedHomepage());
+  for (const locale of Object.keys(homePages)) {
+    outputs.set(homePages[locale], generatedHomepage(locale));
+  }
   outputs.set("agent-skills/openvaultdb/SKILL.md", canonicalSkill);
   outputs.set("install.ps1", readFileSync(windowsInstallerTemplatePath, "utf8"));
   outputs.set("install-skill.sh", generatedSkillInstaller());
@@ -342,7 +394,7 @@ export function buildOutputs() {
     outputs.set(name, readFileSync(join(discoveryDir, name), "utf8"));
   }
   for (const [path, html] of outputs) {
-    if (path.endsWith(".html")) outputs.set(path, addFeedback(html));
+    if (path.endsWith(".html")) outputs.set(path, addFeedback(html, path.startsWith("ru/") ? "ru" : "en"));
   }
   return outputs;
 }
