@@ -17,8 +17,16 @@ test('all generated and static public pages have one exact product feedback widg
   }
 });
 
-test('private account and connect pages do not load feedback scripts', () => {
-  for (const path of ['connect/index.html', 'my/index.html', 'my/apps/index.html', 'my/vaults/index.html']) {
-    assert.doesNotMatch(readFileSync(new URL(path, publicDir), 'utf8'), /improveit.now|feedback.js/);
+test('private documents expose only a local opt-in launcher with a fixed screen', () => {
+  const screens = new Map([
+    ['connect/index.html', 'ovdb-connect'], ['my/index.html', 'ovdb-account'],
+    ['my/apps/index.html', 'ovdb-apps'], ['my/vaults/index.html', 'ovdb-vaults'],
+  ]);
+  for (const [path, screen] of screens) {
+    const html = readFileSync(new URL(path, publicDir), 'utf8');
+    assert.match(html, /data-private-feedback aria-haspopup="dialog" hidden/);
+    assert.ok(html.includes(`data-feedback-screen="${screen}"`), path);
+    assert.match(html, /type="module" src="\/js\/private-feedback.js"/);
+    assert.doesNotMatch(html, /improveit.now|src="[^" ]*feedback.js"[^>]*data-app|rel="(?:preconnect|prefetch)"[^>]*improveit/);
   }
 });

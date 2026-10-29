@@ -1,14 +1,19 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="has-private-feedback">
 <head>
   <meta charset="utf-8" />
   <meta name="robots" content="noindex" />
   <meta http-equiv="refresh" content="0; url=/my/vaults" />
   <link rel="canonical" href="/my/vaults" />
   <title>Redirecting…</title>
+  <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
   <script>location.replace("/my/vaults");</script>
   <p><a href="/my/vaults">Continue to your vaults</a></p>
+  <div class="site-feedback private-feedback" aria-label="Product feedback">
+    <button type="button" data-private-feedback aria-haspopup="dialog" hidden>Suggest an improvement</button>
+  </div>
+  <script type="module" src="/js/private-feedback.js" data-feedback-screen="ovdb-account"></script>
 </body>
 </html>

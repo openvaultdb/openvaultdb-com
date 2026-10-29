@@ -959,3 +959,16 @@ html.has-consent-banner .site-feedback button { bottom: calc(var(--consent-banne
   .film-play-icon { width: 64px; height: 64px; margin: -32px 0 0 -32px; }
   .film-play-icon::after { left: 25px; top: 19px; border-width: 12px 0 12px 19px; }
 }
+
+/* Private app launchers follow this host's effective light palette, including
+   when the operating system prefers dark. The footer reserve above also
+   keeps the final account/privacy controls clear of the floating button. */
+.private-feedback button,
+.private-feedback button:hover {
+  background: var(--surface); color: var(--navy); border-color: var(--line-2);
+  padding-inline: 18px;
+}
+.private-feedback button:focus-visible { outline-color: var(--navy); }
+.private-feedback button[aria-disabled="true"] { cursor: progress; opacity: .8; }
+
+html.has-private-feedback { color-scheme: light; }

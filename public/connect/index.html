@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="has-private-feedback">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -92,5 +92,9 @@
 
   <script type="module" src="/js/auth-ui.js"></script>
   <script type="module" src="/js/connect.js"></script>
+  <div class="site-feedback private-feedback" aria-label="Product feedback">
+    <button type="button" data-private-feedback aria-haspopup="dialog" hidden>Suggest an improvement</button>
+  </div>
+  <script type="module" src="/js/private-feedback.js" data-feedback-screen="ovdb-connect"></script>
 </body>
 </html>

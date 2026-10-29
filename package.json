@@ -14,7 +14,8 @@
     "site:dry-run": "wrangler deploy --dry-run --outdir .wrangler/dry-run",
     "deploy:cloudflare": "npm run check && wrangler deploy",
     "e2e": "playwright test",
-    "e2e:analytics": "playwright test -c playwright.analytics.config.ts"
+    "e2e:analytics": "playwright test -c playwright.analytics.config.ts",
+    "e2e:feedback": "playwright test -c playwright.feedback.config.ts"
   },
   "repository": {
     "type": "git",
