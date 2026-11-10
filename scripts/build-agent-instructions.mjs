@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { renderTechStackPage } from "./tech-stack-pages.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const contentDir = join(root, "content", "agent-instructions");
@@ -386,6 +387,8 @@ export function buildOutputs() {
   for (const locale of Object.keys(homePages)) {
     outputs.set(homePages[locale], generatedHomepage(locale));
   }
+  outputs.set("about/tech-stack/index.html", renderTechStackPage("en"));
+  outputs.set("ru/about/tech-stack/index.html", renderTechStackPage("ru"));
   outputs.set("agent-skills/openvaultdb/SKILL.md", canonicalSkill);
   outputs.set("install.ps1", readFileSync(windowsInstallerTemplatePath, "utf8"));
   outputs.set("install-skill.sh", generatedSkillInstaller());

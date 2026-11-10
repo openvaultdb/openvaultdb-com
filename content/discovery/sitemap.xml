@@ -30,4 +30,16 @@
     <xhtml:link rel="alternate" hreflang="ru" href="https://openvaultdb.com/ru/privacy" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://openvaultdb.com/privacy" />
   </url>
+  <url>
+    <loc>https://openvaultdb.com/about/tech-stack</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://openvaultdb.com/about/tech-stack" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://openvaultdb.com/ru/about/tech-stack" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://openvaultdb.com/about/tech-stack" />
+  </url>
+  <url>
+    <loc>https://openvaultdb.com/ru/about/tech-stack</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://openvaultdb.com/about/tech-stack" />
+    <xhtml:link rel="alternate" hreflang="ru" href="https://openvaultdb.com/ru/about/tech-stack" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://openvaultdb.com/about/tech-stack" />
+  </url>
 </urlset>

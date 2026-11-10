@@ -31,10 +31,24 @@ test("hreflang annotations are reciprocal and x-default is English", () => {
   for (const [en, ru, enFile, ruFile] of [
     ["/", "/ru", "public/index.html", "public/ru/index.html"],
     ["/privacy", "/ru/privacy", "public/privacy/index.html", "public/ru/privacy/index.html"],
+    ["/about/tech-stack", "/ru/about/tech-stack", "public/about/tech-stack/index.html", "public/ru/about/tech-stack/index.html"],
   ]) {
     const expected = { en: BASE + en, ru: BASE + ru, "x-default": BASE + en };
     assert.deepEqual(alternates(read(enFile)), expected, enFile);
     assert.deepEqual(alternates(read(ruFile)), expected, ruFile);
+  }
+});
+
+test("tech stack pages explain the current site and proposed protocol in both languages", () => {
+  for (const [locale, path] of [["en", "about/tech-stack"], ["ru", "ru/about/tech-stack"]]) {
+    const html = read(`public/${path}/index.html`);
+    assert.ok(html.includes(`<html lang="${locale}">`), path);
+    assert.ok(html.includes(`<link rel="canonical" href="${BASE}/${path}" />`), path);
+    assert.equal((html.match(/<h1[\\s>]/g) || []).length, 1, path);
+    assert.match(html, /"@type":"AboutPage"/, path);
+    assert.match(html, /"@type":"BreadcrumbList"/, path);
+    assert.ok(html.includes("https://github.com/openvaultdb/openvaultdb-go"), path);
+    assert.ok(html.includes("https://tugql.org/"), path);
   }
 });
 
