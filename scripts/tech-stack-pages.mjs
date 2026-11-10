@@ -20,6 +20,9 @@ const copy = {
     relatedText: "DataTug explores databases and queries. TugQL defines the query layer, DALgo provides data access, and inGitDB explores Git-backed storage.",
     privacy: "Privacy",
     analytics: "Analytics choices",
+    docs: "Docs",
+    install: "Install",
+    menu: "Open menu",
   },
   ru: {
     title: "Технологии OpenVaultDB — сайт, протокол и хранение",
@@ -39,6 +42,9 @@ const copy = {
     relatedText: "DataTug помогает исследовать базы данных и запросы. TugQL задаёт язык запросов, DALgo обеспечивает доступ к данным, а inGitDB исследует хранение данных в Git.",
     privacy: "Конфиденциальность",
     analytics: "Настройки аналитики",
+    docs: "Документация",
+    install: "Установка",
+    menu: "Открыть меню",
   },
 };
 
@@ -94,9 +100,9 @@ export function renderTechStackPage(locale) {
 <body>
   <header class="site-header"><div class="wrap">
     <a class="brand" href="${home}" aria-label="OpenVaultDB"><b>Open<span>Vault</span>DB</b></a>
-    <nav class="nav" id="nav"><a href="${home}">${c.home}</a><a href="/docs">Docs</a><a href="/install">Install</a><a href="https://github.com/openvaultdb">GitHub ↗</a></nav>
+    <nav class="nav" id="nav"><a href="${home}">${c.home}</a><a href="/docs"${locale === "ru" ? ' lang="en"' : ""}>${c.docs}</a><a href="/install"${locale === "ru" ? ' lang="en"' : ""}>${c.install}</a><a href="https://github.com/openvaultdb">GitHub ↗</a></nav>
     <a class="lang-switch" href="${alternate}" hreflang="${locale === "en" ? "ru" : "en"}" lang="${locale === "en" ? "ru" : "en"}">${c.switchLabel}</a>
-    <button class="nav-toggle" id="navToggle" aria-label="Menu" aria-expanded="false">☰</button>
+    <button class="nav-toggle" id="navToggle" aria-label="${c.menu}" aria-expanded="false">☰</button>
   </div></header>
   <main id="main">
     <section class="tech-head"><div class="wrap" style="max-width:820px">
