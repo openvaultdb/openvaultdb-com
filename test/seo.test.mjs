@@ -75,6 +75,8 @@ test("sitemap lists indexable URLs and skips signed-in routes", () => {
     "https://openvaultdb.com/agent-instructions/onboarding",
     "https://openvaultdb.com/agent-instructions/configure",
     "https://openvaultdb.com/privacy",
+    "https://openvaultdb.com/about/tech-stack",
+    "https://openvaultdb.com/ru/about/tech-stack",
   ]) {
     assert.ok(sitemap.includes(`<loc>${url}</loc>`), url);
   }
